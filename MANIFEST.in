@@ -1,7 +1,7 @@
 include README.md
 include .readthedocs.yaml
-recursive-include assets *.png
-recursive-include docs *.py *.md *.css *.png *.html *.ipynb
+recursive-include assets *.png *.pdf
+recursive-include docs *.py *.md *.css *.png *.pdf *.html *.ipynb
 prune docs/_build
 recursive-include notebooks *.ipynb
 recursive-include examples *.py

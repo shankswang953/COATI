@@ -1,6 +1,8 @@
 # COATI
 
-![COATI — Cross-Omics Alignment for Trajectory Inference](_static/coati-logo.png)
+[![COATI overview: inputs, coupled dynamics and model architecture](_static/coati-overview.png)](_static/coati-overview.pdf)
+
+[View overview PDF](_static/coati-overview.pdf)
 
 Learn continuous trajectories from time-indexed snapshots, with optional constraints from a paired second modality. COATI wraps the TraInf research engine in an installable package with explicit inputs, reusable configuration and reloadable results.
 
