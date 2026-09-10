@@ -1,0 +1,7 @@
+{
+  "regression_tests_passed": 12,
+  "sphinx_warnings_as_errors": "passed",
+  "wheel_and_sdist_build": "passed",
+  "wheel_import_outside_source": "passed",
+  "biological_training_run": false
+}

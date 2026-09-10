@@ -1,0 +1,27 @@
+[
+  {
+    "mode": "balanced",
+    "iterations": 4,
+    "max_parameter_difference": 0.0
+  },
+  {
+    "mode": "kernel_sync",
+    "iterations": 4,
+    "max_parameter_difference": 0.0
+  },
+  {
+    "mode": "unbalanced",
+    "iterations": 4,
+    "max_parameter_difference": 0.0
+  },
+  {
+    "mode": "diagnostic_100",
+    "iterations": 100,
+    "max_parameter_difference": 0.0
+  },
+  {
+    "mode": "adaptive",
+    "iterations": 4,
+    "max_parameter_difference": 0.0
+  }
+]

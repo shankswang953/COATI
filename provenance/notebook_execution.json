@@ -1,0 +1,26 @@
+[
+  {
+    "notebook": "01_gaussian.ipynb",
+    "code_cells": 9,
+    "seconds": 7.0,
+    "status": "passed"
+  },
+  {
+    "notebook": "02_paired.ipynb",
+    "code_cells": 10,
+    "seconds": 8.47,
+    "status": "passed"
+  },
+  {
+    "notebook": "03_split.ipynb",
+    "code_cells": 9,
+    "seconds": 6.8,
+    "status": "passed"
+  },
+  {
+    "notebook": "04_inputs.ipynb",
+    "code_cells": 5,
+    "seconds": 1.76,
+    "status": "passed"
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "gaussian": {
+    "endpoint_sinkhorn_before": 0.14770656824111938,
+    "endpoint_sinkhorn_after": 0.00045530800707638264,
+    "kinetic_energy_mean": 0.1398342251777649,
+    "endpoint_sampling_floor": 0.0002629088703542948
+  },
+  "split": {
+    "endpoint_sinkhorn_before": 0.1465214043855667,
+    "endpoint_sinkhorn_after": 0.0034225734416395426,
+    "kinetic_energy_mean": 0.15395508706569672,
+    "endpoint_sampling_floor": 0.0018356784712523222
+  },
+  "paired": {
+    "endpoint_sinkhorn_before": 0.14770656824111938,
+    "endpoint_sinkhorn_after": 0.00016607437282800674,
+    "kinetic_energy_mean": 0.1486722081899643,
+    "endpoint_sampling_floor": 0.0002629088703542948,
+    "secondary_endpoint_sinkhorn": 0.0015189382247626781
+  },
+  "unbalanced": {
+    "endpoint_sinkhorn_before": 0.1465214043855667,
+    "endpoint_sinkhorn_after": 0.0037763561122119427,
+    "kinetic_energy_mean": 0.0011688948143273592,
+    "endpoint_sampling_floor": 0.0018356784712523222,
+    "predicted_mass_ratio": 0.9675921201705933,
+    "observed_count_ratio": 2.0
+  }
+}

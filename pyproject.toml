@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "coati-trajectory"
+version = "0.1.0"
+description = "Cross-Omics Alignment for Trajectory Inference"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "torch>=2.1", "torchdiffeq>=0.2.3", "geomloss>=0.2.6", "POT>=0.9", "scikit-learn>=1.3", "matplotlib>=3.7", "pandas>=2", "tensorboard>=2.14", "tqdm>=4.65"]
+
+[project.optional-dependencies]
+anndata = ["anndata>=0.10"]
+notebooks = ["jupyterlab>=4", "ipykernel>=6", "nbformat>=5", "nbclient>=0.10"]
+docs = ["sphinx>=7", "furo>=2024.1.29", "myst-parser>=2", "nbsphinx>=0.9"]
+dev = ["pytest>=8", "build>=1", "nbclient>=0.10", "nbformat>=5"]
+legacy = ["scanpy>=1.10", "ipython>=8"]
+
+[project.scripts]
+coati = "coati.cli:main"
+coati-downstream = "coati.downstream.cli:main"
+
+[project.urls]
+Repository = "https://github.com/shankswang953/COATI"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+coati = ["_defaults.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

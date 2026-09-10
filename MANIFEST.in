@@ -1,0 +1,9 @@
+include README.md
+include .readthedocs.yaml
+recursive-include assets *.png
+recursive-include docs *.py *.md *.css *.png *.html *.ipynb
+prune docs/_build
+recursive-include notebooks *.ipynb
+recursive-include examples *.py
+recursive-include scripts *.py
+recursive-include provenance *.json
