@@ -2,7 +2,7 @@
 
 <p align="center"><a href="assets/coati-overview.pdf"><img src="assets/coati-overview.png" alt="COATI overview: inputs, coupled dynamics and model architecture" width="100%"></a></p>
 
-[View overview PDF](assets/coati-overview.pdf)
+[View overview PDF](assets/coati-overview.pdf) · [Watch the animated introduction](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Manim source](animations/)
 
 # COATI
 

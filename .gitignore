@@ -12,3 +12,6 @@ docs/_build/
 .DS_Store
 .venv-clean/
 site/
+
+.venv-manim/
+animations/media/
