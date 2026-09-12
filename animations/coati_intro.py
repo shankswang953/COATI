@@ -86,10 +86,10 @@ class LossPanels:
         sub=formula(r'\mathcal{L}=C_x\mathcal{A}_{X}+C_y\mathcal{A}_{Y}+\mathcal{L}_{\mathrm{Ref}}+\mathcal{L}_{\mathrm{Manifold}}+\mathcal{L}_{\mathrm{Mass}}',.31).move_to([0,2.65,0])
         self.play(FadeIn(title),FadeIn(sub),run_time=.6)
         for i,x in enumerate([-4.55,0,4.55]):
-            label=words(['Reference matching','Manifold support','Population mass'][i],21).move_to([x,1.87,0])
-            eq=formula([r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Ref}}',r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Manifold}}',r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Mass}}'][i],.26,MUTED).move_to([x,1.35,0])
-            start=np.array([x-1.35,-.43,0]);mid=np.array([x,.48,0]);end=np.array([x+1.32,-.08,0])
-            bg=VGroup(population(start,11,n=13,sx=.48,sy=.36),population(mid,7,n=18,sx=.50,sy=.40),population(end,4,n=19,sx=.54,sy=.41))
+            label=words(['Reference matching','Manifold support','Population mass'][i],21).move_to([x,2.02,0])
+            eq=formula([r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Ref}}',r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Manifold}}',r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Mass}}'][i],.26,MUTED).move_to([x,1.48,0])
+            start=np.array([x-1.38,-1.05,0]);mid=np.array([x,.35,0]);end=np.array([x+1.35,-.50,0])
+            bg=VGroup(population(start,11,n=13,sx=.56,sy=.52),population(mid,7,n=18,sx=.58,sy=.57),population(end,4,n=19,sx=.59,sy=.57))
             good=curve([start,mid,end],GREEN,2.5)
             if i==1:
                 rng=np.random.default_rng(5)
@@ -98,11 +98,10 @@ class LossPanels:
                 for t in np.linspace(.12,.9,25):
                     q=good.point_from_proportion(t)+np.array([0,rng.normal(0,.105),0])
                     bg.add(cell(q,.055,'#A8B7C2',rng.uniform(-.5,.5),.6))
-            self.play(FadeIn(label),FadeIn(eq),FadeIn(bg),run_time=.65)
-            green=cell(start,.10,GREEN,.2);self.add(green)
-            self.play(Create(good),MoveAlongPath(green,good),run_time=1.8,rate_func=linear)
+            self.play(FadeIn(label),FadeIn(eq),FadeIn(bg),FadeIn(good),run_time=.65)
+            self.wait(.45)
             if i<2:
-                points=[start,[x-.1,-.85,0],[x+1.25,-.90,0]] if i==0 else [start,[x,-.70,0],end]
+                points=[start,[x-.1,-2.0,0],[x+1.25,-2.05,0]] if i==0 else [start,[x,-1.8,0],end]
                 bad=curve(points,RED,2.5)
                 moving=VGroup(*[cell(start,.085,RED,.2) for _ in range(4)])
                 self.add(moving)
@@ -112,8 +111,8 @@ class LossPanels:
                 # Small outward motion makes a predicted group form gradually.
                 self.play(moving[0].animate.shift(UP*.055),moving[1].animate.shift(DOWN*.055),run_time=.5)
             else:
-                left=curve([start,[x-.7,.16,0],mid],RED,2.5)
-                right=curve([mid,[x+.7,.40,0],end],RED,2.5)
+                left=curve([start,[x-.7,-.15,0],mid],RED,2.5)
+                right=curve([mid,[x+.7,.12,0],end],RED,2.5)
                 founders=VGroup(*[cell(start,.073,RED,.1) for _ in range(4)]);self.add(founders)
                 offsets=[np.array([-.14,.05,0]),np.array([.04,.11,0]),np.array([.15,-.04,0]),np.array([-.03,-.11,0])]
                 self.play(Create(left),*[UpdateFromAlphaFunc(m,lambda mob,a,o=o:mob.move_to(left.point_from_proportion(a)+a*o)) for m,o in zip(founders,offsets)],run_time=1.4,rate_func=linear)
@@ -224,7 +223,7 @@ class COATIIntro(LossPanels,Scene):
         bar=Line([-2.25,-2.56,0],[1.8,-2.56,0],color=GRID,stroke_width=7)
         knob=Dot(radius=.095,color=ORANGE).add_updater(lambda m:m.move_to([-2.25+4.05*c.get_value(),-2.56,0]))
         num=always_redraw(lambda:words(f'{c.get_value():.2f}',23,ORANGE).move_to([2.5,-2.56,0]))
-        obj=formula(r'\min_x\;(1-C_y)\mathcal{A}_{\mathcal{X}}[x]+C_y\mathcal{A}_{\mathcal{Y}}[T\circ x]',.39).move_to([0,-3.18,0])
+        obj=formula(r'\min_x\;(1-C_y)\mathcal{A}_{\mathcal{X}}[x]+C_y\mathcal{A}_{\mathcal{Y}}[y]',.39).move_to([0,-3.18,0])
         self.add(routes)
         self.play(FadeIn(label),FadeIn(bar),FadeIn(knob),FadeIn(num),FadeIn(obj),run_time=.6)
         self.play(c.animate.set_value(1),run_time=6,rate_func=linear)
@@ -240,8 +239,8 @@ class COATIIntro(LossPanels,Scene):
         for xx,count in [(-.65,3),(0,4),(.65,3)]:
             layers.append(VGroup(*[Circle(radius=.065,stroke_color=BLUE,stroke_width=1.4,fill_color=BG,fill_opacity=1).move_to([xx,-2.62+(j-(count-1)/2)*.20,0]) for j in range(count)]))
         links=VGroup(*[Line(a.get_center(),b.get_center(),stroke_color='#A8BCCB',stroke_width=.7) for la,lb in zip(layers[:-1],layers[1:]) for a in la for b in lb])
-        network=VGroup(links,*layers)
-        inp=formula('(x,t)',.30).move_to([-1.50,-2.62,0]);out=formula(r'u_\theta(x,t)',.32,BLUE).move_to([1.72,-2.62,0])
+        network=VGroup(links,*layers).scale(1.65,about_point=np.array([0,-2.62,0]))
+        inp=formula('(x,t)',.48).move_to([-2.15,-2.62,0]);out=formula(r'u_\theta(x,t)',.50,BLUE).move_to([2.48,-2.62,0])
         self.play(FadeIn(network),FadeIn(inp),FadeIn(out),run_time=.8)
         self.play(Indicate(layers[0],color=BLUE),run_time=.8)
         self.play(Indicate(layers[1],color=BLUE),run_time=.8)
@@ -266,8 +265,8 @@ class COATIIntro(LossPanels,Scene):
         self.play(FadeOut(sub),FadeIn(next_sub),FadeIn(arrows),run_time=.8);sub=next_sub
         self.wait(3)
         self.play(FadeOut(network),FadeOut(inp),FadeOut(out),run_time=.5)
-        ode=formula(r'x_t=x_0+\int_0^t u_\theta(x_s,s)\,ds',.42).move_to([0,-2.55,0])
-        t_label=always_redraw(lambda:words(f't = {arrow_time.get_value():.2f}',20,BLUE).move_to([0,-3.16,0]))
+        ode=formula(r'x_t=x_0+\int_0^t u_\theta(x_s,s)\,ds',.64).move_to([0,-2.55,0])
+        t_label=always_redraw(lambda:words(f't = {arrow_time.get_value():.2f}',27,BLUE).move_to([0,-3.27,0]))
         next_sub=words('Neural ODE: integrate the field to generate trajectories',20,MUTED).move_to(sub)
         self.play(FadeOut(sub),FadeIn(next_sub),FadeIn(ode),run_time=.6);sub=next_sub
         arrow_time.set_value(0)
@@ -289,65 +288,3 @@ class COATIIntro(LossPanels,Scene):
         for m in [arrows,advancing,t_label]:m.clear_updaters()
         self.play(*[FadeOut(m) for m in list(self.mobjects)],run_time=.7)
         self.ablations()
-        self.logo_outro()
-
-
-    def logo_outro(self):
-        """A symbolic brand reveal, separate from the scientific demonstration."""
-        self.play(*[FadeOut(m) for m in list(self.mobjects)], run_time=1.1)
-        charcoal = '#2C2F30'
-        origin = np.array([-3.3, 0., 0.])
-        seed = cell(origin, .34, BLUE, .15)
-        self.play(FadeIn(seed, scale=.75), run_time=1.2)
-        self.wait(.6)
-        upper = curve([origin, [-2., .9, 0], [-.3, 1.2, 0], [1.4, 1.6, 0]], BLUE, 9)
-        lower = curve([origin, [-2., -.7, 0], [-.2, -.8, 0], [1.4, -1.4, 0]], ORANGE, 9)
-        blue_tip = cell(origin, .18, BLUE)
-        orange_tip = cell(origin, .18, ORANGE)
-        self.add(blue_tip, orange_tip)
-        self.play(Create(upper), Create(lower), MoveAlongPath(blue_tip, upper),
-                  MoveAlongPath(orange_tip, lower), run_time=3.2, rate_func=smooth)
-        # Curl both paths around the same opening to form the C silhouette.
-        center = np.array([-3.55, .0, 0.])
-        angles = np.linspace(np.pi, .29*np.pi, 90)
-        upper_c = curve([center+[1.32*np.cos(a),1.43*np.sin(a),0] for a in angles], BLUE, 15)
-        lower_c = curve([center+[1.32*np.cos(a),-1.43*np.sin(a),0] for a in angles], ORANGE, 15)
-        self.play(Transform(upper, upper_c), Transform(lower, lower_c),
-                  blue_tip.animate.move_to(upper_c.get_end()),
-                  orange_tip.animate.move_to(lower_c.get_end()),
-                  seed.animate.move_to([-1.2, 0, 0]), run_time=3.2)
-        branches = VGroup()
-        for path, col, sign in [(upper, BLUE, 1), (lower, ORANGE, -1)]:
-            for j in range(3):
-                a=path.point_from_proportion(.70+.09*j)
-                b=path.get_end()+np.array([.20+.17*j, sign*(.18-.17*j), 0])
-                branches.add(curve([a,(a+b)/2+[0,.12*sign,0],b],col,4),
-                             Dot(b,radius=.07+.012*j,color=col))
-        self.play(LaggedStart(*[Create(m) for m in branches],lag_ratio=.06),run_time=1.2)
-        # Paired modality strands and cross-links make alignment visible first.
-        left=Line([.25,-1.12,0],[.68,1.12,0],color=BLUE,stroke_width=8)
-        right=Line([1.55,-1.12,0],[1.12,1.12,0],color=ORANGE,stroke_width=8)
-        links=VGroup(*[DashedLine(left.point_from_proportion(t),right.point_from_proportion(t),
-                     dash_length=.065,color=charcoal,stroke_width=2) for t in [.18,.38,.58,.78]])
-        align_label=words('Alignment',22).move_to([.9,1.8,0])
-        self.play(Create(left),Create(right),FadeIn(align_label),run_time=1.1)
-        self.play(LaggedStart(*[Create(m) for m in links],lag_ratio=.25),run_time=1.6)
-        self.wait(.8)
-        # Preserve the cell boundary as the O; its nucleus dissolves.
-        letter_o=Circle(radius=.92,stroke_color=charcoal,stroke_width=29).move_to([-1.22,0,0])
-        self.play(Transform(seed[0],letter_o),FadeOut(seed[1]),run_time=1.7)
-        left_a=Polygon([-.02,-1.12,0],[.50,-1.12,0],[1.02,1.12,0],[.65,1.12,0],
-                       stroke_width=0,fill_color=BLUE,fill_opacity=1)
-        right_a=Polygon([.83,1.12,0],[1.18,1.12,0],[2.03,-1.12,0],[1.50,-1.12,0],
-                        stroke_width=0,fill_color=ORANGE,fill_opacity=1)
-        bridge=DashedLine([.65,-.24,0],[1.24,-.24,0],dash_length=.10,
-                          color=charcoal,stroke_width=5)
-        self.play(Transform(left,left_a),Transform(right,right_a),
-                  ReplacementTransform(links,bridge),FadeOut(align_label),run_time=1.8)
-        # Draw clean geometric T and I at the same cap height and baseline.
-        tee=VGroup(Rectangle(width=1.65,height=.43,stroke_width=0,fill_color=charcoal,fill_opacity=1).move_to([3.03,.905,0]),
-                   Rectangle(width=.43,height=2.24,stroke_width=0,fill_color=charcoal,fill_opacity=1).move_to([3.03,0,0]))
-        eye=Rectangle(width=.43,height=2.24,stroke_width=0,fill_color=charcoal,fill_opacity=1).move_to([4.52,0,0])
-        self.play(FadeIn(tee,shift=.15*UP),run_time=.9)
-        self.play(FadeIn(eye,shift=.15*UP),run_time=.9)
-        self.wait(3)

@@ -40,8 +40,4 @@ These are possible failure schematics, not measured ablation outcomes. No traini
 
 The film keeps explanations in the scene subtitles and removes persistent footnotes and group-count labels. The map is shown abstractly as `T: X → Y`; its concrete Gaussian height function is documented here and in `geometry.py`, not overlaid on the video.
 
-The three final ablations run sequentially. Paths are drawn while cells move along them; the mass example grows a local group by visible divisions before only a few cells travel onward. No bottom captions or persistent footnotes are shown.
-
-## Logo coda
-
-A separate symbolic ending grows blue and orange branches from one cell, curls them into the C motif, and introduces paired alignment strands. The original cell boundary becomes O; the aligned strands and dashed links become the two-color A; T and I complete the wordmark. This is a brand metaphor, not a branching solution of the deterministic Neural ODE. No explanatory footers are added.
+The three final ablations run sequentially. Green reference paths are static; red failure paths are drawn while cells move along them; the mass example grows a local group by visible divisions before only a few cells travel onward. No bottom captions or persistent footnotes are shown.
