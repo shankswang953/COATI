@@ -51,10 +51,10 @@ def curve(points, color=BLUE, width=4):
     return VMobject(stroke_color=color, stroke_width=width).set_points_smoothly(np.array(points))
 
 def bump(center, sx=.36, sy=.24, color=BLUE):
-    # Nested level sets of a Gaussian; the center stays visible without a point cloud.
+    # Three equal-density contours, with faint fill to distinguish overlapping groups.
     return VGroup(*[Ellipse(width=2*sx*r,height=2*sy*r,stroke_color=color,
-        stroke_width=0,stroke_opacity=0,fill_color=color,fill_opacity=.075).move_to(center)
-        for r in np.linspace(2.7,.25,15)])
+        stroke_width=1.5,stroke_opacity=.78,fill_color=color,fill_opacity=.025).move_to(center)
+        for r in [3.1,2.0,1.0]])
 
 # Cell-inspired distribution schematics: organic envelopes, membranes and nuclei.
 def cell(point,r=.075,color='#93A4B5',angle=0,opacity=.75):
@@ -121,15 +121,13 @@ class LossPanels:
                         q=p+np.array([rad*np.cos(a),.7*rad*np.sin(a),0])
                         bad.add(cell(q,.074,RED,rng.uniform(-.6,.6)))
                 caption='Distort population size'
-            cap=words(caption,18,MUTED).move_to([x,-1.85,0])
-            g.add(cap);groups.append(g);failures.append(bad)
+            groups.append(g);failures.append(bad)
         self.play(LaggedStart(*[FadeIn(g) for g in groups],lag_ratio=.2),run_time=1.5)
         self.wait(1)
         for fail in failures:
             self.play(FadeIn(fail),run_time=1.3);self.wait(1.4)
-        legend=VGroup(words('Observed cells',17,'#8A9EAF'),words('Constrained path',17,GREEN),words('Possible failure',17,RED)).arrange(RIGHT,buff=.65).move_to([0,-2.85,0])
-        note=words('Mass constraint: growth / unbalanced extension',16,MUTED).move_to([0,-3.35,0])
-        self.play(FadeIn(legend),FadeIn(note),run_time=.6);self.wait(4)
+        self.wait(4.6)
+
 
 from geometry import height, solve, INITIAL, TERMINAL, STARTS, SHAPES
 
@@ -174,33 +172,30 @@ class COATIIntro(LossPanels,Scene):
         sub=words('Two initial populations. Five destinations.',20,MUTED).move_to([0,2.76,0])
         primary_label=words('Primary · 2D projection',18,BLUE).move_to([-3.55,2.16,0])
         secondary_label=words('Secondary · 3D geometry',18,ORANGE).move_to([3.55,2.16,0])
-        footer=words('COATI · geometric toy illustration',16,MUTED).move_to([0,-3.63,0])
-        self.add(title,sub,footer)
+        self.add(title,sub)
         clouds=VGroup()
         for (x,y),(sx,sy,angle) in zip(np.vstack([INITIAL,TERMINAL]),SHAPES):
-            cloud=bump(ORIGIN,.98*sx,.80*sy,BLUE).rotate(angle).move_to(primary_point(x,y))
+            cloud=bump(ORIGIN,sx,sy,BLUE).rotate(angle).apply_matrix(np.diag([.98,.80,1])).move_to(primary_point(x,y))
             clouds.add(cloud)
-        timelabels=VGroup(words('2 initial groups',16,MUTED).move_to([-5.1,-2.03,0]),words('5 terminal groups',16,MUTED).move_to([-1.30,-1.89,0]))
-        self.play(FadeIn(primary_label),FadeIn(secondary_label),FadeIn(clouds),FadeIn(timelabels),run_time=1.2)
+        self.play(FadeIn(primary_label),FadeIn(secondary_label),FadeIn(clouds),run_time=1.2)
         terrain=surface()
         rng=np.random.default_rng(8)
         offsets=rng.normal(size=(12,2))*[.08,.065]
         s_clouds=VGroup()
         for (x,y),(sx,sy,angle) in zip(np.vstack([INITIAL,TERMINAL]),SHAPES):
-            for r in np.linspace(2.7,.25,18):
+            for r in [3.1,2.0,1.0]:
                 points=[]
                 for a in np.linspace(0,TAU,50):
                     dx=sx*r*np.cos(a);dy=sy*r*np.sin(a)
                     xx=x+dx*np.cos(angle)-dy*np.sin(angle); yy=y+dx*np.sin(angle)+dy*np.cos(angle)
                     points.append(secondary_point(xx,yy,height(xx,yy)+.018))
-                contour=VMobject(stroke_width=0,fill_color=ORANGE,fill_opacity=.075).set_points_as_corners(points)
+                contour=VMobject(stroke_color=ORANGE,stroke_width=1.5,stroke_opacity=.78,fill_color=ORANGE,fill_opacity=.025).set_points_as_corners(points)
                 contour.close_path()
                 s_clouds.add(contour)
-        map_eq=formula(r'T(x_1,x_2)=(x_1,x_2,h(x_1,x_2)),\qquad\pi(T(x))=x',.38).move_to([0,-2.62,0])
-        gaussian=formula(r'h(x)=\sum_k a_k\exp\!\left(-\frac{\|x-m_k\|^2}{2\sigma_k^2}\right)',.40,ORANGE).move_to([0,-3.18,0])
-        self.play(FadeIn(terrain),FadeIn(s_clouds),FadeIn(map_eq),FadeIn(gaussian),run_time=1.6)
+        map_eq=formula(r'T:\mathcal{X}\longrightarrow\mathcal{Y}',.44).move_to([0,-2.62,0])
+        self.play(FadeIn(terrain),FadeIn(s_clouds),FadeIn(map_eq),run_time=1.6)
         self.wait(3)
-        self.play(FadeOut(gaussian),FadeOut(map_eq),run_time=.4)
+        self.play(FadeOut(map_eq),run_time=.4)
         ode=formula(r'\dot{x}_t=u_\theta(x_t,t)\qquad y_t=T(x_t)',.43).move_to([0,-2.67,0])
         next_sub=words('Without sync: a straight path crosses the bump',20,MUTED).move_to(sub)
         self.play(FadeOut(sub),FadeIn(next_sub),FadeIn(ode),run_time=.7);sub=next_sub
@@ -235,14 +230,13 @@ class COATIIntro(LossPanels,Scene):
         knob=Dot(radius=.095,color=ORANGE).add_updater(lambda m:m.move_to([-2.25+4.05*c.get_value(),-2.56,0]))
         num=always_redraw(lambda:words(f'{c.get_value():.2f}',23,ORANGE).move_to([2.5,-2.56,0]))
         obj=formula(r'\min_x\;(1-C_y)\mathcal{A}_{\mathcal{X}}[x]+C_y\mathcal{A}_{\mathcal{Y}}[T\circ x]',.39).move_to([0,-3.18,0])
-        legend=words('Without sync     With sync',16,MUTED).move_to([3.5,-2.0,0])
-        self.add(routes,legend)
+        self.add(routes)
         self.play(FadeIn(label),FadeIn(bar),FadeIn(knob),FadeIn(num),FadeIn(obj),run_time=.6)
         self.play(c.animate.set_value(1),run_time=6,rate_func=linear)
         self.wait(2)
         # Make the learned vector field explicit before integrating any new path.
         for m in [routes,knob,num]:m.clear_updaters()
-        self.play(*[FadeOut(m) for m in [routes,straight,label,bar,knob,num,obj,legend]],run_time=.6)
+        self.play(*[FadeOut(m) for m in [routes,straight,label,bar,knob,num,obj]],run_time=.6)
         next_sub=words('First learn the local velocity field',20,MUTED).move_to(sub)
         self.play(FadeOut(sub),FadeIn(next_sub),run_time=.5);sub=next_sub
         from neural_field import NeuralField
@@ -253,8 +247,7 @@ class COATIIntro(LossPanels,Scene):
         links=VGroup(*[Line(a.get_center(),b.get_center(),stroke_color='#A8BCCB',stroke_width=.7) for la,lb in zip(layers[:-1],layers[1:]) for a in la for b in lb])
         network=VGroup(links,*layers)
         inp=formula('(x,t)',.30).move_to([-1.50,-2.62,0]);out=formula(r'u_\theta(x,t)',.32,BLUE).move_to([1.72,-2.62,0])
-        fit_note=words('A neural network predicts the velocity at each state and time.',17,MUTED).move_to([0,-3.20,0])
-        self.play(FadeIn(network),FadeIn(inp),FadeIn(out),FadeIn(fit_note),run_time=.8)
+        self.play(FadeIn(network),FadeIn(inp),FadeIn(out),run_time=.8)
         self.play(Indicate(layers[0],color=BLUE),run_time=.8)
         self.play(Indicate(layers[1],color=BLUE),run_time=.8)
         self.play(Indicate(layers[2],color=BLUE),run_time=.8)
@@ -277,7 +270,7 @@ class COATIIntro(LossPanels,Scene):
         next_sub=words('The fitted vector field tells cells where to move',20,MUTED).move_to(sub)
         self.play(FadeOut(sub),FadeIn(next_sub),FadeIn(arrows),run_time=.8);sub=next_sub
         self.wait(3)
-        self.play(FadeOut(network),FadeOut(inp),FadeOut(out),FadeOut(fit_note),run_time=.5)
+        self.play(FadeOut(network),FadeOut(inp),FadeOut(out),run_time=.5)
         ode=formula(r'x_t=x_0+\int_0^t u_\theta(x_s,s)\,ds',.42).move_to([0,-2.55,0])
         t_label=always_redraw(lambda:words(f't = {arrow_time.get_value():.2f}',20,BLUE).move_to([0,-3.16,0]))
         next_sub=words('Neural ODE: integrate the field to generate trajectories',20,MUTED).move_to(sub)
