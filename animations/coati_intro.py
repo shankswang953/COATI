@@ -288,3 +288,71 @@ class COATIIntro(LossPanels,Scene):
         for m in [arrows,advancing,t_label]:m.clear_updaters()
         self.play(*[FadeOut(m) for m in list(self.mobjects)],run_time=.7)
         self.ablations()
+        self.logo_outro()
+
+
+    def logo_outro(self):
+        """A symbolic brand reveal, separate from the scientific demonstration."""
+        self.play(*[FadeOut(m) for m in list(self.mobjects)], run_time=.5)
+        charcoal = '#2C2F30'
+        origin = np.array([-3.3, 0., 0.])
+        seed = cell(origin, .34, BLUE, .15)
+        self.play(FadeIn(seed, scale=.75), run_time=.6)
+        self.wait(.2)
+        upper = curve([origin, [-2., .9, 0], [-.3, 1.2, 0], [1.4, 1.6, 0]], BLUE, 9)
+        lower = curve([origin, [-2., -.7, 0], [-.2, -.8, 0], [1.4, -1.4, 0]], ORANGE, 9)
+        blue_tip = cell(origin, .18, BLUE)
+        orange_tip = cell(origin, .18, ORANGE)
+        self.add(blue_tip, orange_tip)
+        self.play(Create(upper), Create(lower), MoveAlongPath(blue_tip, upper),
+                  MoveAlongPath(orange_tip, lower), run_time=1.4, rate_func=smooth)
+        # Curl both paths around the same opening to form the C silhouette.
+        center = np.array([-3.55, .0, 0.])
+        angles = np.linspace(np.pi, .29*np.pi, 90)
+        upper_c = curve([center+[1.32*np.cos(a),1.43*np.sin(a),0] for a in angles], BLUE, 15)
+        lower_c = curve([center+[1.32*np.cos(a),-1.43*np.sin(a),0] for a in angles], ORANGE, 15)
+        self.play(Transform(upper, upper_c), Transform(lower, lower_c),
+                  blue_tip.animate.move_to(upper_c.get_end()),
+                  orange_tip.animate.move_to(lower_c.get_end()),
+                  seed.animate.move_to([-1.2, 0, 0]), run_time=1.4)
+        branches = VGroup()
+        for path, col, sign in [(upper, BLUE, 1), (lower, ORANGE, -1)]:
+            for j in range(3):
+                a=path.point_from_proportion(.70+.09*j)
+                b=path.get_end()+np.array([.20+.17*j, sign*(.18-.17*j), 0])
+                branches.add(curve([a,(a+b)/2+[0,.12*sign,0],b],col,4),
+                             Dot(b,radius=.07+.012*j,color=col))
+        self.play(LaggedStart(*[Create(m) for m in branches],lag_ratio=.06),run_time=.6)
+        # Paired modality strands and cross-links make alignment visible first.
+        left=Line([.25,-1.12,0],[.68,1.12,0],color=BLUE,stroke_width=8)
+        right=Line([1.55,-1.12,0],[1.12,1.12,0],color=ORANGE,stroke_width=8)
+        links=VGroup(*[DashedLine(left.point_from_proportion(t),right.point_from_proportion(t),
+                     dash_length=.065,color=charcoal,stroke_width=2) for t in [.18,.38,.58,.78]])
+        self.play(Create(left),Create(right),run_time=.5)
+        self.play(LaggedStart(*[Create(m) for m in links],lag_ratio=.25),run_time=.7)
+        self.wait(.25)
+        # Exact artwork tiles: every final letter is taken from the supplied logo.
+        from PIL import Image
+        pixels=np.asarray(Image.open(Path(__file__).resolve().parents[1]/'assets/coati-logo.png').convert('RGB'))
+        h,w=pixels.shape[:2];scale=11.5/w
+        def tile(x0,y0,x1,y1):
+            m=ImageMobject(pixels[y0:y1,x0:x1].copy()).set_width((x1-x0)*scale)
+            return m.move_to([((x0+x1)/2-w/2)*scale,(h/2-(y0+y1)/2)*scale,0])
+        c_art=tile(0,0,650,h)
+        o_art=tile(650,0,1018,580)
+        a_art=tile(1018,0,1350,580)
+        t_art=tile(1350,0,1695,580)
+        i_art=tile(1695,0,w,580)
+        caption=tile(650,580,w,h)
+        background=Rectangle(width=15,height=9,stroke_width=0,fill_color=WHITE,fill_opacity=1)
+        self.add(background);self.bring_to_back(background)
+        self.play(FadeTransform(VGroup(upper,lower,branches,blue_tip,orange_tip),c_art),
+                  FadeTransform(seed,o_art),run_time=.8)
+        self.play(FadeTransform(VGroup(left,right,links),a_art),run_time=.65)
+        self.play(FadeIn(t_art),run_time=.3)
+        self.play(FadeIn(i_art),run_time=.3)
+        self.play(FadeIn(caption),run_time=.35)
+        # Replace the tiled reveal with the untouched source image for the hold.
+        exact=ImageMobject(pixels).set_width(11.5)
+        self.remove(c_art,o_art,a_art,t_art,i_art,caption);self.add(exact)
+        self.wait(1.5)

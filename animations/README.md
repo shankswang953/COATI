@@ -41,3 +41,5 @@ These are possible failure schematics, not measured ablation outcomes. No traini
 The film keeps explanations in the scene subtitles and removes persistent footnotes and group-count labels. The map is shown abstractly as `T: X → Y`; its concrete Gaussian height function is documented here and in `geometry.py`, not overlaid on the video.
 
 The three final ablations run sequentially. Green reference paths are static; red failure paths are drawn while cells move along them; the mass example grows a local group by visible divisions before only a few cells travel onward. No bottom captions or persistent footnotes are shown.
+
+The short symbolic coda resolves into tiles of the supplied logo artwork, then holds the untouched complete logo. No separate Alignment label appears. This is a brand metaphor, not a branching Neural ODE solution.
