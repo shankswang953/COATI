@@ -168,8 +168,8 @@ def paths_at(c,solutions,grid):
 class COATIIntro(LossPanels,Scene):
     def construct(self):
         self.camera.background_color=BG
-        title=words('When geometry changes the route',31).move_to([0,3.32,0])
-        sub=words('Two initial populations. Five destinations.',20,MUTED).move_to([0,2.76,0])
+        title=words('Synchronized Optimal Transport',31).move_to([0,3.32,0])
+        sub=VectorizedPoint([0,2.76,0])
         primary_label=words('Primary · 2D projection',18,BLUE).move_to([-3.55,2.16,0])
         secondary_label=words('Secondary · 3D geometry',18,ORANGE).move_to([3.55,2.16,0])
         self.add(title,sub)
