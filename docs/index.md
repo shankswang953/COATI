@@ -1,11 +1,11 @@
 # COATI
 
 ```{raw} html
-<video controls playsinline preload="metadata" poster="_static/coati-intro-poster.png" style="width:100%;height:auto;border-radius:8px;background:#101720" aria-label="COATI animated introduction: from paired snapshots to coupled trajectories" aria-describedby="animation-caption">
+<video controls playsinline preload="metadata" poster="_static/coati-intro-poster.png" style="width:100%;height:auto;border-radius:8px;background:#FAFBFD" aria-label="COATI animated introduction: from paired snapshots to coupled trajectories" aria-describedby="animation-caption">
   <source src="_static/coati-intro.mp4" type="video/mp4">
   <p><a href="_static/coati-intro.mp4">Download the COATI introduction video</a>.</p>
 </video>
-<p id="animation-caption">A 48-second introduction: paired snapshots, a primary Neural ODE, cross-modal mapping, and a joint objective. Silent, with on-screen equations. The motion illustrates the balanced core; it is not a fitted result.</p>
+<p id="animation-caption">Two initial Gaussian groups evolve toward five terminal groups, mapped from 2D onto a 3D Gaussian-bump surface. Compare straight paths without sync with detours under stronger secondary weighting, then see what reference, manifold and mass constraints prevent. Silent, with on-screen equations. Paths come from a small geometric optimization; the failure panels are illustrative.</p>
 ```
 
 [Download video](_static/coati-intro.mp4) · [Animation source and formula notes](https://github.com/shankswang953/COATI/tree/main/animations)

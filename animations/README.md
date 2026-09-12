@@ -1,6 +1,6 @@
-# COATI animated introduction
+# COATI geometric introduction
 
-A silent, captioned Manim film for the documentation homepage. Blue denotes the primary/RNA space; orange denotes the secondary/ATAC space. All particle positions come from analytic illustration functions, not a fitted model or biological dataset.
+A silent Manim film: two initial Gaussian groups and five terminal groups in a 2D primary space are mapped to a 3D surface with Gaussian bumps. The primary space is the coordinate projection of that surface. The film finishes with illustrative failures without reference, manifold and mass constraints.
 
 ## Reproduce
 
@@ -8,30 +8,26 @@ A silent, captioned Manim film for the documentation homepage. Blue denotes the 
 python -m venv .venv-manim
 source .venv-manim/bin/activate
 pip install -r animations/requirements.txt
+python animations/geometry.py
 python animations/render.py
 ```
 
-Manim's native Cairo/Pango dependencies must be available for the platform. Formulas use Matplotlib mathtext exported as SVG, so this scene does not require LaTeX/dvisvgm. Use `python animations/render.py --preview` for 720p; the default is 1080p. The video is silent by design and includes on-screen explanations.
+Use `--preview` for 720p; the default is 1080p. Native Cairo/Pango libraries are required. Formulas use Matplotlib mathtext, with no system LaTeX dependency.
 
-## Scientific scope
+## Geometry and optimization
 
-This is the balanced core, with a fixed (possibly time-dependent) map during trajectory fitting. It does not attempt to explain the growth/mass extension in the same introductory clip.
+`T(x1,x2) = (x1,x2,h(x1,x2))`, where `h` is a sum of three Gaussian bumps. Projection onto the first two coordinates recovers the primary space. These bumps encode **extra geometry**, not the density of the observed groups. The blue and orange endpoint contours represent multiple Gaussian populations; orange contours are their mapped images on the surface.
 
-1. At each observed time, the two modalities are paired. Across-time trajectories are not observed.
-2. Only the primary velocity is parameterized as a Neural ODE: `dx/dt = u_theta(x,t)`.
-3. Secondary states are `y(t) = T_omega(x(t),t)`. The full chain rule includes both `D_x T u_theta` and `partial_t T`.
-4. `xi_t = (T_{omega,t})_# rho_t` is the predicted pushforward distribution. It is not asserted equal to the empirical secondary snapshot by definition.
-5. Both spaces constrain theta. T is frozen in this illustration; gradients pass through its input.
-6. `c = sync_weight` mixes energy and manifold terms. It does not multiply or disable the independent Sinkhorn coefficients. Changing c in the film changes a coefficient display, not purported re-trained trajectories.
+For each of five paths from distinct points within the two initial groups, `geometry.py` minimizes the discrete action `(1-Cy) A_X[x] + Cy A_Y[T(x)]`. Each action is one half the sum of squared consecutive displacements divided by the time step. This uses mapped positions; no secondary velocity model or velocity formula is shown.
 
-Balanced objective, following `coati/_core/Epoch.py`:
+The optimizer fixes progress along each start–end direction on a uniform grid of 65 points and optimizes 63 interior transverse offsets, with endpoints fixed. It tries three initial paths and keeps the lowest objective. This is a restricted numerical geometry illustration, **not a COATI Neural ODE training run or a claim of a global geodesic optimum**. At Cy=0, paths are straight. At Cy=1, the paths detour and have lower secondary action than the straight paths. Seventeen coefficient settings are optimized; intermediate animation frames interpolate them. The paths start at distinct nearby states, so the illustration does not split one identical Neural ODE initial state. Moving particles illustrate these paths with small offsets, not independently optimized particle trajectories.
 
-`L = (1-c) A_X + c A_Y + lambda_X S_X + lambda_Y S_Y`
+The Neural ODE equation connects the illustration to COATI. In the film's geometric comparison the reference endpoints are fixed, and only the action tradeoff is varied. The end screen's full objective is schematic paper notation: reference, manifold and mass coefficients are absorbed into their loss symbols. Mass applies only to the growth/unbalanced extension. No claim is made that Cy disables independently weighted reference constraints in the implementation.
 
-`A_m = lambda_E E_m + lambda_D D_m`
+## Final ablation panels
 
-`E_X = 1/2 E[integral ||dx/dt||^2 dt]`, `E_Y = 1/2 E[integral ||dy/dt||^2 dt]`.
+- Without reference matching: miss observed distributions.
+- Without manifold support: take a shortcut through low-density regions.
+- Without mass matching: reach plausible positions with incorrect population mass; circle area denotes mass.
 
-These energies are expectations over initial primary samples, averaged in implementation. `S_m` denotes the sum of per-observed-time Sinkhorn discrepancies. `D_m` denotes the implementation's manifold-density penalty. Terms that are disabled by configuration are omitted. Time discretization and sampling remain in the engine, not in this drawing script.
-
-The static paper overview remains available as a separate PDF. No algorithm files are modified by this animation.
+These are possible failure schematics, not measured ablation outcomes. No training code or original TraInf files are modified.
