@@ -16,7 +16,7 @@ Use `--preview` for 720p; the default is 1080p. Native Cairo/Pango libraries and
 
 ## Geometry and optimization
 
-`T(x1,x2) = (x1,x2,h(x1,x2))`, where `h` is a sum of three Gaussian bumps. Projection onto the first two coordinates recovers the primary space. These bumps encode **extra geometry**, not the density of the observed groups. Each snapshot center has exactly three equal-density contours with light overlap and faint fill. The blue and orange endpoint contours represent multiple Gaussian populations, with staggered terminal centers; orange contours are their mapped images on the surface.
+`T(x1,x2) = (x1,x2,h(x1,x2))`, where `h` is a sum of three Gaussian bumps. Projection onto the first two coordinates recovers the primary space. These bumps encode **extra geometry**, not the density of the observed groups. Contours are computed from the sum of all Gaussian densities at each observed time, at three shared density levels. The lowest level forms a single enclosing loop, while higher levels resolve the component peaks; they are not superimposed component ellipses. Secondary curves are the mapped primary level sets, not an assertion about equal density relative to 3D surface area. The blue and orange endpoint contours represent multiple Gaussian populations, with staggered terminal centers; orange contours are their mapped images on the surface.
 
 For each of five paths from distinct points within the two initial groups, `geometry.py` minimizes the discrete action `(1-Cy) A_X[x] + Cy A_Y[T(x)]`. Each action is one half the sum of squared consecutive displacements divided by the time step. This uses mapped positions; no secondary velocity model or velocity formula is shown.
 
@@ -39,3 +39,5 @@ The Neural ODE equation connects the illustration to COATI. In the film's geomet
 These are possible failure schematics, not measured ablation outcomes. No training code or original TraInf files are modified.
 
 The film keeps explanations in the scene subtitles and removes persistent footnotes and group-count labels. The map is shown abstractly as `T: X → Y`; its concrete Gaussian height function is documented here and in `geometry.py`, not overlaid on the video.
+
+The three final ablations run sequentially. Paths are drawn while cells move along them; the mass example grows a local group by visible divisions before only a few cells travel onward. No bottom captions or persistent footnotes are shown.

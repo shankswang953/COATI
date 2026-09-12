@@ -85,48 +85,49 @@ class LossPanels:
         title=words('What keeps a trajectory biologically plausible?',27).move_to([0,3.25,0])
         sub=formula(r'\mathcal{L}=C_x\mathcal{A}_{X}+C_y\mathcal{A}_{Y}+\mathcal{L}_{\mathrm{Ref}}+\mathcal{L}_{\mathrm{Manifold}}+\mathcal{L}_{\mathrm{Mass}}',.31).move_to([0,2.65,0])
         self.play(FadeIn(title),FadeIn(sub),run_time=.6)
-        centers=[-4.55,0,4.55];groups=[];failures=[]
-        for i,x in enumerate(centers):
+        for i,x in enumerate([-4.55,0,4.55]):
             label=words(['Reference matching','Manifold support','Population mass'][i],21).move_to([x,1.87,0])
             eq=formula([r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Ref}}',r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Manifold}}',r'\mathrm{w/o}\;\mathcal{L}_{\mathrm{Mass}}'][i],.26,MUTED).move_to([x,1.35,0])
             start=np.array([x-1.35,-.43,0]);mid=np.array([x,.48,0]);end=np.array([x+1.32,-.08,0])
             bg=VGroup(population(start,11,n=13,sx=.48,sy=.36),population(mid,7,n=18,sx=.50,sy=.40),population(end,4,n=19,sx=.54,sy=.41))
+            good=curve([start,mid,end],GREEN,2.5)
             if i==1:
-                # A curved cloud of cells shows supported tissue states between snapshots.
                 rng=np.random.default_rng(5)
                 bridge=curve([start,mid,end],'#B7C5CE',31).set_stroke(opacity=.15)
                 bg.add_to_back(bridge)
                 for t in np.linspace(.12,.9,25):
-                    q=curve([start,mid,end]).point_from_proportion(t)+np.array([0,rng.normal(0,.105),0])
+                    q=good.point_from_proportion(t)+np.array([0,rng.normal(0,.105),0])
                     bg.add(cell(q,.055,'#A8B7C2',rng.uniform(-.5,.5),.6))
-            good=curve([start,mid,end],GREEN,2.5)
-            good_cells=VGroup(*[cell(p,.10,GREEN,a) for p,a in zip([start,mid,end],[.2,.6,-.2])])
-            g=VGroup(label,eq,bg,good,good_cells)
-            if i==0:
-                bad_points=[start,[x-.1,-.85,0],[x+1.25,-.90,0]]
-                bad=VGroup(curve(bad_points,RED,2.5),population(bad_points[1],16,n=6,color=RED,sx=.24,sy=.17),population(bad_points[2],19,n=6,color=RED,sx=.24,sy=.17))
-                caption='Miss observed cell states'
-            elif i==1:
-                bad_points=[start,[x,-.70,0],end]
-                bad=VGroup(curve(bad_points,RED,2.5),*[cell([x+dx,-.69+dy,0],.085,RED,.2) for dx,dy in [(-.26,.01),(.04,-.04),(.32,.01)]])
-                caption='Leave the cell manifold'
+            self.play(FadeIn(label),FadeIn(eq),FadeIn(bg),run_time=.65)
+            green=cell(start,.10,GREEN,.2);self.add(green)
+            self.play(Create(good),MoveAlongPath(green,good),run_time=1.8,rate_func=linear)
+            if i<2:
+                points=[start,[x-.1,-.85,0],[x+1.25,-.90,0]] if i==0 else [start,[x,-.70,0],end]
+                bad=curve(points,RED,2.5)
+                moving=VGroup(*[cell(start,.085,RED,.2) for _ in range(4)])
+                self.add(moving)
+                fractions=[.43,.61,.82,1.] if i==0 else [.30,.46,.62,1.]
+                actions=[UpdateFromAlphaFunc(m,lambda mob,a,f=f:mob.move_to(bad.point_from_proportion(a*f))) for m,f in zip(moving,fractions)]
+                self.play(Create(bad),*actions,run_time=3.4,rate_func=linear)
+                # Small outward motion makes a predicted group form gradually.
+                self.play(moving[0].animate.shift(UP*.055),moving[1].animate.shift(DOWN*.055),run_time=.5)
             else:
-                bad=VGroup(curve([start,mid,end],RED,2))
-                # Wrong abundance on the same support, rather than arbitrary large circles.
-                for k,p in enumerate([mid,end]):
-                    rng=np.random.default_rng(31+k)
-                    count=20 if k==0 else 3
-                    for _ in range(count):
-                        a=rng.uniform(0,TAU);rad=rng.uniform(.08,.37)
-                        q=p+np.array([rad*np.cos(a),.7*rad*np.sin(a),0])
-                        bad.add(cell(q,.074,RED,rng.uniform(-.6,.6)))
-                caption='Distort population size'
-            groups.append(g);failures.append(bad)
-        self.play(LaggedStart(*[FadeIn(g) for g in groups],lag_ratio=.2),run_time=1.5)
-        self.wait(1)
-        for fail in failures:
-            self.play(FadeIn(fail),run_time=1.3);self.wait(1.4)
-        self.wait(4.6)
+                left=curve([start,[x-.7,.16,0],mid],RED,2.5)
+                right=curve([mid,[x+.7,.40,0],end],RED,2.5)
+                founders=VGroup(*[cell(start,.073,RED,.1) for _ in range(4)]);self.add(founders)
+                offsets=[np.array([-.14,.05,0]),np.array([.04,.11,0]),np.array([.15,-.04,0]),np.array([-.03,-.11,0])]
+                self.play(Create(left),*[UpdateFromAlphaFunc(m,lambda mob,a,o=o:mob.move_to(left.point_from_proportion(a)+a*o)) for m,o in zip(founders,offsets)],run_time=1.4,rate_func=linear)
+                daughters=VGroup()
+                for j,m in enumerate(founders):
+                    for k in range(2):
+                        angle=(2*j+k)*TAU/8;pos=mid+np.array([.30*np.cos(angle),.22*np.sin(angle),0])
+                        d=cell(pos,.073,RED,angle);daughters.add(d)
+                self.play(*[TransformFromCopy(founders[j//2],d) for j,d in enumerate(daughters)],run_time=1.3)
+                travelers=VGroup(*[daughters[j] for j in [1,4,6]])
+                initial=[m.get_center().copy() for m in travelers]
+                self.play(Create(right),*[UpdateFromAlphaFunc(m,lambda mob,a,p=p,j=j:mob.move_to(right.point_from_proportion(a)+(1-a)*(p-mid)+a*np.array([.065*(j-1),.045*(j-1),0]))) for j,(m,p) in enumerate(zip(travelers,initial))],run_time=1.4,rate_func=linear)
+            self.wait(.9)
+        self.wait(2.5)
 
 
 from geometry import height, solve, INITIAL, TERMINAL, STARTS, SHAPES
@@ -173,25 +174,19 @@ class COATIIntro(LossPanels,Scene):
         primary_label=words('Primary · 2D projection',18,BLUE).move_to([-3.55,2.16,0])
         secondary_label=words('Secondary · 3D geometry',18,ORANGE).move_to([3.55,2.16,0])
         self.add(title,sub)
-        clouds=VGroup()
-        for (x,y),(sx,sy,angle) in zip(np.vstack([INITIAL,TERMINAL]),SHAPES):
-            cloud=bump(ORIGIN,sx,sy,BLUE).rotate(angle).apply_matrix(np.diag([.98,.80,1])).move_to(primary_point(x,y))
-            clouds.add(cloud)
+        from mixture import mixture_contours
+        snapshots=[mixture_contours(INITIAL,SHAPES[:2])[0],mixture_contours(TERMINAL,SHAPES[2:])[0]]
+        clouds=VGroup();s_clouds=VGroup()
+        for levels in snapshots:
+            for level,loops in enumerate(levels):
+                for points in loops:
+                    for target,mapper,color in [(clouds,lambda x,y:primary_point(x,y),BLUE),(s_clouds,lambda x,y:secondary_point(x,y,height(x,y)+.018),ORANGE)]:
+                        line=VMobject(stroke_color=color,stroke_width=1.5,stroke_opacity=.80,fill_color=color,fill_opacity=.018 if level==0 else 0)
+                        line.set_points_as_corners([mapper(x,y) for x,y in points]);line.close_path();target.add(line)
         self.play(FadeIn(primary_label),FadeIn(secondary_label),FadeIn(clouds),run_time=1.2)
         terrain=surface()
         rng=np.random.default_rng(8)
         offsets=rng.normal(size=(12,2))*[.08,.065]
-        s_clouds=VGroup()
-        for (x,y),(sx,sy,angle) in zip(np.vstack([INITIAL,TERMINAL]),SHAPES):
-            for r in [3.1,2.0,1.0]:
-                points=[]
-                for a in np.linspace(0,TAU,50):
-                    dx=sx*r*np.cos(a);dy=sy*r*np.sin(a)
-                    xx=x+dx*np.cos(angle)-dy*np.sin(angle); yy=y+dx*np.sin(angle)+dy*np.cos(angle)
-                    points.append(secondary_point(xx,yy,height(xx,yy)+.018))
-                contour=VMobject(stroke_color=ORANGE,stroke_width=1.5,stroke_opacity=.78,fill_color=ORANGE,fill_opacity=.025).set_points_as_corners(points)
-                contour.close_path()
-                s_clouds.add(contour)
         map_eq=formula(r'T:\mathcal{X}\longrightarrow\mathcal{Y}',.44).move_to([0,-2.62,0])
         self.play(FadeIn(terrain),FadeIn(s_clouds),FadeIn(map_eq),run_time=1.6)
         self.wait(3)
