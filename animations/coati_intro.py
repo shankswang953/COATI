@@ -289,3 +289,65 @@ class COATIIntro(LossPanels,Scene):
         for m in [arrows,advancing,t_label]:m.clear_updaters()
         self.play(*[FadeOut(m) for m in list(self.mobjects)],run_time=.7)
         self.ablations()
+        self.logo_outro()
+
+
+    def logo_outro(self):
+        """A symbolic brand reveal, separate from the scientific demonstration."""
+        self.play(*[FadeOut(m) for m in list(self.mobjects)], run_time=1.1)
+        charcoal = '#2C2F30'
+        origin = np.array([-3.3, 0., 0.])
+        seed = cell(origin, .34, BLUE, .15)
+        self.play(FadeIn(seed, scale=.75), run_time=1.2)
+        self.wait(.6)
+        upper = curve([origin, [-2., .9, 0], [-.3, 1.2, 0], [1.4, 1.6, 0]], BLUE, 9)
+        lower = curve([origin, [-2., -.7, 0], [-.2, -.8, 0], [1.4, -1.4, 0]], ORANGE, 9)
+        blue_tip = cell(origin, .18, BLUE)
+        orange_tip = cell(origin, .18, ORANGE)
+        self.add(blue_tip, orange_tip)
+        self.play(Create(upper), Create(lower), MoveAlongPath(blue_tip, upper),
+                  MoveAlongPath(orange_tip, lower), run_time=3.2, rate_func=smooth)
+        # Curl both paths around the same opening to form the C silhouette.
+        center = np.array([-3.55, .0, 0.])
+        angles = np.linspace(np.pi, .29*np.pi, 90)
+        upper_c = curve([center+[1.32*np.cos(a),1.43*np.sin(a),0] for a in angles], BLUE, 15)
+        lower_c = curve([center+[1.32*np.cos(a),-1.43*np.sin(a),0] for a in angles], ORANGE, 15)
+        self.play(Transform(upper, upper_c), Transform(lower, lower_c),
+                  blue_tip.animate.move_to(upper_c.get_end()),
+                  orange_tip.animate.move_to(lower_c.get_end()),
+                  seed.animate.move_to([-1.2, 0, 0]), run_time=3.2)
+        branches = VGroup()
+        for path, col, sign in [(upper, BLUE, 1), (lower, ORANGE, -1)]:
+            for j in range(3):
+                a=path.point_from_proportion(.70+.09*j)
+                b=path.get_end()+np.array([.20+.17*j, sign*(.18-.17*j), 0])
+                branches.add(curve([a,(a+b)/2+[0,.12*sign,0],b],col,4),
+                             Dot(b,radius=.07+.012*j,color=col))
+        self.play(LaggedStart(*[Create(m) for m in branches],lag_ratio=.06),run_time=1.2)
+        # Paired modality strands and cross-links make alignment visible first.
+        left=Line([.25,-1.12,0],[.68,1.12,0],color=BLUE,stroke_width=8)
+        right=Line([1.55,-1.12,0],[1.12,1.12,0],color=ORANGE,stroke_width=8)
+        links=VGroup(*[DashedLine(left.point_from_proportion(t),right.point_from_proportion(t),
+                     dash_length=.065,color=charcoal,stroke_width=2) for t in [.18,.38,.58,.78]])
+        align_label=words('Alignment',22).move_to([.9,1.8,0])
+        self.play(Create(left),Create(right),FadeIn(align_label),run_time=1.1)
+        self.play(LaggedStart(*[Create(m) for m in links],lag_ratio=.25),run_time=1.6)
+        self.wait(.8)
+        # Preserve the cell boundary as the O; its nucleus dissolves.
+        letter_o=Circle(radius=.92,stroke_color=charcoal,stroke_width=29).move_to([-1.22,0,0])
+        self.play(Transform(seed[0],letter_o),FadeOut(seed[1]),run_time=1.7)
+        left_a=Polygon([-.02,-1.12,0],[.50,-1.12,0],[1.02,1.12,0],[.65,1.12,0],
+                       stroke_width=0,fill_color=BLUE,fill_opacity=1)
+        right_a=Polygon([.83,1.12,0],[1.18,1.12,0],[2.03,-1.12,0],[1.50,-1.12,0],
+                        stroke_width=0,fill_color=ORANGE,fill_opacity=1)
+        bridge=DashedLine([.65,-.24,0],[1.24,-.24,0],dash_length=.10,
+                          color=charcoal,stroke_width=5)
+        self.play(Transform(left,left_a),Transform(right,right_a),
+                  ReplacementTransform(links,bridge),FadeOut(align_label),run_time=1.8)
+        # Draw clean geometric T and I at the same cap height and baseline.
+        tee=VGroup(Rectangle(width=1.65,height=.43,stroke_width=0,fill_color=charcoal,fill_opacity=1).move_to([3.03,.905,0]),
+                   Rectangle(width=.43,height=2.24,stroke_width=0,fill_color=charcoal,fill_opacity=1).move_to([3.03,0,0]))
+        eye=Rectangle(width=.43,height=2.24,stroke_width=0,fill_color=charcoal,fill_opacity=1).move_to([4.52,0,0])
+        self.play(FadeIn(tee,shift=.15*UP),run_time=.9)
+        self.play(FadeIn(eye,shift=.15*UP),run_time=.9)
+        self.wait(3)
