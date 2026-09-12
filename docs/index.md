@@ -5,7 +5,7 @@
   <source src="_static/coati-intro.mp4" type="video/mp4">
   <p><a href="_static/coati-intro.mp4">Download the COATI introduction video</a>.</p>
 </video>
-<p id="animation-caption">Two initial Gaussian groups evolve toward five terminal groups, mapped from 2D onto a 3D Gaussian-bump surface. Compare straight paths without sync with detours under stronger secondary weighting, then see what reference, manifold and mass constraints prevent. Silent, with on-screen equations. Paths come from a small geometric optimization; the failure panels are illustrative.</p>
+<p id="animation-caption">Two initial cell populations and five staggered terminal groups, with different covariance shapes. A 2D projection is mapped onto a 3D Gaussian-bump surface. Compare sync weights, inspect a fitted neural velocity field, and follow slow ODE integration. The final cell-distribution panels illustrate missing reference, manifold and mass constraints. Silent, with on-screen equations. The fitted field is a standalone geometric illustration, not a COATI training result.</p>
 ```
 
 [Download video](_static/coati-intro.mp4) · [Animation source and formula notes](https://github.com/shankswang953/COATI/tree/main/animations)

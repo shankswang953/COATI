@@ -5,7 +5,9 @@ from scipy.optimize import minimize
 BUMP_CENTERS=[(0.,0.,2.7,.59),(-.38,.63,.65,.38),(.40,-.62,.65,.38)]
 ROT=np.array([[np.cos(.49),-np.sin(.49)],[np.sin(.49),np.cos(.49)]])
 INITIAL=np.array([[-2.2,-.48],[-2.2,.48]])@ROT.T
-TERMINAL=np.array([[2.2,y] for y in [-1.15,-.57,0,.57,1.15]])@ROT.T
+TERMINAL=np.array([[1.80,-1.30],[2.50,-.66],[1.75,.02],[2.48,.53],[1.65,1.23]])@ROT.T
+# Unequal anisotropic covariance shapes, shared by both views through T.
+SHAPES=[(.19,.11,-.25),(.13,.20,.42),(.12,.17,.50),(.19,.09,-.40),(.105,.14,.75),(.16,.11,.18),(.115,.18,-.55)]
 # Distinct points within two initial populations, not branching a single ODE state.
 STARTS=np.array([[-2.2,-.58],[-2.2,-.45],[-2.2,-.30],[-2.2,.38],[-2.2,.58]])@ROT.T
 

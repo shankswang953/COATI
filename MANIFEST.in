@@ -7,5 +7,5 @@ recursive-include notebooks *.ipynb
 recursive-include examples *.py
 recursive-include scripts *.py
 recursive-include provenance *.json
-recursive-include animations *.py *.md *.txt
+recursive-include animations *.py *.md *.txt *.npz
 prune animations/media

@@ -1,6 +1,6 @@
 # COATI geometric introduction
 
-A silent Manim film: two initial Gaussian groups and five terminal groups in a 2D primary space are mapped to a 3D surface with Gaussian bumps. The primary space is the coordinate projection of that surface. The film finishes with illustrative failures without reference, manifold and mass constraints.
+A silent Manim film: two initial Gaussian groups and five terminal groups in a 2D primary space are mapped to a 3D surface with Gaussian bumps. The primary space is the coordinate projection of that surface. The text and numerical labels use Arial; formulas use an Arial-based math configuration with symbol fallback. An elevated oblique camera makes the 3D detours visible without a wireframe. The film finishes with illustrative failures without reference, manifold and mass constraints.
 
 ## Reproduce
 
@@ -12,15 +12,21 @@ python animations/geometry.py
 python animations/render.py
 ```
 
-Use `--preview` for 720p; the default is 1080p. Native Cairo/Pango libraries are required. Formulas use Matplotlib mathtext, with no system LaTeX dependency.
+Use `--preview` for 720p; the default is 1080p. Native Cairo/Pango libraries and the Arial font are required. Prose is laid out using the actual Arial font file and converted to one combined path per line, preserving kerning and spaces. Subtitles crossfade as complete lines. Formulas use Matplotlib mathtext, with no system LaTeX dependency.
 
 ## Geometry and optimization
 
-`T(x1,x2) = (x1,x2,h(x1,x2))`, where `h` is a sum of three Gaussian bumps. Projection onto the first two coordinates recovers the primary space. These bumps encode **extra geometry**, not the density of the observed groups. The blue and orange endpoint contours represent multiple Gaussian populations; orange contours are their mapped images on the surface.
+`T(x1,x2) = (x1,x2,h(x1,x2))`, where `h` is a sum of three Gaussian bumps. Projection onto the first two coordinates recovers the primary space. These bumps encode **extra geometry**, not the density of the observed groups. The blue and orange endpoint contours represent multiple Gaussian populations, with staggered terminal centers; orange contours are their mapped images on the surface.
 
 For each of five paths from distinct points within the two initial groups, `geometry.py` minimizes the discrete action `(1-Cy) A_X[x] + Cy A_Y[T(x)]`. Each action is one half the sum of squared consecutive displacements divided by the time step. This uses mapped positions; no secondary velocity model or velocity formula is shown.
 
 The optimizer fixes progress along each start–end direction on a uniform grid of 65 points and optimizes 63 interior transverse offsets, with endpoints fixed. It tries three initial paths and keeps the lowest objective. This is a restricted numerical geometry illustration, **not a COATI Neural ODE training run or a claim of a global geodesic optimum**. At Cy=0, paths are straight. At Cy=1, the paths detour and have lower secondary action than the straight paths. Seventeen coefficient settings are optimized; intermediate animation frames interpolate them. The paths start at distinct nearby states, so the illustration does not split one identical Neural ODE initial state. Moving particles illustrate these paths with small offsets, not independently optimized particle trajectories.
+
+## Fitted neural field and slow integration
+
+A separate illustrative MLP is fitted to the optimized toy paths (`train_field.py`), then refined against RK4 rollouts (`refine_field.py`). This is supervised fitting of a geometric illustration, **not COATI's joint distribution-training procedure**. The tiny fitted weights are included in `field_weights.npz`; rendering uses only NumPy inference (`neural_field.py`). Run `python animations/neural_field.py` to check arrival at the five target centers. Regeneration of weights requires PyTorch; it is not required to render the included weights.
+
+The network diagram illustrates parameter fitting; its pulses are not a recorded optimization history. The following arrows are actual evaluations of the fitted time-dependent field near its sampled trajectories. The final five moving cells and growing traces come from RK4 integration of that field, played over 14 seconds. The time label is simulation time, not wall-clock time. This segment has no added particle offsets. The Gaussian groups have distinct anisotropic covariance shapes and angles; the same shapes are mapped into 3D. The first geometric comparison remains a separate coefficient demonstration.
 
 The Neural ODE equation connects the illustration to COATI. In the film's geometric comparison the reference endpoints are fixed, and only the action tradeoff is varied. The end screen's full objective is schematic paper notation: reference, manifold and mass coefficients are absorbed into their loss symbols. Mass applies only to the growth/unbalanced extension. No claim is made that Cy disables independently weighted reference constraints in the implementation.
 
@@ -28,6 +34,6 @@ The Neural ODE equation connects the illustration to COATI. In the film's geomet
 
 - Without reference matching: miss observed distributions.
 - Without manifold support: take a shortcut through low-density regions.
-- Without mass matching: reach plausible positions with incorrect population mass; circle area denotes mass.
+- Without mass matching: reach plausible positions with incorrect population mass; cell abundance indicates mass.
 
 These are possible failure schematics, not measured ablation outcomes. No training code or original TraInf files are modified.
