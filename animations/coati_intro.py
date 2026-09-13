@@ -331,28 +331,46 @@ class COATIIntro(LossPanels,Scene):
         self.play(Create(left),Create(right),run_time=.5)
         self.play(LaggedStart(*[Create(m) for m in links],lag_ratio=.25),run_time=.7)
         self.wait(.25)
-        # Exact artwork tiles: every final letter is taken from the supplied logo.
-        from PIL import Image
+        # Isolate semantic letter silhouettes, not rectangular strips that cut
+        # diagonals or reveal a neighboring letter before its turn.
+        from PIL import Image, ImageDraw
         pixels=np.asarray(Image.open(Path(__file__).resolve().parents[1]/'assets/coati-logo.png').convert('RGB'))
         h,w=pixels.shape[:2];scale=11.5/w
-        def tile(x0,y0,x1,y1):
-            m=ImageMobject(pixels[y0:y1,x0:x1].copy()).set_width((x1-x0)*scale)
-            return m.move_to([((x0+x1)/2-w/2)*scale,(h/2-(y0+y1)/2)*scale,0])
-        c_art=tile(0,0,650,h)
-        o_art=tile(650,0,1018,580)
-        a_art=tile(1018,0,1350,580)
-        t_art=tile(1350,0,1695,580)
-        i_art=tile(1695,0,w,580)
-        caption=tile(650,580,w,h)
+        def point(x,y):return np.array([(x-w/2)*scale,(h/2-y)*scale,0])
+        def artwork(polygon, achromatic=False):
+            mask=Image.new('L',(w,h));ImageDraw.Draw(mask).polygon(polygon,fill=255)
+            alpha=np.asarray(mask).copy()
+            if achromatic:alpha[np.ptp(pixels.astype(float),axis=2)>18]=0
+            rgba=np.dstack([pixels,alpha])
+            return ImageMobject(rgba).set_width(11.5)
+        c_art=artwork([(0,0),(750,0),(750,224),(650,224),(650,793),(0,793)])
+        o_art=artwork([(838+183*np.cos(t),405+180*np.sin(t)) for t in np.linspace(0,TAU,120)],achromatic=True)
+        a_art=artwork([(989,579),(1140,235),(1265,235),(1405,579)])
+        t_art=artwork([(1360,230),(1680,230),(1680,580),(1360,580)])
+        i_art=artwork([(1720,230),(1820,230),(1820,580),(1720,580)])
+        caption=artwork([(650,580),(w,580),(w,h),(650,h)])
+        # Match the precursor geometry to the artwork before the fixed-position
+        # crossfade. No image bounding-box morph and no shifting letter tiles.
+        match_upper=curve([point(185,358),point(277,250),point(421,216),point(590,121)],BLUE,15)
+        match_lower=curve([point(202,492),point(325,566),point(447,577),point(554,541)],ORANGE,15)
+        match_o=Ellipse(width=350*scale,height=350*scale,stroke_color=charcoal,stroke_width=32).move_to(point(838,409))
+        match_left=Line(point(1040,556),point(1185,263),color=BLUE,stroke_width=13)
+        match_right=Line(point(1219,263),point(1345,556),color=ORANGE,stroke_width=13)
+        match_bridge=DashedLine(point(1145,454),point(1248,454),color=charcoal,stroke_width=5,dash_length=.085)
         background=Rectangle(width=15,height=9,stroke_width=0,fill_color=WHITE,fill_opacity=1)
         self.add(background);self.bring_to_back(background)
-        self.play(FadeTransform(VGroup(upper,lower,branches,blue_tip,orange_tip),c_art),
-                  FadeTransform(seed,o_art),run_time=.8)
-        self.play(FadeTransform(VGroup(left,right,links),a_art),run_time=.65)
+        self.play(Transform(upper,match_upper),Transform(lower,match_lower),
+                  FadeOut(branches),FadeOut(blue_tip),FadeOut(orange_tip),
+                  Transform(seed[0],match_o),FadeOut(seed[1]),
+                  Transform(left,match_left),Transform(right,match_right),
+                  Transform(links,match_bridge),run_time=.65)
+        self.play(FadeOut(upper),FadeOut(lower),FadeIn(c_art),
+                  FadeOut(seed[0]),FadeIn(o_art),run_time=.4)
+        self.play(FadeOut(left),FadeOut(right),FadeOut(links),FadeIn(a_art),run_time=.4)
         self.play(FadeIn(t_art),run_time=.3)
         self.play(FadeIn(i_art),run_time=.3)
         self.play(FadeIn(caption),run_time=.35)
-        # Replace the tiled reveal with the untouched source image for the hold.
         exact=ImageMobject(pixels).set_width(11.5)
-        self.remove(c_art,o_art,a_art,t_art,i_art,caption);self.add(exact)
+        self.play(FadeIn(exact),run_time=.25)
+        self.remove(c_art,o_art,a_art,t_art,i_art,caption)
         self.wait(1.5)
