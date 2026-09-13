@@ -303,26 +303,30 @@ class COATIIntro(LossPanels,Scene):
         lower = curve([origin, [-2., -.7, 0], [-.2, -.8, 0], [1.4, -1.4, 0]], ORANGE, 9)
         blue_tip = cell(origin, .18, BLUE)
         orange_tip = cell(origin, .18, ORANGE)
+        def branch_pair(up,down):
+            result=VGroup()
+            for path,col,sign in [(up,BLUE,1),(down,ORANGE,-1)]:
+                for j in range(3):
+                    start=path.point_from_proportion(.72)
+                    end=path.get_end()+np.array([.15+.15*j,sign*(.30-.28*j),0])
+                    result.add(curve([start,(start+end)/2+[0,.10*sign,0],end],col,4),
+                               Dot(end,radius=.07+.012*j,color=col))
+            return result
+        branches=branch_pair(upper,lower)
         self.add(blue_tip, orange_tip)
-        self.play(Create(upper), Create(lower), MoveAlongPath(blue_tip, upper),
-                  MoveAlongPath(orange_tip, lower), run_time=1.4, rate_func=smooth)
-        # Curl both paths around the same opening to form the C silhouette.
-        center = np.array([-3.55, .0, 0.])
-        angles = np.linspace(np.pi, .29*np.pi, 90)
-        upper_c = curve([center+[1.32*np.cos(a),1.43*np.sin(a),0] for a in angles], BLUE, 15)
-        lower_c = curve([center+[1.32*np.cos(a),-1.43*np.sin(a),0] for a in angles], ORANGE, 15)
-        self.play(Transform(upper, upper_c), Transform(lower, lower_c),
+        self.play(Create(upper),Create(lower),MoveAlongPath(blue_tip,upper),
+                  MoveAlongPath(orange_tip,lower),
+                  Succession(Wait(.85),Create(branches,run_time=.55)),
+                  run_time=1.4,rate_func=smooth)
+        center=np.array([-3.55,0.,0.])
+        angles=np.linspace(np.pi,.29*np.pi,90)
+        upper_c=curve([center+[1.32*np.cos(a),1.43*np.sin(a),0] for a in angles],BLUE,15)
+        lower_c=curve([center+[1.32*np.cos(a),-1.43*np.sin(a),0] for a in angles],ORANGE,15)
+        self.play(Transform(upper,upper_c),Transform(lower,lower_c),
+                  Transform(branches,branch_pair(upper_c,lower_c)),
                   blue_tip.animate.move_to(upper_c.get_end()),
                   orange_tip.animate.move_to(lower_c.get_end()),
-                  seed.animate.move_to([-1.2, 0, 0]), run_time=1.4)
-        branches = VGroup()
-        for path, col, sign in [(upper, BLUE, 1), (lower, ORANGE, -1)]:
-            for j in range(3):
-                a=path.point_from_proportion(.70+.09*j)
-                b=path.get_end()+np.array([.20+.17*j, sign*(.18-.17*j), 0])
-                branches.add(curve([a,(a+b)/2+[0,.12*sign,0],b],col,4),
-                             Dot(b,radius=.07+.012*j,color=col))
-        self.play(LaggedStart(*[Create(m) for m in branches],lag_ratio=.06),run_time=.6)
+                  seed.animate.move_to([-1.2,0,0]),run_time=1.4)
         # Paired modality strands and cross-links make alignment visible first.
         left=Line([.25,-1.12,0],[.68,1.12,0],color=BLUE,stroke_width=8)
         right=Line([1.55,-1.12,0],[1.12,1.12,0],color=ORANGE,stroke_width=8)
@@ -360,13 +364,19 @@ class COATIIntro(LossPanels,Scene):
         background=Rectangle(width=15,height=9,stroke_width=0,fill_color=WHITE,fill_opacity=1)
         self.add(background);self.bring_to_back(background)
         self.play(Transform(upper,match_upper),Transform(lower,match_lower),
-                  FadeOut(branches),FadeOut(blue_tip),FadeOut(orange_tip),
+                  Transform(branches,branch_pair(match_upper,match_lower)),FadeOut(blue_tip),FadeOut(orange_tip),
                   Transform(seed[0],match_o),FadeOut(seed[1]),
                   Transform(left,match_left),Transform(right,match_right),
                   Transform(links,match_bridge),run_time=.65)
-        self.play(FadeOut(upper),FadeOut(lower),FadeIn(c_art),
+        self.play(FadeOut(upper),FadeOut(lower),FadeOut(branches),FadeIn(c_art),
                   FadeOut(seed[0]),FadeIn(o_art),run_time=.4)
-        self.play(FadeOut(left),FadeOut(right),FadeOut(links),FadeIn(a_art),run_time=.4)
+        self.wait(.15)
+        # Expand the complete A legs before revealing its texture. This avoids
+        # an isolated triangular toe appearing beside the narrow precursor.
+        solid_left=Polygon(point(992,568),point(1090,568),point(1200,310),point(1198,250),point(1144,250),stroke_width=0,fill_color=BLUE,fill_opacity=1)
+        solid_right=Polygon(point(1198,250),point(1247,250),point(1398,568),point(1303,568),point(1198,310),stroke_width=0,fill_color=ORANGE,fill_opacity=1)
+        self.play(Transform(left,solid_left),Transform(right,solid_right),run_time=.4)
+        self.play(FadeOut(left),FadeOut(right),FadeOut(links),FadeIn(a_art),run_time=.3)
         self.play(FadeIn(t_art),run_time=.3)
         self.play(FadeIn(i_art),run_time=.3)
         self.play(FadeIn(caption),run_time=.35)
