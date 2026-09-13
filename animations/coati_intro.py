@@ -363,8 +363,7 @@ class COATIIntro(LossPanels,Scene):
         match_bridge=DashedLine(point(1145,454),point(1248,454),color=charcoal,stroke_width=5,dash_length=.085)
         background=Rectangle(width=15,height=9,stroke_width=0,fill_color=WHITE,fill_opacity=1)
         self.add(background);self.bring_to_back(background)
-        self.play(Transform(upper,match_upper),Transform(lower,match_lower),
-                  Transform(branches,branch_pair(match_upper,match_lower)),FadeOut(blue_tip),FadeOut(orange_tip),
+        self.play(FadeOut(blue_tip),FadeOut(orange_tip),
                   Transform(seed[0],match_o),FadeOut(seed[1]),
                   Transform(left,match_left),Transform(right,match_right),
                   Transform(links,match_bridge),run_time=.65)
