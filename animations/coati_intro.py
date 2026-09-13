@@ -170,8 +170,8 @@ class COATIIntro(LossPanels,Scene):
         self.camera.background_color=BG
         title=words('Synchronized Optimal Transport',31).move_to([0,3.32,0])
         sub=VectorizedPoint([0,2.76,0])
-        primary_label=words('Primary · 2D projection',18,BLUE).move_to([-3.55,2.16,0])
-        secondary_label=words('Secondary · 3D geometry',18,ORANGE).move_to([3.55,2.16,0])
+        primary_label=words('Primary',18,BLUE).move_to([-3.55,2.16,0])
+        secondary_label=words('Secondary',18,ORANGE).move_to([3.55,2.16,0])
         self.add(title,sub)
         from mixture import mixture_contours
         snapshots=[mixture_contours(INITIAL,SHAPES[:2])[0],mixture_contours(TERMINAL,SHAPES[2:])[0]]
