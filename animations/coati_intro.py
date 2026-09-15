@@ -352,7 +352,9 @@ class COATIIntro(LossPanels,Scene):
         a_art=artwork([(989,579),(1140,235),(1265,235),(1405,579)])
         t_art=artwork([(1360,230),(1680,230),(1680,580),(1360,580)])
         i_art=artwork([(1720,230),(1820,230),(1820,580),(1720,580)])
-        caption=artwork([(650,580),(w,580),(w,h),(650,h)])
+        caption_background=Rectangle(width=(w-650)*scale,height=(h-580)*scale,stroke_width=0,fill_color=WHITE,fill_opacity=1).move_to(point((650+w)/2,(580+h)/2))
+        caption_text=words('Cross-Omics Aligned Trajectory Inference',25,charcoal).set_width(1155*scale).move_to(point(1247,614))
+        caption=VGroup(caption_background,caption_text)
         # Match the precursor geometry to the artwork before the fixed-position
         # crossfade. No image bounding-box morph and no shifting letter tiles.
         match_upper=curve([point(185,358),point(277,250),point(421,216),point(590,121)],BLUE,15)
@@ -379,7 +381,7 @@ class COATIIntro(LossPanels,Scene):
         self.play(FadeIn(t_art),run_time=.3)
         self.play(FadeIn(i_art),run_time=.3)
         self.play(FadeIn(caption),run_time=.35)
-        exact=ImageMobject(pixels).set_width(11.5)
+        exact=Group(ImageMobject(pixels).set_width(11.5),caption.copy())
         self.play(FadeIn(exact),run_time=.25)
         self.remove(c_art,o_art,a_art,t_art,i_art,caption)
         self.wait(1.5)
