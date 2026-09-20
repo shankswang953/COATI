@@ -236,7 +236,6 @@ def log_losses_to_tensorboard(writer, Whole_results, itr, args):
     + Whole_results['forward_sinkhorn_pdf_loss'] * args.pdf_coefficient 
     + Whole_results['forward_energy_loss'] * args.energy_coefficient 
     + Whole_results['reverse_matching_loss'] * args.pdf_coefficient 
-    + Whole_results['forward_mmd_loss'] * args.pdf_coefficient 
     +Whole_results['forward_mass_loss'] * args.mass_coefficient 
     )
 
@@ -249,8 +248,6 @@ def log_losses_to_tensorboard(writer, Whole_results, itr, args):
 
         if args.sync_pdf_loss:
             sec_loss = sec_loss + Whole_results['sync_pdf_loss'] * args.pdf_coefficient 
-        if args.sync_mmd_loss:
-            sec_loss = sec_loss + Whole_results['sync_mmd_loss'] * args.pdf_coefficient
 
         total_loss = total_loss + sec_loss
 
@@ -265,8 +262,6 @@ def log_losses_to_tensorboard(writer, Whole_results, itr, args):
         writer.add_scalar('Primal/rhog2_unbalanced', to_scalar(Whole_results['forward_energy_growth']), itr)
     else:
         writer.add_scalar('Primal/rhov2_balanced', to_scalar(Whole_results['forward_energy_loss']), itr)
-    if args.mmd_loss:
-        writer.add_scalar('Primal/mmd_terminal_matching', to_scalar(Whole_results['forward_mmd_loss']), itr)
     if args.reverseMatching:
         writer.add_scalar('Primal/reverse_matching_loss', to_scalar(Whole_results['reverse_matching_loss']), itr)
     
@@ -275,7 +270,5 @@ def log_losses_to_tensorboard(writer, Whole_results, itr, args):
         writer.add_scalar('Secondary/sync_rhov2', to_scalar(Whole_results['sync_secondary_energy_loss']), itr)
         if args.sync_pdf_loss:
             writer.add_scalar('Secondary/sync_terminal_matching', to_scalar(Whole_results['sync_pdf_loss']), itr)
-        if args.sync_mmd_loss:
-            writer.add_scalar('Secondary/sync_mmd_matching', to_scalar(Whole_results['sync_mmd_loss']), itr)
         if args.sync_density_loss:
             writer.add_scalar('Secondary/sync_manifold_constraint', to_scalar(Whole_results['sync_density_loss']), itr)

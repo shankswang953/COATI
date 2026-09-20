@@ -12,7 +12,7 @@ from .data import TemporalData
 def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
         map_config=None,
         primal_norm_path=None, sec_norm_path=None, warm_start_path=None,
-        metric_primal=None, metric_secondary=None, verbose=False):
+        verbose=False):
     """Fit validated snapshots and return a portable Result.
 
     Output directories must be empty; repeated notebook runs never erase previous logs.
@@ -100,8 +100,7 @@ def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
                 stack.enter_context(contextlib.redirect_stderr(log))
             trained = run_training(args, T_model=T_model, map_model=map_model,
                                    primal_norm_path=primal_norm_path, sec_norm_path=sec_norm_path,
-                                   warm_start_path=warm_start_path, metric_primal=metric_primal,
-                                   metric_secondary=metric_secondary)
+                                   warm_start_path=warm_start_path)
     if not (out/"checkpoints/path_param.pth").exists():
         raise RuntimeError(f"Training did not finish; see {out/'training.log'}")
     metadata = {"version": 1, "config": cfg.to_dict(), "times": data.times.tolist(), "labels": data.labels,

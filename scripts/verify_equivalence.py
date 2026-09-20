@@ -32,7 +32,7 @@ def main():
         new=fit(data,cfg,output_dir=cli.output/(name+"-coati"))
         directory=(cli.output/(name+"-reference")).resolve();directory.mkdir()
         keys=data.save_npz(directory/"inputs");(directory/"checkpoints").mkdir()
-        values=cfg.to_dict();values.update(data_path=str(directory/"inputs/primary.npz"),sync_data_path=str(directory/"inputs/secondary.npz"),
+        values=cfg.to_dict();values.update(mmd_loss=False,sync_mmd_loss=False);values.update(data_path=str(directory/"inputs/primary.npz"),sync_data_path=str(directory/"inputs/secondary.npz"),
             time_labels=keys,time_points=data.times.tolist(),otdim=2,train_dir=str(directory/"checkpoints"),results_dir=str(directory/"logs"))
         with (directory/"training.log").open("w") as log,contextlib.redirect_stdout(log),contextlib.redirect_stderr(log):
             old=original.run_training(types.SimpleNamespace(**values))

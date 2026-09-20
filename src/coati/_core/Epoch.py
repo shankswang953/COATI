@@ -14,7 +14,7 @@ from .utility import log_losses_to_tensorboard, build_exp_name
 
 
 def train_path_epoch(func, primary_data, time_points, time_steps_list,
-               optimizer, device, args, MapModel = None, metric_primal = None, metric_secondary = None, secondary_data=None, writer=None, loss_meter=None, scheduler=None, rare_files=None,
+               optimizer, device, args, MapModel = None, secondary_data=None, writer=None, loss_meter=None, scheduler=None, rare_files=None,
                sinkhorn_primal_list=None, sinkhorn_secondary_list=None):
     
     try:
@@ -75,14 +75,12 @@ def train_path_epoch(func, primary_data, time_points, time_steps_list,
             
             Whole_results =  {
                 'forward_density_loss': 0.0,
-                'forward_mmd_loss': 0.0,
                 'forward_sinkhorn_pdf_loss': 0.0,
                 'forward_energy_loss': 0.0,
                 'forward_energy_velocity': 0.0,
                 'forward_energy_growth': 0.0,
                 'forward_mass_loss': 0.0,
                 'sync_secondary_energy_loss': 0.0,
-                'sync_mmd_loss': 0.0,
                 'sync_pdf_loss': 0.0,
                 'sync_density_loss': 0.0,
                 'reverse_matching_loss': 0.0,
@@ -119,8 +117,6 @@ def train_path_epoch(func, primary_data, time_points, time_steps_list,
                     time_steps_list=time_steps_list,
                     device=device,
                     MapModel=MapModel,
-                    metric_primal=metric_primal,
-                    metric_secondary=metric_secondary,
                     args=args,
                     itr=itr + epoch * args.niters,
                     rare_files=rare_files,

@@ -84,8 +84,6 @@ def run_training(
     primal_norm_path=None,
     sec_norm_path=None,
     warm_start_path=None,
-    metric_primal=None,
-    metric_secondary=None,
 ):
     """
     Run the full training pipeline.
@@ -106,8 +104,6 @@ def run_training(
         warm_start_path: optional checkpoint filename (relative to
             ``args.train_dir``). If given, ``func`` is initialized from this
             checkpoint before training (warm-start). Pass None for a fresh run.
-        metric_primal / metric_secondary: optional Riemannian metrics forwarded
-            to ``train_path_epoch``.
 
     Returns:
         dict with keys:
@@ -531,8 +527,6 @@ def run_training(
         device=device,
         secondary_data=secondary_data,
         MapModel=map_model,
-        metric_primal=metric_primal,
-        metric_secondary=metric_secondary,
         args=args,
         loss_meter=loss_meter,
         scheduler=scheduler,

@@ -6,12 +6,11 @@ from typing import Tuple, List, Dict
 from .Loss import calculate_density_loss, calculate_pdf_loss, calc_mass_loss
 from .DataLoad import Sampling
 from torchdiffeq import odeint
-from .Loss import MMD_loss, sample_target, calculate_pdf_loss
+from .Loss import sample_target, calculate_pdf_loss
 from .MapSpace import map_whole_trajectory2another_manifold, smooth_trajectory, kernel_project_paired
 from geomloss import SamplesLoss
 from torch.utils.checkpoint import checkpoint
 from .Integration import CrossModalVAE
-from .RiemannMetric import ConformalMetric
 
 
 import time
@@ -121,8 +120,6 @@ def short_term_loss(
     time_steps_list: List[Tuple] = None,
     device: torch.device = None,
     MapModel: CrossModalVAE = None,
-    metric_primal: ConformalMetric = None,
-    metric_secondary: ConformalMetric = None,
     args = None,
     itr=None,
     rare_files=None,
@@ -149,7 +146,6 @@ def short_term_loss(
     """
     # get arguments
 
-    mmd_criterion = MMD_loss()
     # Get current and next time point data
     z_curr_primal = primary_data[t_idx]
     z_next_primal = primary_data[t_idx + 1]
@@ -208,14 +204,12 @@ def short_term_loss(
     # Initialize results dictionary
     results =  {
         'forward_density_loss': 0.0,
-        'forward_mmd_loss': 0.0,
         'forward_sinkhorn_pdf_loss': 0.0,
         'forward_energy_loss': 0.0,
         'forward_energy_velocity': 0.0,
         'forward_energy_growth': 0.0,
         'forward_mass_loss': 0.0,
         'sync_secondary_energy_loss': 0.0,
-        'sync_mmd_loss': 0.0,
         'sync_pdf_loss': 0.0,
         'sync_density_loss': 0.0,
         'reverse_matching_loss': 0.0,
@@ -302,18 +296,6 @@ def short_term_loss(
 
     if args.time_plot:
         t0 = tic()
-        
-    # Calculate MMD loss
-    mmd_loss = 0
-    if args.mmd_loss:
-        next_mmd = mmd_criterion(zt_primal_sample[-1], z_next_sub)
-        mmd_loss = next_mmd 
-        results['forward_mmd_loss'] = mmd_loss
-    if args.time_plot:
-        toc(t0, "MMD Loss")
-    
-    if args.time_plot:
-        t0 = tic()
     if args.sinkhorn_pdf:
         if args.unbalancedModel:
             loss_pdf = calculate_pdf_loss(
@@ -391,9 +373,6 @@ def short_term_loss(
                 sinkhorn_loss=sinkhorn_primal_list[t_idx],
             )
             results['reverse_matching_loss'] = reverse_matching_loss
-        if args.mmd_loss:
-            reverse_matching_loss = mmd_criterion(zt_reverse_sample[-1], z_curr_sub)
-            results['reverse_matching_loss'] = reverse_matching_loss 
 
         
     
@@ -476,26 +455,12 @@ def short_term_loss(
         # generate point cloud pairs
         
 
-        if metric_secondary is None:
-            diff = secondary_trajectory[1:] - secondary_trajectory[:-1]   # (T-1, N, D)
-            sq = diff.pow(2).sum(dim=2)           # (T-1, N)
-            secondary_energy_loss = (0.5 * sq.sum(dim=0) / args.dt).mean()
-            #batch_losses = [w2_loss((pc1), (pc2)) for pc1, pc2 in point_cloud_pairs]
-            #secondary_energy_loss = torch.sum((torch.stack(disp)**2), dim=0).mean()/args.dt
-            results['sync_secondary_energy_loss'] = secondary_energy_loss
-        else:
-            T, B, D = secondary_trajectory.shape
-            trajectory_1 = secondary_trajectory[:-1]
-            trajectory_2 = secondary_trajectory[1:]
-            velocity = (trajectory_2 - trajectory_1) / args.dt
-            mid_trajectory = (trajectory_1 + trajectory_2) / 2
-
-            v_flat = velocity.reshape(-1, D)
-            mid_flat = mid_trajectory.reshape(-1, D)
-            speed_square = metric_secondary.speed(mid_flat, v_flat)
-            speed_square = speed_square.reshape(T-1, B, 1)
-            secondary_energy_loss = speed_square.sum(dim=0).mean() * args.dt
-            results['sync_secondary_energy_loss'] = secondary_energy_loss
+        diff = secondary_trajectory[1:] - secondary_trajectory[:-1]   # (T-1, N, D)
+        sq = diff.pow(2).sum(dim=2)           # (T-1, N)
+        secondary_energy_loss = (0.5 * sq.sum(dim=0) / args.dt).mean()
+        #batch_losses = [w2_loss((pc1), (pc2)) for pc1, pc2 in point_cloud_pairs]
+        #secondary_energy_loss = torch.sum((torch.stack(disp)**2), dim=0).mean()/args.dt
+        results['sync_secondary_energy_loss'] = secondary_energy_loss
 
 
 
@@ -512,10 +477,6 @@ def short_term_loss(
 
         if args.time_plot:
             t0 = tic()
-        # sync mmd loss
-        if args.sync_mmd_loss:
-            sync_mmd_loss = mmd_criterion(secondary_trajectory[-1], next_sec_sub)
-            results['sync_mmd_loss'] = sync_mmd_loss
 
 
         if args.sync_pdf_loss:

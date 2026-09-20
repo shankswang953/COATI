@@ -1,0 +1,41 @@
+{
+  "baseline_commit": "e05b2f8c70e20426bebae3016b2453fbb000f7d1",
+  "scope": "MMD and custom Riemannian metric removal; unchanged W2/Sinkhorn and Euclidean energy",
+  "device": "cpu",
+  "iterations_per_case": 4,
+  "seed": 0,
+  "paired_cells_per_stage": 32,
+  "tests": {
+    "passed": 28,
+    "warnings": 1,
+    "warning": "Expected map-quality warning from deliberately short paired toy training"
+  },
+  "comparisons": [
+    {
+      "case": "balanced",
+      "max_parameter_difference": 0.0,
+      "max_trajectory_difference": 0.0
+    },
+    {
+      "case": "kernel_sync",
+      "max_parameter_difference": 0.0,
+      "max_trajectory_difference": 0.0
+    },
+    {
+      "case": "film_sync",
+      "max_parameter_difference": 0.0,
+      "max_trajectory_difference": 0.0
+    },
+    {
+      "case": "unbalanced",
+      "max_parameter_difference": 0.0,
+      "max_trajectory_difference": 0.0
+    },
+    {
+      "case": "adaptive",
+      "max_parameter_difference": 0.0,
+      "max_trajectory_difference": 0.0
+    }
+  ],
+  "known_preexisting_failure": "reverseMatching=True failed in the baseline with IndexError in Neural.py:73 (reverse ODE state shape); excluded from equivalence claims; not changed in this cleanup."
+}

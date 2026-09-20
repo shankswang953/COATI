@@ -51,3 +51,10 @@ These are original normalization dictionaries containing `scale`, applied as `x 
 ## Time spacing
 
 Training uses the original Euler integrator and energy formulas. The wrapper rejects grids whose intervals are not integer multiples of `dt`, rather than changing their integration silently. Prediction defaults to RK4 on 41 grid points, independently of the training grid. Specify `method="euler"` and an explicit matching grid for a training-discretization comparison.
+
+### Distribution matching
+
+Matching uses the existing W2-based Sinkhorn loss (`p=2`). MMD matching and custom
+Riemannian metric arguments are no longer supported. This does not remove
+`result.evaluate()` or its evaluation metrics. See [migration](migration.md)
+for loading older configurations.

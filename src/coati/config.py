@@ -58,6 +58,15 @@ class Config:
     to reuse the research pipeline's normalization exactly.
     """
     def __init__(self, *, extra=None, **kwargs):
+        # Old W2-only saved configs contain disabled MMD flags. Drop only False;
+        # never silently reinterpret a configuration that requested MMD matching.
+        kwargs = dict(kwargs)
+        extra = dict(extra or {})
+        for fields in (kwargs, extra):
+            for key in ("mmd_loss", "sync_mmd_loss"):
+                if key in fields:
+                    if fields.pop(key) is not False:
+                        raise ValueError(f"{key} has been removed; matching uses W2 (Sinkhorn, p=2).")
         defaults = json.loads(Path(__file__).with_name("_defaults.json").read_text())
         unknown = set(kwargs) - set(defaults)
         if unknown:
