@@ -61,6 +61,10 @@ data = ct.TemporalData.from_npz(
 
 Cross-modal inputs must be paired **within each snapshot**, including row identity and ordering. Across-time cells may be unpaired and counts may differ. Inputs are used as supplied: no hidden normalization, PCA or log transform.
 
+## External-method benchmarks
+
+[TraInfBench](https://github.com/shankswang953/TraInfBench) hosts the external-method portion of our benchmark comparison, including the code for running external methods and comparing them with COATI.
+
 ## Documentation
 
 ```bash
