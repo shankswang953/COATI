@@ -45,6 +45,7 @@ tutorials
 :caption: Understand and extend
 
 configuration
+maps
 api
 migration
 validation

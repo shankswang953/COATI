@@ -28,7 +28,7 @@ def main():
                             ("adaptive","gaussian",dict(adaptive_lambda=True,extra={"dual_warmup":0,"dual_update_freq":1}))]:
         data=getattr(datasets,kind)(n=40)
         steps=100 if name=="diagnostic_100" else 4
-        cfg=Config(niters=steps,num_samples=32,floor_n_sample=32,median_n_sample=40,hidden_dim=16,**extra)
+        cfg=Config(niters=steps,num_samples=32,floor_n_sample=32,median_n_sample=40,hidden_dim=16,map_type="kernel",**extra)
         new=fit(data,cfg,output_dir=cli.output/(name+"-coati"))
         directory=(cli.output/(name+"-reference")).resolve();directory.mkdir()
         keys=data.save_npz(directory/"inputs");(directory/"checkpoints").mkdir()

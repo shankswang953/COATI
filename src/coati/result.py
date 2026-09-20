@@ -11,10 +11,12 @@ class Result:
         self.output_dir = Path(output_dir)
         self.T_model = T_model
         self.map_model = map_model
+        report_path = metadata.get("map_report")
+        self.map_report = json.loads((self.output_dir / report_path).read_text()) if report_path else None
 
     @classmethod
     def load(cls, directory, *, device="cpu", T_model=None, map_model=None):
-        """Reload weights and input snapshots. Custom map architecture is supplied by the caller."""
+        """Reload trajectories and built-in maps; external maps must be supplied again."""
         import torch
         from ._core.Neural import MLPVectorField
         directory = Path(directory)
@@ -28,13 +30,20 @@ class Result:
         secondary = directory/"inputs/secondary.npz"
         data = TemporalData.from_npz(directory/"inputs/primary.npz", times=meta["times"],
                                      secondary_path=secondary if secondary.exists() else None)
+        from .maps import load_map, freeze_external_map
+        if T_model is not None and map_model is not None:
+            raise ValueError("Supply only one of T_model and map_model.")
+        if T_model is None and map_model is None and meta.get("map_checkpoint"):
+            T_model = load_map(directory / meta["map_checkpoint"], device=device)
+        elif T_model is not None:
+            T_model = freeze_external_map(T_model, device)
         import copy
         def freeze(m):
             if m is None: return None
             m=copy.deepcopy(m).to(device).eval()
             for p in m.parameters(): p.requires_grad_(False)
             return m
-        return cls(model, data, meta, directory, freeze(T_model), freeze(map_model))
+        return cls(model, data, meta, directory, T_model, freeze(map_model))
 
     def predict(self, initial=None, *, times=None, method="rk4", raw=True):
         """Return {times, primary, energy, log_weights?} on an increasing grid.

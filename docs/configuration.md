@@ -15,7 +15,7 @@
 | `blur_coeff` | 0.05 | Per-time, per-modality median-distance multiplier |
 | `sync_loss` | False | Enable cross-modal constraints |
 | `sync_weight` | 0 | Secondary kinetic-energy weight |
-| `map_type` | kernel | Scalar kernel; `accurate_kernel` uses per-cell bandwidths |
+| `map_type` | film | Automatically trained FiLM; `mlp` omits time; `kernel` and `accurate_kernel` retain explicit kernel modes |
 | `device` | cpu | Explicit public device choice |
 
 Use `config.to_dict()` to inspect every default. These are example defaults, not universal scientific recommendations. Explicitly port your experiment's settings to reproduce that experiment.
@@ -36,7 +36,9 @@ The unbalanced mass prior defaults to cumulative observed counts relative to the
 result = ct.fit(data, ct.Config(sync_loss=True, sync_weight=.35, map_type="MLP"), T_model=my_model)
 ```
 
-The original `forward(q, t)` contract is retained. COATI copies, moves, freezes and sets the supplied module to evaluation mode; the caller's object remains unchanged. Legacy `map_model` and primary/secondary metric arguments are forwarded. Custom architectures and maps are not serialized automatically; supply them again when needed after reload.
+The supplied map may implement `forward(q, t)` or `forward(q)`; COATI adapts the latter to ignore time. It must support inputs with arbitrary leading dimensions, including a time-by-particle tensor. COATI copies, moves, freezes and sets the supplied module to evaluation mode; the caller's object remains unchanged. It does not retrain the supplied map. Legacy `map_model` and primary/secondary metric arguments are forwarded. Custom architectures and maps are not serialized automatically; supply the same trained map again after reload. Providing a custom map does not establish which stages it was trained on; that exclusion remains the caller's responsibility.
+
+Without an external map, synchronized runs train and save a FiLM map automatically. `map_type="mlp"` selects a time-independent MLP. Pass `map_config=ct.MapConfig(...)` to configure epochs, validation splits and quality warnings. These settings apply only to automatically trained maps. See [Cross-modal maps](maps.md).
 
 ## Normalization
 

@@ -23,6 +23,18 @@ restored = ct.load_result(result.output_dir)
 restored.predict()
 ```
 
+## Paired modalities with an automatically trained map
+
+```python
+data = ct.datasets.paired(n=128)
+result = ct.fit(data, ct.Config(sync_loss=True, sync_weight=.35))
+print(result.map_report["status"])
+secondary = result.project_secondary()
+restored = ct.load_result(result.output_dir)  # restores the FiLM map too
+```
+
+The map is fitted to paired cells, validated within each supplied stage and frozen before trajectory fitting. Choose `map_type="mlp"` for a map without time input. The run contains `map/report.txt`, `map/report.json`, training history and the saved map. Quality warnings are visible even when trajectory logs are redirected. See [Cross-modal maps](maps.md) for held-out stages, custom maps and the configurable quality gate.
+
 ## Command line
 
 ```bash

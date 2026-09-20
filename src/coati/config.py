@@ -1,7 +1,54 @@
 """Configuration independent of command-line parsers and experiment folders."""
 import copy
 import json
+import math
+from dataclasses import asdict, dataclass
 from pathlib import Path
+
+
+@dataclass
+class MapConfig:
+    """Paired map fitting and validation, separate from trajectory settings.
+
+    Quality thresholds are configurable diagnostics, not universal acceptance criteria.
+    Validation cells are withheld within each supplied stage, not at new stages.
+    """
+    hidden_dim: int = 128
+    n_layers: int = 3
+    time_hidden_dim: int = 32
+    epochs: int = 300
+    batch_size: int = 1024
+    lr: float = 1e-3
+    weight_decay: float = 1e-4
+    validation_fraction: float = 0.2
+    patience: int = 30
+    eval_samples: int = 256
+    eval_repeats: int = 5
+    min_validation_cells: int = 20
+    max_normalized_mse: float = 0.5
+    max_sinkhorn_ratio: float = 5.0
+    quality_action: str = "warn"
+
+    def __post_init__(self):
+        for key in ("hidden_dim", "n_layers", "time_hidden_dim", "epochs", "batch_size",
+                    "patience", "eval_samples", "eval_repeats", "min_validation_cells"):
+            value = getattr(self, key)
+            if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+                raise ValueError(f"MapConfig.{key} must be a positive integer.")
+        if self.n_layers < 2:
+            raise ValueError("MapConfig.n_layers must be at least two.")
+        for key in ("lr", "max_normalized_mse", "max_sinkhorn_ratio"):
+            if not math.isfinite(getattr(self, key)) or getattr(self, key) <= 0:
+                raise ValueError(f"MapConfig.{key} must be finite and positive.")
+        if not math.isfinite(self.weight_decay) or self.weight_decay < 0:
+            raise ValueError("MapConfig.weight_decay must be finite and nonnegative.")
+        if not 0 < self.validation_fraction < 1:
+            raise ValueError("MapConfig.validation_fraction must be between zero and one.")
+        if self.quality_action not in {"warn", "error"}:
+            raise ValueError("MapConfig.quality_action must be 'warn' or 'error'.")
+
+    def to_dict(self):
+        return asdict(self)
 
 class Config:
     """Keep the original research parameter names; defaults target small CPU examples.

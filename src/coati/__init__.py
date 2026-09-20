@@ -1,6 +1,6 @@
 """COATI: Cross-Omics Alignment for Trajectory Inference."""
 from .data import TemporalData
-from .config import Config
+from .config import Config, MapConfig
 __version__ = "0.1.0"
 
 def fit(*args, **kwargs):

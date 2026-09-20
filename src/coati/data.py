@@ -116,3 +116,20 @@ class TemporalData:
         if self.secondary is not None:
             np.savez(directory / "secondary.npz", **dict(zip(keys,self.secondary)))
         return keys
+
+    def without_times(self, times):
+        """Return paired snapshots excluding exact numeric observation times.
+
+        Supply this object to fit to exclude the same stages from automatic map
+        fitting and trajectory fitting. Remaining numeric times are not renumbered.
+        At least two observed stages must remain. This does not refit preprocessing.
+        """
+        omitted = np.atleast_1d(np.asarray(times, dtype=float))
+        if omitted.ndim != 1 or not np.isfinite(omitted).all():
+            raise ValueError("Excluded times must be a finite one-dimensional sequence.")
+        if not np.isin(omitted, self.times).all():
+            raise ValueError("Every excluded time must be present in the observations.")
+        keep = np.flatnonzero(~np.isin(self.times, omitted))
+        return TemporalData([self.primary[i] for i in keep], self.times[keep],
+                            None if self.secondary is None else [self.secondary[i] for i in keep],
+                            [self.labels[i] for i in keep])

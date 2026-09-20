@@ -24,6 +24,8 @@ Only these mechanical changes were made inside the copied core:
 
 No loss constants, normalization formulas, neural architectures or update rules were changed. `evaluation.py` retains its secondary evaluation behavior. The wrapper checks inputs, stages numeric NPZ files, creates output directories, protects existing results and adds a reloadable result interface.
 
+The public synchronized default now adds a paired FiLM training step before calling this preserved engine. It freezes the resulting map and passes it through the existing `T_model` interface. `map_type="mlp"` uses an ordinary MLP instead. Explicit `map_type="kernel"` retains the original public default and is used by the original-engine equivalence checks. The automatic map's standardization and checkpoint selection are documented in [Cross-modal maps](maps.md); they do not modify the trajectory engine.
+
 ## Reproducing a previous experiment
 
 Transfer all numerical settings, use the same data, row order, numeric times, normalization dictionaries, model/map, seed and device. Public defaults intentionally target small CPU examples; replacing a production `Args.py` with the default `Config()` is not equivalent.

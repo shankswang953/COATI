@@ -7,6 +7,9 @@
 .. autoclass:: coati.config.Config
    :members:
 
+.. autoclass:: coati.config.MapConfig
+   :members:
+
 .. autofunction:: coati.training.fit
 
 .. autoclass:: coati.result.Result

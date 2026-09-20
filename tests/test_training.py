@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
-from coati import datasets, Config, fit, load_result
+from coati import datasets, Config, MapConfig, fit, load_result
 
 @pytest.mark.parametrize("kind",["gaussian","split","paired"])
 def test_fit_reload(kind,tmp_path):
     data=getattr(datasets,kind)(n=40)
     cfg=Config(niters=3,num_samples=32,floor_n_sample=32,median_n_sample=40,hidden_dim=16,sync_loss=kind=="paired",sync_weight=.35 if kind=="paired" else 0.)
-    r=fit(data,cfg,output_dir=tmp_path/"run")
+    r=fit(data,cfg,output_dir=tmp_path/"run",map_config=MapConfig(epochs=5,hidden_dim=16) if kind=="paired" else None)
     prediction=r.predict()
     assert np.isfinite(prediction["primary"]).all()
     loaded=load_result(tmp_path/"run")
@@ -37,5 +37,5 @@ def test_normalization_and_accurate_kernel(tmp_path):
 
 
 def test_disabled_density_diagnostic(tmp_path):
-    r=fit(datasets.paired(n=32),Config(niters=100,num_samples=26,floor_n_sample=26,median_n_sample=32,hidden_dim=8,sync_loss=True,sync_weight=.35,sync_density_loss=False),output_dir=tmp_path/"diagnostic")
+    r=fit(datasets.paired(n=32),Config(niters=100,num_samples=26,floor_n_sample=26,median_n_sample=32,hidden_dim=8,sync_loss=True,sync_weight=.35,sync_density_loss=False,map_type="kernel"),output_dir=tmp_path/"diagnostic")
     assert np.isfinite(r.predict()["primary"]).all()

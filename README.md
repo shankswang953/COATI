@@ -25,11 +25,16 @@ import coati as ct
 
 data = ct.datasets.paired()
 config = ct.Config(niters=200, sync_loss=True, sync_weight=0.35)
-result = ct.fit(data, config)  # creates a unique outputs/run-* directory
+result = ct.fit(data, config)  # trains FiLM first, freezes it, then trains the synchronized flow
 trajectory = result.predict()
 result.plot()
+print(result.map_report["status"])
 print(result.evaluate())
 ```
+
+No separately trained map is needed. Use `Config(..., map_type="mlp")` for a map without time input, or pass your own `T_model` to `fit`. Built-in maps and validation reports are saved with the run and restored by `ct.load_result`. Poor validation results raise a warning; `MapConfig(quality_action="error")` stops before trajectory training instead. See [cross-modal maps](docs/maps.md) for settings and report definitions.
+
+For a held-out stage, pass only the retained snapshots, for example `training_data = data.without_times([0.5])`. Both the default map and the flow then use only those snapshots. Keep the original numeric times and query the missing time with `result.predict(times=[0.0, 0.5, 1.0])`. This exclusion does not undo any preprocessing performed before creating `TemporalData`.
 
 ## Scripts and notebooks
 
@@ -78,6 +83,7 @@ The documentation uses Sphinx + Furo and includes a Read the Docs configuration.
 
 ```text
 src/coati/           public data, config, training and result interfaces
+src/coati/maps.py    automatic FiLM/MLP fitting, validation and checkpoints
 src/coati/_core/     preserved research engine with package-relative imports
 examples/           script entry point
 notebooks/          executable cell-by-cell tutorials

@@ -34,7 +34,7 @@
   "sync_mmd_loss": false,
   "sync_density_loss": false,
   "sync_pdf_loss": true,
-  "map_type": "kernel",
+  "map_type": "film",
   "kernel_sigma": 0.01,
   "adaptive_lambda": false,
   "blur_coeff": 0.05,
