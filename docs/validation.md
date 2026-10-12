@@ -6,6 +6,25 @@ The archived numerical results below used the earlier kernel-map default. They a
 
 On 2026-09-20, the default FiLM and time-independent MLP workflows were each run for 300 map epochs and 200 trajectory iterations on the paired toy with its middle stage omitted. Both completed without map-quality warnings and reproduced their primary and secondary predictions exactly after reload. The paired tutorial notebook was also executed with automatic FiLM fitting. These are CPU functional checks, not evidence of accuracy at held-out biological stages. The five original-engine equivalence checks were rerun with explicit kernel mapping and retained zero parameter differences.
 
+## Biological temporal holdout
+
+On 2026-10-12, [the pancreas reconstruction tutorial](tutorials/06_heldout_biological.ipynb)
+was executed on paired RNA PCA50 / ATAC PoissonVI22 inputs. E15.5 (t = 1) was
+excluded from both FiLM-map and vector-field fitting; E14.5 and E16.5 kept their
+original times 0 and 2. The vector-field checkpoint records exactly 1,000
+iterations, and RNA/ATAC predictions agreed after save/reload. The map passed its
+within-retained-stage validation checks; this does not establish unseen-stage map accuracy.
+
+The notebook includes shared UMAPs fitted only on retained observations and
+representation-space distribution scores. Mean Sinkhorn reconstruction scores
+were 0.3796 for RNA and 0.4914 for ATAC, versus 0.6399 and 0.7794 for the initial
+distributions. The equal endpoint-mixture baseline scored 0.3904 and 0.4573,
+so the short run did not beat that baseline in both modalities. These are one-seed
+results with five subsampling repeats, not convergence or biological-superiority claims.
+The existing all-data reduced representations and scalar normalization were fixed;
+this is not an end-to-end raw-data holdout. The resolved settings and input hashes
+are recorded in `provenance/heldout_pancreas_1000.json`.
+
 ## Original-engine equivalence
 
 Same data, float32 precision, settings and seed in the original and packaged engines. The original device selector is overridden to CPU **only in the comparison harness**; its source files remain untouched.
@@ -48,4 +67,4 @@ Machine-readable records are in `provenance/`: `equivalence.json`, `toy_metrics.
 
 ## Scope
 
-CPU results only. GPU/MPS, large biological datasets, full flow-matching pipelines and downstream biological analyses have not been validated here. This is a usability refactor and synthetic sanity check, not evidence of biological superiority.
+CPU results only. GPU/MPS, long biological training runs, full flow-matching pipelines and downstream molecular analyses have not been validated here. The toy checks and short biological holdout establish execution for these examples, not biological superiority.

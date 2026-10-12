@@ -26,7 +26,8 @@ def main():
         # Keep web titles short and retain all code and scientific outputs.
         titles = {"01_gaussian": "Gaussian translation", "02_paired": "Paired modalities",
                   "03_split": "Splitting and growth", "04_inputs": "Input adapters",
-                  "05_velocity": "Vector fields and UMAP velocity"}
+                  "05_velocity": "Vector fields and UMAP velocity",
+                  "06_heldout_biological": "Held-out biological reconstruction"}
         if notebook.cells and notebook.cells[0].cell_type == "markdown":
             first = notebook.cells[0].source.splitlines()
             first[0] = "# " + titles.get(source.stem, first[0].lstrip("# "))

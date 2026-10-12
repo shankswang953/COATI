@@ -80,6 +80,7 @@ Each run directory must be new. Results include the resolved config, input snaps
 - [03 · Splitting and growth](notebooks/03_split.ipynb)
 - [04 · Input formats](notebooks/04_inputs.ipynb)
 - [05 · Vector fields and AnnData UMAP velocity](notebooks/05_velocity.ipynb)
+- [06 · Held-out biological distribution reconstruction](notebooks/06_heldout_biological.ipynb)
 
 ## Your own data
 
@@ -122,4 +123,4 @@ provenance/         source hashes and validation records
 assets/             supplied COATI logo
 ```
 
-The original TraInf repositories are not dependencies and are not modified. Defaults are explicit toy-oriented choices; this release does not claim biological validation. Reference interface inspiration: [CytoBridge](https://github.com/zhenyiizhang/CytoBridge) and its [documentation](https://cytobridge.readthedocs.io/en/latest/index.html). No CytoBridge implementation is copied.
+The original TraInf repositories are not dependencies and are not modified. Defaults are explicit toy-oriented choices; the biological holdout notebook is a short reconstruction example, not a claim of convergence or biological superiority. Reference interface inspiration: [CytoBridge](https://github.com/zhenyiizhang/CytoBridge) and its [documentation](https://cytobridge.readthedocs.io/en/latest/index.html). No CytoBridge implementation is copied.
