@@ -125,7 +125,7 @@ def create_mixture_gaussian(mu, base_sigma, adaptive_sigma, device, max_componen
             v = pts.var(dim=0, unbiased=False).mean()
             cluster_var[k] = v
 
-    # mean of original sigmas (当作方差) in cluster, to preserve adaptive scale information
+    # Mean of cluster sigmas (treated as variances) preserves adaptive scale information.
     sigma_intra = torch.zeros(K, device=device, dtype=mu.dtype)
     for k in range(K):
         idx = (assign == k)

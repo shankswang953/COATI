@@ -25,7 +25,7 @@ def plot_losses(log_file="loss_log.npz", out_file="loss_plot.png"):
     data = np.load(log_file)
     epochs = range(1, len(data["total"]) + 1)
 
-    # 要画的 loss 名字和标题
+    # Loss keys and corresponding plot titles.
     loss_keys = ["rec", "cross", "kl", "align", "smooth", "total"]
     loss_titles = [
         "Reconstruction Loss",
@@ -230,7 +230,7 @@ def train(model, loader, x_rna_all, neighbor_pairs,
     model = model.to(device)
     opt = torch.optim.Adam(model.parameters(), lr=lr)
 
-    # 用来存 loss
+    # Store per-epoch loss history.
     history = {"rec": [], "cross": [], "kl": [], "align": [], "smooth": [], "total": []}
 
     for epoch in range(epochs):
@@ -264,7 +264,7 @@ def train(model, loader, x_rna_all, neighbor_pairs,
             total_align += l_align.item()
             total_smooth += l_smooth.item()
 
-        # 计算平均
+        # Compute epoch averages.
         n_batches = len(loader)
         history["rec"].append(total_rec / n_batches)
         history["cross"].append(total_cross / n_batches)

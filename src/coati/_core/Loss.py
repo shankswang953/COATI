@@ -444,13 +444,13 @@ def MultiNormal_density(point_cloud_a, point_cloud_b, sigma=5, device='cuda'):
     Calculate the probability density of point_cloud_b with respect to point_cloud_a.
     
     Args:
-        point_cloud_a (torch.Tensor): point cloud a (num_points_a, dimension)。
-        point_cloud_b (torch.Tensor): point cloud b (num_points_b, dimension)。
+        point_cloud_a (torch.Tensor): point cloud a (num_points_a, dimension).
+        point_cloud_b (torch.Tensor): point cloud b (num_points_b, dimension).
         sigma (float): the value of the diagonal elements of the covariance matrix.
         device (torch.device): the device for calculation (CPU or GPU).
         
     Returns:
-        torch.Tensor: the probability density of point cloud b with respect to point cloud a, shape (num_points_b,)。
+        torch.Tensor: the probability density of point cloud b with respect to point cloud a, shape (num_points_b,).
     """
    
     point_cloud_a = point_cloud_a.to(device)
