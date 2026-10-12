@@ -4,7 +4,7 @@ Prepare `celltype`, `time` and `barcode` with `ct.prepare_anndata` before
 training or plotting; see [input conventions](inputs.md). AnnData copies preserve
 source fields and order, and arrays can be assembled automatically.
 
-![Cell types and instantaneous growth with the same COATI flow](_static/dynamics-umap-example.png)
+![Gastrulation E8.5: supplied cell types and instantaneous growth with the same COATI flow](_static/dynamics-umap-example.png)
 
 ## Cell types, growth and flow together
 
@@ -45,9 +45,18 @@ result.plot_dynamics(cells[cells.obs["time"] == 1.].copy())
 
 `time=.5` evaluates a field at one common time on the displayed coordinates;
 it does not transport those cells to that time. Growth is unavailable for
-balanced models. The example image and [tutorial](tutorials/07_dynamics.ipynb)
-use a short synthetic unbalanced run; they demonstrate these functions, not
-converged population growth or biological cell-type inference.
+balanced models. The image and [biological tutorial](tutorials/07_dynamics.ipynb)
+use a 1,000-iteration multimodal unbalanced gastrulation run on all four observed
+stages. The plot shows all 11,470 E8.5 cells at their shared model time t = 2,
+with supplied cell-type names in the legend. RNA50 and paired ATAC14 inputs are
+already scaled; the source RNA UMAP is reused. Source data: Argelaguet and
+colleagues, [GSE205117](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205117),
+with prepared inputs from [TraInfBench](https://github.com/shankswang953/TraInfBench).
+This is a short workflow demonstration, not a convergence or proliferation claim.
+
+Run `examples/run_gastrulation_dynamics.py --data-dir /path/to/gastrulation
+--output outputs/gastrulation-dynamics --iterations 1000` to reproduce the example.
+The toy script `examples/run_dynamics.py` remains available for a small input check.
 
 ## Existing velocity interface
 

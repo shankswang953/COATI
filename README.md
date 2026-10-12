@@ -93,6 +93,7 @@ python examples/run_toy.py --dataset paired --output outputs/paired
 coati toy --dataset split --unbalanced --output outputs/unbalanced
 python examples/run_velocity.py --multimodal --unbalanced --output outputs/velocity
 python examples/run_dynamics.py --output outputs/dynamics
+python examples/run_gastrulation_dynamics.py --data-dir /path/to/gastrulation --output outputs/gastrulation-dynamics --iterations 1000
 python -m jupyterlab notebooks/
 ```
 
@@ -104,7 +105,7 @@ Each run directory must be new. Results include the resolved config, input snaps
 - [04 · Input formats](notebooks/04_inputs.ipynb)
 - [05 · Vector fields and AnnData UMAP velocity](notebooks/05_velocity.ipynb)
 - [06 · Held-out biological distribution reconstruction](notebooks/06_heldout_biological.ipynb)
-- [07 · Cell types, growth and UMAP flow](notebooks/07_dynamics.ipynb)
+- [07 · Gastrulation cell types, growth and UMAP flow](notebooks/07_dynamics.ipynb)
 
 ## Your own data
 

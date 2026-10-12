@@ -94,3 +94,27 @@ Balanced results did not fabricate growth values. This validates the interfaces
 and plotting behavior, not converged population mass or biological accuracy.
 Records are in `provenance/anndata_dynamics_validation.json`. The training
 algorithm under `src/coati/_core/` was not changed.
+
+## Gastrulation UMAP dynamics
+
+On 2026-10-12, the [biological dynamics tutorial](tutorials/07_dynamics.ipynb)
+was run on all 35,503 paired gastrulation cells (RNA50 / ATAC14) at times
+0, 1, 2 and 2.5. The multimodal unbalanced checkpoint records exactly 1,000
+vector-field iterations. The fitted FiLM map passed its configured within-stage
+validation checks, with checkpoint selection at epoch 53; these checks reuse
+validation cells for selection and do not establish independent biological accuracy.
+
+The figure displays all 11,470 E8.5 cells using the existing source RNA UMAP.
+Source annotations are preserved, with 3,015 missing labels explicitly marked
+`unknown` across the training data. Features are reused as supplied without a
+second normalization. No new UMAP or cell-type inference is performed.
+Velocities and instantaneous growth agree exactly after checkpoint reload;
+AnnData storage preserves the tested vectors, growth, coordinates and barcodes.
+The standalone script was verified by reloading the same run, and notebook
+plotting/storage cells were also checked from the notebook directory.
+
+This one-seed short run is a functional biological-data example, not a claim of
+convergence, lineage accuracy or measured proliferation. The resolved configuration,
+source hashes, map diagnostics and growth summaries are in
+`provenance/gastrulation_dynamics_1000.json`. No training algorithm or original
+TraInf file was changed.
