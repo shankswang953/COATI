@@ -46,3 +46,22 @@
 .. autoclass:: coati.maps.PairedMap
    :members: forward
 ```
+
+## Molecular trajectory readouts
+
+```{eval-rst}
+.. autofunction:: coati.downstream.read_h5ad_features
+
+.. autofunction:: coati.downstream.fit_feature_decoder
+
+.. autoclass:: coati.downstream.FeatureDecoder
+   :members: predict, validate
+
+.. autofunction:: coati.downstream.select_lineage
+
+.. autofunction:: coati.downstream.compute_feature_dynamics
+
+.. autofunction:: coati.downstream.plot_feature_dynamics
+
+.. autofunction:: coati.downstream.plot_feature_heatmap
+```

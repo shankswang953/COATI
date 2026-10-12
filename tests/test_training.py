@@ -39,3 +39,30 @@ def test_normalization_and_accurate_kernel(tmp_path):
 def test_disabled_density_diagnostic(tmp_path):
     r=fit(datasets.paired(n=32),Config(niters=100,num_samples=26,floor_n_sample=26,median_n_sample=32,hidden_dim=8,sync_loss=True,sync_weight=.35,sync_density_loss=False,map_type="kernel"),output_dir=tmp_path/"diagnostic")
     assert np.isfinite(r.predict()["primary"]).all()
+
+
+def test_later_start_inference_is_explicit_and_preserves_default(tmp_path):
+    import torch
+    from coati.result import Result
+    class ConstantField(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.anchor=torch.nn.Parameter(torch.zeros(1))
+        def forward(self,time,state):
+            x,energy=state
+            return torch.ones_like(x),torch.zeros_like(energy)
+    data=datasets.gaussian(n=8)
+    result=Result(ConstantField(),data,{'dimension':2,'primary_scale':2.,'config':{'unbalancedModel':False}},tmp_path)
+    initial=np.zeros((3,2))
+    later=result.predict_trajectory(initial,start_time=.5,times=[.5,.75,1.])
+    np.testing.assert_allclose(later['primary'][-1],1.,atol=1e-6)
+    default=result.predict(initial)
+    explicit=result.predict(initial,start_time=0.)
+    for key in default:
+        np.testing.assert_array_equal(default[key],explicit[key])
+    with pytest.raises(ValueError,match='initial states'):
+        result.predict(start_time=.5)
+    with pytest.raises(ValueError,match='begin at start_time'):
+        result.predict(initial,start_time=.5,times=[0.,1.])
+    with pytest.raises(ValueError,match='within the observed range'):
+        result.predict(initial,start_time=.5,times=[.5,2.])

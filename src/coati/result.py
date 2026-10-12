@@ -45,22 +45,34 @@ class Result:
             return m
         return cls(model, data, meta, directory, T_model, freeze(map_model))
 
-    def predict(self, initial=None, *, times=None, method="rk4", raw=True):
+    def predict(self, initial=None, *, times=None, method="rk4", raw=True, start_time=None):
         """Return {times, primary, energy, log_weights?} on an increasing grid.
 
         initial is in input units when raw=True. Returned energy remains in training units.
-        times starts at the observed initial time; its spacing controls fixed-step solvers.
+        times starts at the observed initial time by default; its spacing controls fixed-step solvers.
+        start_time allows an explicit supplied cohort to start later within the observed range.
+        It does not select, transport or relabel initial cells automatically.
         """
         import torch
         from torchdiffeq import odeint
         device = next(self.model.parameters()).device
-        t = np.asarray(times if times is not None else np.linspace(self.data.times[0], self.data.times[-1], 41), dtype=float)
+        start = float(self.data.times[0] if start_time is None else start_time)
+        if not np.isfinite(start):
+            raise ValueError("start_time must be finite.")
+        if start_time is not None:
+            if not self.data.times[0] <= start < self.data.times[-1]:
+                raise ValueError("start_time must lie within the observed range, before the final time.")
+            if initial is None and not np.isclose(start, self.data.times[0]):
+                raise ValueError("Supply initial states when starting at a later time.")
+        t = np.asarray(times if times is not None else np.linspace(start, self.data.times[-1], 41), dtype=float)
         if t.ndim != 1 or len(t)<2 or not np.isfinite(t).all() or not np.all(np.diff(t)>0):
             raise ValueError("Prediction times must be finite and strictly increasing.")
-        if not np.isclose(t[0], self.data.times[0]):
-            raise ValueError("Prediction must start at the initial observed time.")
+        if not np.isclose(t[0], start):
+            raise ValueError("Prediction times must begin at start_time (the initial observed time by default).")
+        if start_time is not None and t[-1] > self.data.times[-1] + 1e-8:
+            raise ValueError("A later-start cohort must end within the observed range.")
         x = torch.as_tensor(self.data.primary[0] if initial is None else initial, dtype=torch.float32, device=device)
-        if x.ndim != 2 or x.shape[1] != self.metadata["dimension"] or not torch.isfinite(x).all():
+        if x.ndim != 2 or not len(x) or x.shape[1] != self.metadata["dimension"] or not torch.isfinite(x).all():
             raise ValueError("Initial states must be a finite cells × model-dimension matrix.")
         scale = self.metadata["primary_scale"]
         if raw or initial is None: x = x/scale

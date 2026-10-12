@@ -108,6 +108,22 @@ Each run directory must be new. Results include the resolved config, input snaps
 - [06 · Held-out biological distribution reconstruction](notebooks/06_heldout_biological.ipynb)
 - [07 · Gastrulation cell types, growth and UMAP flow](notebooks/07_dynamics.ipynb)
 - [08 · Train T and inspect biological map quality](notebooks/08_map_quality.ipynb)
+- [09 · Lineage gene and peak dynamics](notebooks/09_lineage_features.ipynb)
+
+## Molecular readouts along a lineage
+
+`coati.downstream` provides `select_lineage`, `fit_feature_decoder`,
+`compute_feature_dynamics`, curve/heat-map plots and block-based
+`read_h5ad_features`. The [lineage tutorial](notebooks/09_lineage_features.ipynb)
+checks NMP endpoints and held-out gene/peak readouts before interpretation.
+`start_time` on `predict_trajectory` supports a supplied later-stage initial cohort.
+Training objectives and the original TraInf repositories are unchanged.
+
+Run `examples/run_lineage_features.py --help` for the script counterpart. Molecular
+features must be supplied separately from PCA/LSI, in verified barcode order.
+Local feature interpolation is an estimate, not an inverse embedding or evidence
+of regulation. The current 1,000-step example has no accepted NMP → Somitic cohort;
+its additional curves are labeled NMP-origin diagnostics.
 
 ## Your own data
 

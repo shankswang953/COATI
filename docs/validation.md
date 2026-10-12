@@ -152,3 +152,33 @@ verified from its own directory, and the standalone script reproduced the saved
 map checks using `--reuse`. Numerical settings, data hashes, subgroup tables and
 validation details are in `provenance/gastrulation_map_quality.json`. Original
 TraInf files and the packaged training algorithm were not changed.
+
+## Lineage molecular readouts
+
+On 2026-10-12, all 56 package checks passed after adding downstream feature
+readouts and explicit later-start inference. Tests cover dense/CSR/CSC feature
+extraction, cell/variable reordering, exact and duplicate neighbor matches,
+binary probabilities, support masking, stable growth weighting, missing-lineage
+rejection, fixed-baseline validation and unchanged default integration results.
+The original training engine was not modified.
+
+The [lineage tutorial](tutorials/09_lineage_features.ipynb) executed on 237 E8.0
+NMP starting cells, integrating to E8.75 with the existing 1,000-step gastrulation
+checkpoint. No path passed the Somitic endpoint threshold and support screen.
+The tutorial reports no NMP-to-Somitic molecular curves for that checkpoint;
+additional plots are explicitly NMP-origin diagnostics. Their observed markers
+represent different annotation cohorts, not longitudinal measurements.
+
+Three genes and three promoter-candidate peaks were extracted from source H5AD
+files in bounded blocks with verified barcode order. Local decoders withheld
+7,101 cells from fitting. Gene skill versus a fixed training-mean baseline was
+0.660 (T), 0.320 (Sox2) and 0.337 (Tbx6). Peak Brier skill was -0.020, 0.227 and
+-0.005 for the displayed features: two peaks did not improve the constant open
+fraction baseline. Source PCA/LSI and scales remained fixed, so this is a decoder
+holdout, not an end-to-end preprocessing or vector-field holdout.
+
+The notebook also ran from its own directory; the standalone script reproduced
+its endpoint screening and feature readout results. Machine-readable settings,
+scope and readout values are in `provenance/lineage_feature_validation.json`.
+These checks validate software behavior, not a recovered Somitic lineage,
+regulation or chromatin priming.
