@@ -1,52 +1,22 @@
-# Cell-by-cell tutorials
+# Tutorials
 
-Start JupyterLab with `python -m jupyterlab notebooks/` after installation. Each notebook has separate cells for imports, data inspection, configuration, training, prediction, metrics, plotting and reload.
+Read the examples directly in the documentation. Each tutorial includes the code,
+saved results and figures, with the same navigation and theme as the rest of the site.
 
-| Notebook | What it covers |
+| Tutorial | What it covers |
 | --- | --- |
-| [Gaussian translation](_static/notebooks/01_gaussian.html) | Basic balanced transport across three snapshots |
-| [Paired modalities](_static/notebooks/02_paired.html) | 2D primary → 3D secondary kernel synchronization |
-| [Splitting and growth](_static/notebooks/03_split.html) | Two terminal branches with doubled observed counts |
-| [Vector fields and UMAP velocity](_static/notebooks/05_velocity.html) | Explicit modes, AnnData velocities, arrows, grid and streamlines |
-| [Input adapters](_static/notebooks/04_inputs.html) | Arrays, dictionary, NPZ, CSV and AnnData equivalence |
+| [Gaussian translation](tutorials/01_gaussian.ipynb) | Basic balanced transport across three snapshots |
+| [Paired modalities](tutorials/02_paired.ipynb) | Synchronized transport with a paired secondary modality |
+| [Splitting and growth](tutorials/03_split.ipynb) | Branching trajectories and changing population mass |
+| [Input adapters](tutorials/04_inputs.ipynb) | Arrays, dictionary, NPZ, CSV and AnnData inputs |
+| [Vector fields and UMAP velocity](tutorials/05_velocity.ipynb) | Training controls, AnnData velocities, arrows, grids and streamlines |
 
-## A paired run, step by step
+```{toctree}
+:hidden:
 
-```python
-import coati as ct
+Gaussian translation <tutorials/01_gaussian>
+Paired modalities <tutorials/02_paired>
+Splitting and growth <tutorials/03_split>
+Input adapters <tutorials/04_inputs>
+Vector fields and UMAP velocity <tutorials/05_velocity>
 ```
-
-```python
-data = ct.datasets.paired(n=128, seed=0)
-[(x.shape, y.shape) for x, y in zip(data.primary, data.secondary)]
-```
-
-```python
-config = ct.Config(niters=200, sync_loss=True, sync_weight=.35)
-result = ct.fit(data, config)
-```
-
-```python
-trajectory = result.predict()
-result.plot()
-result.evaluate()
-```
-
-These are runnable functional examples, not claims of superior trajectory accuracy or biological performance.
-
-## Download notebooks
-
-- [Download 01_gaussian.ipynb](_static/notebooks/01_gaussian.ipynb)
-- [Download 02_paired.ipynb](_static/notebooks/02_paired.ipynb)
-- [Download 03_split.ipynb](_static/notebooks/03_split.ipynb)
-- [Download 04_inputs.ipynb](_static/notebooks/04_inputs.ipynb)
-
-## Project secondary trajectories
-
-```python
-secondary = result.project_secondary(trajectory)
-```
-
-Kernel prediction uses all paired observations as its deterministic basis; training still uses the original randomly sampled paired basis. Both primary and secondary outputs default to input units.
-
-- [Download 05_velocity.ipynb](_static/notebooks/05_velocity.ipynb)

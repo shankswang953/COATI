@@ -2,3 +2,9 @@
 .content {font-size: 1rem;} h1 {letter-spacing: -.025em;}
 a {text-underline-offset: 3px;} .highlight {border-left: 3px solid #0087dd;}
 article img.brand {width:100%; max-width: 760px; background: white;}
+
+/* Native notebook tutorials share the documentation's code styling. */
+#furo-main-content .cell_input {border-left: 3px solid #0087dd;}
+.cell_input .highlight {border-left: 0;}
+.cell_input pre, .cell_output pre {white-space: pre-wrap; overflow-wrap: anywhere;}
+.cell_output {margin-bottom: 1.5rem;}

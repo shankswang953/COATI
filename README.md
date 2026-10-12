@@ -114,7 +114,7 @@ src/coati/           public data, config, training and result interfaces
 src/coati/maps.py    automatic FiLM/MLP fitting, validation and checkpoints
 src/coati/_core/     preserved research engine with package-relative imports
 examples/           script entry point
-notebooks/          executable cell-by-cell tutorials
+notebooks/          executable tutorials
 tests/              data and training checks
 scripts/            original-engine equivalence verification
 docs/               Sphinx documentation source

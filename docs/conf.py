@@ -2,7 +2,7 @@ project = "COATI"
 author = "COATI contributors"
 copyright = "2026, COATI contributors"
 release = "0.1.0"
-extensions = ["myst_parser", "sphinx.ext.autodoc", "sphinx.ext.napoleon"]
+extensions = ["myst_nb", "sphinx.ext.autodoc", "sphinx.ext.napoleon"]
 html_theme = "furo"
 html_title = "COATI documentation"
 html_logo = "_static/coati-logo.png"
@@ -15,3 +15,7 @@ html_theme_options = {
     "source_repository": "https://github.com/shankswang953/COATI/",
     "source_branch": "main", "source_directory": "docs/",
 }
+
+# Render saved notebook outputs in the documentation without running training.
+nb_execution_mode = "off"
+myst_enable_extensions = ["dollarmath"]
