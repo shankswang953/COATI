@@ -84,7 +84,7 @@ python examples/run_velocity.py --output outputs/velocity-single
 python examples/run_velocity.py --multimodal --unbalanced --output outputs/velocity-multi
 coati train-vector-field primary.npz --keys t0 t1 --times 0 1 --iterations 200 --output outputs/run
 coati plot-velocity outputs/run cells.h5ad --use-rep X_pca --time-key time --color cell_type --output velocity.pdf
-python -m jupyterlab notebooks/05_velocity.ipynb
+python -m jupyterlab notebooks/01_gaussian.ipynb
 ```
 
 Install the visualization extra for the AnnData/UMAP toy script. It exports an

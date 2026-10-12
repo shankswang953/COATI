@@ -17,6 +17,8 @@ def main():
     out = root / "docs/tutorials"
     out.mkdir(parents=True, exist_ok=True)
     for source in sorted((root / "notebooks").glob("*.ipynb")):
+        if source.stem in {"02_paired", "05_velocity"}:
+            continue  # Their stable web URLs point to the consolidated comparison.
         notebook = nbformat.read(source, as_version=4)
         if args.execute:
             from nbclient import NotebookClient
@@ -24,7 +26,7 @@ def main():
                            resources={"metadata": {"path": str(root)}}).execute()
             nbformat.write(notebook, source)
         # Keep web titles short and retain all code and scientific outputs.
-        titles = {"01_gaussian": "Gaussian translation", "02_paired": "Paired modalities",
+        titles = {"01_gaussian": "Gaussian toy: sync vs no sync", "02_paired": "Paired modalities",
                   "03_split": "Splitting and growth", "04_inputs": "Input adapters",
                   "05_velocity": "Vector fields and UMAP velocity",
                   "06_heldout_biological": "Held-out biological reconstruction",

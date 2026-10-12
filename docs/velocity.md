@@ -149,4 +149,4 @@ result.plot_velocity(embedding=umap_coordinates, points=primary_coordinates,
 `write_velocity` defaults to modifying the supplied AnnData and returns it; copy=True
 leaves the input unchanged. This is the only plotting workflow that writes vectors.
 For CLI plotting, use `coati plot-velocity --help`. For a fully runnable toy example,
-use `examples/run_velocity.py` or `notebooks/05_velocity.ipynb`.
+use `examples/run_velocity.py` for the plotting API, the [Gaussian sync comparison](tutorials/01_gaussian.ipynb) for a controlled toy, or [gastrulation dynamics](tutorials/07_dynamics.ipynb) for biological AnnData.

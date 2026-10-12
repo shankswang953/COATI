@@ -8,7 +8,8 @@ html_title = "COATI documentation"
 html_logo = "_static/coati-logo.png"
 html_static_path = ["_static"]
 html_css_files = ["coati.css"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store",
+                    "tutorials/02_paired.ipynb", "tutorials/05_velocity.ipynb"]
 html_theme_options = {
     "light_css_variables": {"color-brand-primary": "#006bc4", "color-brand-content": "#006bc4"},
     "dark_css_variables": {"color-brand-primary": "#46baff", "color-brand-content": "#46baff"},

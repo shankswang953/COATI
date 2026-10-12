@@ -87,7 +87,7 @@ an RNA-velocity-style visualization. See [velocity plotting](docs/velocity.md).
 ## Scripts and notebooks
 
 ```bash
-python examples/run_toy.py --dataset gaussian --output outputs/gaussian
+python examples/run_gaussian_sync.py --output outputs/gaussian-sync --iterations 1000
 python examples/run_toy.py --dataset split --output outputs/split
 python examples/run_toy.py --dataset paired --output outputs/paired
 coati toy --dataset split --unbalanced --output outputs/unbalanced
@@ -100,11 +100,9 @@ python -m jupyterlab notebooks/
 
 Each run directory must be new. Results include the resolved config, input snapshots, checkpoint, TensorBoard logs and metadata. CLI runs also write metrics and a trajectory figure.
 
-- [01 · Gaussian translation](notebooks/01_gaussian.ipynb)
-- [02 · Paired modalities](notebooks/02_paired.ipynb)
+- [01 · Gaussian toy: sync vs no sync](notebooks/01_gaussian.ipynb)
 - [03 · Splitting and growth](notebooks/03_split.ipynb)
 - [04 · Input formats](notebooks/04_inputs.ipynb)
-- [05 · Vector fields and AnnData UMAP velocity](notebooks/05_velocity.ipynb)
 - [06 · Held-out biological distribution reconstruction](notebooks/06_heldout_biological.ipynb)
 - [07 · Gastrulation cell types, growth and UMAP flow](notebooks/07_dynamics.ipynb)
 - [08 · Train T and inspect biological map quality](notebooks/08_map_quality.ipynb)
