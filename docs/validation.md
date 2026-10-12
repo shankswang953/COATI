@@ -25,6 +25,14 @@ The existing all-data reduced representations and scalar normalization were fixe
 this is not an end-to-end raw-data holdout. The resolved settings and input hashes
 are recorded in `provenance/heldout_pancreas_1000.json`.
 
+The optional W2 scalar-normalization branch was also executed for 1,000
+vector-field iterations, including checkpoint reload and shared UMAP projection.
+Its RNA and ATAC scales were fitted only at times 0 and 2. Changing all held-out
+values by a factor of 100 left both fitted scales unchanged, and converting the
+working inputs back to their selected input units reproduced the source features.
+The default branch retained identical reconstruction scores. Details are recorded
+in `provenance/heldout_normalization_validation.json`.
+
 ## Original-engine equivalence
 
 Same data, float32 precision, settings and seed in the original and packaged engines. The original device selector is overridden to CPU **only in the comparison harness**; its source files remain untouched.

@@ -10,7 +10,7 @@ saved results and figures, with the same navigation and theme as the rest of the
 | [Splitting and growth](tutorials/03_split.ipynb) | Branching trajectories and changing population mass |
 | [Input adapters](tutorials/04_inputs.ipynb) | Arrays, dictionary, NPZ, CSV and AnnData inputs |
 | [Vector fields and UMAP velocity](tutorials/05_velocity.ipynb) | Training controls, AnnData velocities, arrows, grids and streamlines |
-| [Held-out biological reconstruction](tutorials/06_heldout_biological.ipynb) | Omit the middle pancreas stage, train for 1,000 iterations and compare reconstructed distributions in shared UMAPs |
+| [Held-out biological reconstruction](tutorials/06_heldout_biological.ipynb) | Optional W2 normalization, a held-out pancreas stage, 1,000 training iterations and shared UMAP reconstruction |
 
 ```{toctree}
 :hidden:

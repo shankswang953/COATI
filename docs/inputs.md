@@ -54,3 +54,16 @@ data = ct.TemporalData.from_anndata(
 ```
 
 Both embeddings share `adata.obs`, preserving cell identity. Omit `obsm_key` to use `adata.X` explicitly. Sparse matrices are materialized densely; select a compact representation before importing large data. COATI does not claim automatic preprocessing of raw counts.
+
+## Optional scalar normalization
+
+The [biological reconstruction tutorial](tutorials/06_heldout_biological.ipynb)
+includes an explicit `normalize` switch. Leave it off for prepared `X_latent`
+inputs. Turn it on to estimate a W2-based scalar from the unscaled reduced
+features in `X_reduced_raw`, independently for RNA and ATAC.
+
+The scales are fitted using retained training stages only and then applied to
+all observations and held-out references. They preserve relative feature scales;
+this is not per-feature standardization or raw-count preprocessing. The notebook
+saves the scales, the stages used to fit them and predictions converted back to
+the selected input units. Existing PCA/PoissonVI representations remain fixed.

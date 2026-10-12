@@ -16,12 +16,21 @@
     2.0
   ],
   "vector_field_iterations": 1000,
-  "training_seconds": 33.87080937507562,
+  "training_seconds": 34.12370766699314,
   "map_status": "passed",
   "map_best_epoch": 35,
   "mode": "multimodal balanced",
   "prediction_particles": 4000,
-  "preprocessing": "Frozen common all-data representations and scalar normalization; no second normalization.",
+  "preprocessing": "Frozen common all-data reduced representations; optional retained-stage scalar normalization.",
+  "normalization": {
+    "enabled": false,
+    "input_representation": "X_latent",
+    "scales": {
+      "RNA": 1.0,
+      "ATAC": 1.0
+    },
+    "fit_times": []
+  },
   "umap_fit_scope": "Retained observations only, one frozen projector per modality.",
   "evaluation_scope": "Held-out stage used only after training for display and distribution scores.",
   "source_sha256": {
@@ -102,7 +111,7 @@
       "Comparison": "Reconstruction",
       "Mean": 0.3795593798160553,
       "SD": 0.009738660368963918,
-      "Blur": 0.12198660373687745,
+      "Regularization \u03b5": 0.014880731491257963,
       "Points": 512,
       "Repeats": 5
     },
@@ -111,7 +120,7 @@
       "Comparison": "Initial distribution",
       "Mean": 0.6399096369743347,
       "SD": 0.03310030937552874,
-      "Blur": 0.12198660373687745,
+      "Regularization \u03b5": 0.014880731491257963,
       "Points": 512,
       "Repeats": 5
     },
@@ -120,7 +129,7 @@
       "Comparison": "Endpoint mixture",
       "Mean": 0.39043623208999634,
       "SD": 0.010511081837017775,
-      "Blur": 0.12198660373687745,
+      "Regularization \u03b5": 0.014880731491257963,
       "Points": 512,
       "Repeats": 5
     },
@@ -129,7 +138,7 @@
       "Comparison": "Observed split",
       "Mean": 0.32653971910476687,
       "SD": 0.0048197940815207325,
-      "Blur": 0.12198660373687745,
+      "Regularization \u03b5": 0.014880731491257963,
       "Points": 512,
       "Repeats": 5
     },
@@ -138,7 +147,7 @@
       "Comparison": "Reconstruction",
       "Mean": 0.4914072275161743,
       "SD": 0.017357226875123352,
-      "Blur": 0.14310046434402465,
+      "Regularization \u03b5": 0.02047774289547547,
       "Points": 512,
       "Repeats": 5
     },
@@ -147,7 +156,7 @@
       "Comparison": "Initial distribution",
       "Mean": 0.7794250130653382,
       "SD": 0.042767982287656096,
-      "Blur": 0.14310046434402465,
+      "Regularization \u03b5": 0.02047774289547547,
       "Points": 512,
       "Repeats": 5
     },
@@ -156,7 +165,7 @@
       "Comparison": "Endpoint mixture",
       "Mean": 0.4572951853275299,
       "SD": 0.017044798961150694,
-      "Blur": 0.14310046434402465,
+      "Regularization \u03b5": 0.02047774289547547,
       "Points": 512,
       "Repeats": 5
     },
@@ -165,11 +174,11 @@
       "Comparison": "Observed split",
       "Mean": 0.38674715757369993,
       "SD": 0.012364629481530831,
-      "Blur": 0.14310046434402465,
+      "Regularization \u03b5": 0.02047774289547547,
       "Points": 512,
       "Repeats": 5
     }
   ],
   "notebook": "notebooks/06_heldout_biological.ipynb",
-  "run_directory": "outputs/pancreas-heldout-1000-20261012T175116530337Z"
+  "run_directory": "outputs/pancreas-heldout-1000-20261012T184239774396Z"
 }
