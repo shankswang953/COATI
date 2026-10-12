@@ -49,8 +49,8 @@ pair = ds.compute_gene_peak_dynamics(
     gene, trajectory, gene_decoder=gene_decoder, peak_decoder=peak_decoder,
     peak_gene_links=links, selection=lineage, weighting="growth",
 )
-pair.plot(layout="combined")  # one figure; separate RNA/ATAC panels and units
-pair.plot(layout="separate")  # a gene figure and a peak figure
+pair.plot(layout="combined", normalization="zscore")  # RNA and peaks on one axis
+pair.plot(layout="separate", normalization="zscore")  # separate standardized profiles
 ```
 
 Use `weighting="uniform"` for balanced models. The link table needs `gene` and
@@ -63,8 +63,18 @@ feature IDs raise an error instead of silently skipping them or inventing links.
 
 This assumes the RNA/ATAC coordinates have the same preprocessing and units as
 `trajectory["primary"]` and `trajectory["secondary"]`. The readouts search kNN
-in the respective latent spaces, not UMAP. Expression and peak probabilities
-keep their own axes; they are not placed on an arbitrary common physical scale.
+in the respective latent spaces, not UMAP. The combined figure overlays the gene and all linked peaks on **one coordinate
+system**. Each temporal mean profile is standardized separately as
+`(value - temporal mean) / temporal std`, using finite time points and `ddof=0`,
+following the paper's separately standardized RNA and ATAC profiles. Stored
+readouts remain in their original units. This display normalization adds no
+extra log transformation to already preprocessed observations.
+
+Separate figures use the same standardization by default. Native units remain
+available with `layout="separate", normalization=None`. Unsupported times
+remain missing; constant mean profiles are flat at zero, with undefined
+normalized IQR/observed overlays omitted. `show_iqr=True` optionally displays
+across-path variation using the mean profile's center and scale.
 
 ## Optional observed reference points
 
@@ -75,12 +85,14 @@ peak counts converted to presence before averaging for a binary readout.
 
 ```python
 pair.plot(layout="combined", show_observed=False)
-pair.plot(layout="combined", show_observed=True, observed=observed_summary)
+pair.plot(layout="combined", normalization="zscore",
+          show_observed=True, observed=observed_summary)
 ```
 
 The [biological tutorial](tutorials/09_lineage_features.ipynb) builds this table
 from observed NMP and Somitic annotations, records cohort cell counts, and lets
-you set `SHOW_OBSERVED`. Such snapshots are different cells at different times,
+you set `SHOW_OBSERVED`. Observed means use the matching trajectory curve's center and scale, rather than
+fitting a separate normalization to the snapshots. Such snapshots are different cells at different times,
 not measured longitudinal changes of the same cells.
 
 ## Check local molecular readouts
@@ -124,8 +136,8 @@ remain available for arbitrary gene or peak lists. The gene-centered container
 exposes `pair.rna`, `pair.atac` and `pair.links` for further analysis.
 
 ```python
-pair.rna.summary.to_csv("lineage_gene_dynamics.csv", index=False)
-pair.atac.summary.to_csv("lineage_peak_dynamics.csv", index=False)
+pair.rna.summary  # original-unit readout summaries
+pair.atac.summary
 ds.plot_feature_heatmap(pair.atac, standardize=True)
 ```
 

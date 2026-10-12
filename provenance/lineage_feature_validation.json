@@ -95,15 +95,19 @@
   "molecular_readout": "Distance-weighted interpolation; binary ATAC targets give local open probabilities",
   "scope": "Current short checkpoint has no accepted Somitic branch; NMP-origin diagnostic curves are not lineage validation or evidence of priming.",
   "date": "2026-10-12",
-  "package_checks_passed": 59,
+  "package_checks_passed": 60,
   "notebook": "notebooks/09_lineage_features.ipynb",
   "standalone_script": "examples/run_lineage_features.py",
   "training_algorithm_modified": false,
   "raw_source_access": "Read-only source-verified selected-feature cache; original source files and TraInf untouched",
   "biological_checks": [
-    "Tbx6 notebook: combined and separate, observed off",
-    "Sox2 script: separate, observed on"
+    "Tbx6 normalized notebook: shared coordinate system and separate figures, observed off",
+    "Sox2 normalized Python script: common axis and observed overlays, opt-in figure export"
   ],
   "source_selected_features_hash_format": "SHA256 of float32 RNA, float32 binary ATAC, then UTF-8 newline-delimited barcodes",
-  "source_selected_features_sha256": "0f93026b8c74095f2acb6e827437af9e99e11fefe7a07b77f51db0c38c71b693"
+  "source_selected_features_sha256": "0f93026b8c74095f2acb6e827437af9e99e11fefe7a07b77f51db0c38c71b693",
+  "plot_normalization": "Separate temporal z-scores for RNA and each peak; ddof=0; finite mean-profile times",
+  "combined_coordinate_system": "One Matplotlib Axes shared by RNA and all candidate peaks",
+  "observed_normalization": "Matching trajectory profile center/std; no separate fitting to observed snapshots",
+  "notebook_automatic_saving": false
 }

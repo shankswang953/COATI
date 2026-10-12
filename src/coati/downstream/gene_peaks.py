@@ -66,9 +66,9 @@ class GenePeakDynamics:
     atac: FeatureDynamics
     links: pd.DataFrame
 
-    def plot(self, *, layout="combined", show_observed=False, observed=None, show_iqr=True):
-        """Plot together or separately; measured snapshot means are optional."""
-        return plot_gene_peak_dynamics(self, layout=layout, show_observed=show_observed,
+    def plot(self, *, layout="combined", normalization="zscore", show_observed=False, observed=None, show_iqr=False):
+        """Overlay separately standardized RNA/ATAC profiles, or use separate figures."""
+        return plot_gene_peak_dynamics(self, layout=layout, normalization=normalization, show_observed=show_observed,
                                       observed=observed, show_iqr=show_iqr)
 
 
@@ -112,66 +112,106 @@ def _observed_table(observed):
     return observed
 
 
-def plot_gene_peak_dynamics(dynamics, *, layout="combined", show_observed=False,
-                            observed=None, show_iqr=True):
-    """Plot a gene and candidate peaks with shared time and separate native units.
+def _profile_transform(mean, normalization):
+    """Fit one display transform to the finite trajectory mean over time."""
+    values = np.asarray(mean, dtype=float)
+    finite = np.isfinite(values)
+    if normalization is None:
+        return lambda x: np.asarray(x, dtype=float), False
+    if not finite.any():
+        return lambda x: np.full(np.asarray(x).shape, np.nan), True
+    center, scale = float(values[finite].mean()), float(values[finite].std(ddof=0))
+    if scale <= 1e-12:
+        # A flat mean has no temporal standard deviation. Keep its mean flat at
+        # zero, but do not invent a scale for observed points or across-path IQR.
+        return lambda x: np.full(np.asarray(x).shape, np.nan), True
+    return lambda x: (np.asarray(x, dtype=float)-center)/scale, False
 
-    combined places the gene above the peaks in one figure. separate creates
-    a gene figure and a peak figure. Return a dict of Axes arrays keyed by gene
-    and peaks in either layout. show_observed defaults to False; when enabled,
-    observed must contain modality (RNA/ATAC), feature, time, mean and optionally
-    cohort. Scatter points are measured snapshot-cohort means, not the fitted
-    trajectory or longitudinal observations of the same cells. IQR describes
-    across-path variation. The plot does not normalize expression and peaks onto
-    a common y scale or infer temporal precedence.
+
+def plot_gene_peak_dynamics(dynamics, *, layout="combined", normalization="zscore",
+                            show_observed=False, observed=None, show_iqr=False):
+    """Plot RNA and linked peaks on one coordinate system, or on separate panels.
+
+    combined overlays the gene and every linked peak on one Axes; each temporal
+    mean is standardized separately as (value - temporal mean) / temporal std,
+    with ddof=0 and finite trajectory time points. separate creates a gene figure
+    and a peak figure, using the same normalization. normalization=None keeps
+    native units only in separate mode. This display transform leaves the stored
+    readouts unchanged and does not apply an additional log/count transform.
+
+    Return Axes arrays keyed by gene and peaks. In combined mode all entries
+    refer to the same Axes. show_observed is optional and requires a table with
+    modality (RNA/ATAC), feature, time, mean and optionally cohort. Observed means
+    use the matching model profile's center and scale, not their own fitted
+    normalization. show_iqr transforms the bounds with that same scale; it
+    describes across-path variation, not a molecular confidence interval.
+
+    Unsupported times remain NaN. A constant mean becomes a zero line with
+    undefined IQR/observed normalization omitted. Profiles with no supported
+    times remain missing. Standardized shapes do not establish temporal precedence.
     """
     import matplotlib.pyplot as plt
     if not isinstance(dynamics, GenePeakDynamics):
         raise TypeError("dynamics must be GenePeakDynamics.")
     if layout not in ("combined", "separate"):
         raise ValueError("layout must be 'combined' or 'separate'.")
+    if normalization not in ("zscore", None):
+        raise ValueError("normalization must be 'zscore' or None.")
+    if layout == "combined" and normalization is None:
+        raise ValueError("Combined RNA/ATAC curves require normalization='zscore'; use separate for native units.")
     table = _observed_table(observed) if show_observed else None
     n_peaks = len(dynamics.atac.features)
     if layout == "combined":
-        figure, axes = plt.subplots(1+n_peaks, 1, sharex=True, squeeze=False,
-                                   figsize=(8, 2.4*(1+n_peaks)), layout="constrained")
-        axes = axes[:, 0]
-        groups = {"gene": axes[:1], "peaks": axes[1:]}
-        figure.suptitle(f"{dynamics.gene} and candidate peaks", fontsize=14)
+        figure, ax = plt.subplots(figsize=(8, 4.2), layout="constrained")
+        groups = {"gene": np.array([ax]), "peaks": np.array([ax]*n_peaks)}
+        ax.set_title(f"{dynamics.gene} and candidate peaks", fontsize=13)
     else:
         groups = {}
         for name, count in [("gene", 1), ("peaks", n_peaks)]:
             _, axes = plt.subplots(count, 1, sharex=True, squeeze=False,
-                                   figsize=(8, 2.4*count), layout="constrained")
+                                   figsize=(8, 2.7*count), layout="constrained")
             groups[name] = axes[:, 0]
-    for key, modality, readout, color in [("gene", "RNA", dynamics.rna, "#0072b2"),
-                                         ("peaks", "ATAC", dynamics.atac, "#e69f00")]:
-        for ax, feature in zip(groups[key], readout.features):
+    colors = ["#e69f00", "#cc79a7", "#d55e00", "#009e73", "#8b6eaf"]
+    for key, modality, readout in [("gene", "RNA", dynamics.rna), ("peaks", "ATAC", dynamics.atac)]:
+        for index, (ax, feature) in enumerate(zip(groups[key], readout.features)):
             sub = readout.summary.loc[readout.summary.feature == feature]
-            ax.plot(sub.time, sub["mean"], color=color, lw=2, label="kNN trajectory mean")
-            if show_iqr:
-                ax.fill_between(sub.time.to_numpy(), sub.q25.to_numpy(), sub.q75.to_numpy(),
-                                color=color, alpha=.16, label="Across-path IQR")
+            raw_mean = sub["mean"].to_numpy(dtype=float)
+            transform, flat = _profile_transform(raw_mean, normalization)
+            curve = transform(raw_mean)
+            if flat and np.isfinite(raw_mean).any():
+                curve = np.where(np.isfinite(raw_mean), 0., np.nan)
+            color = "#0072b2" if modality == "RNA" else colors[index % len(colors)]
+            style = "-" if modality == "RNA" else ["--", ":", "-."][index % 3]
+            label = f"{modality} · {feature}" + (" (flat profile)" if flat and np.isfinite(raw_mean).any() else "")
+            ax.plot(sub.time, curve, color=color, ls=style, lw=2.2, label=label)
+            if show_iqr and not flat:
+                ax.fill_between(sub.time.to_numpy(), transform(sub.q25.to_numpy()), transform(sub.q75.to_numpy()),
+                                color=color, alpha=.12)
             if table is not None:
                 rows = table.loc[(table.modality == modality) & (table.feature == feature) &
                                  table.time.between(readout.times[0], readout.times[-1])]
                 if readout.binary and ((rows["mean"] < 0) | (rows["mean"] > 1)).any():
-                    raise ValueError("Observed binary peak means must be fractions in [0, 1].")
-                if "cohort" in rows:
-                    for index, (cohort, cohort_rows) in enumerate(rows.groupby("cohort", sort=False, dropna=False)):
-                        ax.scatter(cohort_rows.time, cohort_rows["mean"], color="#243445",
-                                   marker=["D", "s", "^"][index % 3], s=34, zorder=3,
-                                   label=f"Observed: {cohort}")
-                elif not rows.empty:
-                    ax.scatter(rows.time, rows["mean"], color="#243445", marker="D", s=34,
-                               zorder=3, label="Observed snapshot mean")
-            ax.set(title=feature, ylabel=readout.units, xlim=readout.times[[0, -1]])
-            ax.title.set_fontsize(11)
+                    raise ValueError("Observed binary peak means must be fractions in [0, 1] before normalization.")
+                if not flat:
+                    cohorts = rows.groupby("cohort", sort=False, dropna=False) if "cohort" in rows else [("snapshot", rows)]
+                    for cohort, cohort_rows in cohorts:
+                        if not cohort_rows.empty:
+                            ax.scatter(cohort_rows.time, transform(cohort_rows["mean"]), color=color,
+                                       marker="o" if modality == "RNA" else "D", s=32, zorder=3,
+                                       label=f"Observed {modality} · {feature} · {cohort}")
+            ylabel = "Standardized profile (z-score)" if normalization else readout.units
+            ax.set(ylabel=ylabel, xlim=readout.times[[0, -1]])
             ax.spines[["top", "right"]].set_visible(False)
-            if readout.binary:
+            if layout == "separate":
+                ax.set_title(feature, fontsize=11)
+            if readout.binary and normalization is None:
                 ax.set_ylim(0, 1)
-            if table is not None:
-                ax.legend(frameon=False, fontsize=8, loc="best")
-        if layout == "separate" or key == "peaks":
-            groups[key][-1].set_xlabel("Model time")
+    unique_axes = list(dict.fromkeys([*groups["gene"], *groups["peaks"]]))
+    for ax in unique_axes:
+        ax.legend(frameon=False, fontsize=8, loc="best")
+    if layout == "combined":
+        unique_axes[0].set_xlabel("Model time")
+    else:
+        for axes in groups.values():
+            axes[-1].set_xlabel("Model time")
     return groups

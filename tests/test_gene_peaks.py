@@ -59,29 +59,66 @@ def test_gene_pair_keeps_modality_coordinates_and_feature_identity():
                                   gene_decoder=gene, peak_decoder=peaks, peak_gene_links=links)
 
 
-def test_joint_separate_plots_observed_toggle_and_native_units():
+def test_joint_normalized_axis_observed_transform_and_separate_units():
     gene, peaks, links, pred = example()
     pair = compute_gene_peak_dynamics('G', pred, gene_decoder=gene, peak_decoder=peaks, peak_gene_links=links)
+    before = pair.rna.summary.copy(deep=True)
     observed = pd.DataFrame({'modality': ['RNA', 'ATAC'], 'feature': ['G', 'p1'],
                              'time': [1., 1.], 'mean': [8., .2], 'cohort': ['Target', 'Target']})
     try:
-        hidden = pair.plot(observed=observed, show_iqr=False)
+        hidden = pair.plot(observed=observed)
+        ax = hidden['gene'][0]
         assert len(hidden['gene']) == 1 and len(hidden['peaks']) == 2
-        assert hidden['gene'][0].figure is hidden['peaks'][0].figure
-        assert not hidden['gene'][0].collections
-        shown = pair.plot(show_observed=True, observed=observed, show_iqr=False)
-        np.testing.assert_array_equal(shown['gene'][0].collections[0].get_offsets(), [[1., 8.]])
-        np.testing.assert_array_equal(shown['peaks'][0].collections[0].get_offsets(), [[1., .2]])
-        assert shown['gene'][0].get_ylabel() == 'Expression'
-        assert shown['peaks'][0].get_ylabel() == 'Open probability'
-        assert shown['peaks'][0].get_ylim() == (0., 1.)
+        assert all(axis is ax for axis in hidden['peaks'])
+        np.testing.assert_array_equal(ax.lines[0].get_ydata(), [-1., 1.])
+        np.testing.assert_array_equal(ax.lines[1].get_ydata(), [1., -1.])
+        np.testing.assert_array_equal(ax.lines[2].get_ydata(), [-1., 1.])
+        assert not ax.collections and ax.get_ylabel() == 'Standardized profile (z-score)'
+        shown = pair.plot(show_observed=True, observed=observed)
+        collections = shown['gene'][0].collections
+        # Reference means use the fitted trajectory scale, never their own scale.
+        np.testing.assert_allclose(collections[0].get_offsets(), [[1., 7.]])
+        np.testing.assert_allclose(collections[1].get_offsets(), [[1., -.6]])
         separate = pair.plot(layout='separate')
         assert separate['gene'][0].figure is not separate['peaks'][0].figure
+        assert separate['peaks'][0].get_ylabel() == 'Standardized profile (z-score)'
+        raw = pair.plot(layout='separate', normalization=None)
+        assert raw['gene'][0].get_ylabel() == 'Expression'
+        assert raw['peaks'][0].get_ylabel() == 'Open probability'
+        assert raw['peaks'][0].get_ylim() == (0., 1.)
+        pd.testing.assert_frame_equal(pair.rna.summary, before)
         with pytest.raises(ValueError, match='Observed overlays require'):
             pair.plot(show_observed=True)
         with pytest.raises(ValueError, match='layout'):
             pair.plot(layout='overlay')
+        with pytest.raises(ValueError, match='require normalization'):
+            pair.plot(normalization=None)
         with pytest.raises(ValueError, match='unique'):
             pair.plot(show_observed=True, observed=pd.concat([observed, observed]))
+    finally:
+        plt.close('all')
+
+
+def test_standardization_preserves_unsupported_gaps_and_handles_flat_profiles():
+    gene, peaks, links, pred = example()
+    gene.support_cutoff = .2
+    gap_pred = {'times': [0., .5, 1.],
+                'primary': np.array([[[0.]], [[4.]], [[1.]]]),
+                'secondary': np.array([[[1.]], [[0.]], [[0.]]])}
+    pair = compute_gene_peak_dynamics('G', gap_pred, gene_decoder=gene, peak_decoder=peaks, peak_gene_links=links)
+    try:
+        ax = pair.plot()['gene'][0]
+        np.testing.assert_allclose(ax.lines[0].get_ydata(), [-1., np.nan, 1.], equal_nan=True)
+        gene.observed[:, 1] = 3.
+        flat = compute_gene_peak_dynamics('G', pred, gene_decoder=gene, peak_decoder=peaks, peak_gene_links=links)
+        observed = pd.DataFrame({'modality': ['RNA'], 'feature': ['G'], 'time': [1.], 'mean': [8.]})
+        ax = flat.plot(show_iqr=True, show_observed=True, observed=observed)['gene'][0]
+        np.testing.assert_array_equal(ax.lines[0].get_ydata(), [0., 0.])
+        assert 'flat profile' in ax.lines[0].get_label()
+        assert not any('Observed RNA' in item.get_label() for item in ax.collections)
+        missing = compute_gene_peak_dynamics('G', {**pred, 'primary': np.full_like(pred['primary'], 4.)},
+                                             gene_decoder=gene, peak_decoder=peaks, peak_gene_links=links)
+        ax = missing.plot()['gene'][0]
+        assert np.isnan(ax.lines[0].get_ydata()).all()
     finally:
         plt.close('all')

@@ -1,12 +1,11 @@
-"""Gene-centered lineage readouts using the calculations in tutorial 09.
+"""Plot gene/peak relative changes on one axis using tutorial 09 calculations.
 
-Only existing gene/peak observations and annotation links are read. The short
-checkpoint may have no accepted Somitic paths; diagnostic plots keep that label.
+Each temporal profile is standardized separately. Figure export is opt-in;
+no trajectory archive, CSV tables or final report is automatically saved.
 """
 import argparse
 from pathlib import Path
 import os
-import uuid
 import json
 import numpy as np
 import pandas as pd
@@ -21,28 +20,31 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--latent-dir", required=True)
     parser.add_argument("--features-dir", required=True)
-    parser.add_argument("--model", required=True, help="A saved paired gastrulation COATI result directory")
-    parser.add_argument("--output", required=True, help="A fresh directory")
+    parser.add_argument("--model", required=True)
     parser.add_argument("--gene", default="Tbx6")
     parser.add_argument("--peak-region", default="promoter", help="Annotation region_type, or all")
     parser.add_argument("--max-peaks", type=int, default=2)
     parser.add_argument("--layout", choices=["combined", "separate"], default="combined")
     parser.add_argument("--show-observed", action="store_true")
+    parser.add_argument("--show-iqr", action="store_true")
+    parser.add_argument("--output", help="Optional fresh directory for figure export; no final report is saved")
     args = parser.parse_args()
+    output_dir = Path(args.output) if args.output else None
+    if output_dir is not None:
+        output_dir.mkdir(parents=True, exist_ok=False)
     plt.rcParams.update({"font.family": "Arial", "font.size": 11})
     project_dir = Path(__file__).resolve().parents[1]
     LATENT_DIR = Path(args.latent_dir)
     RAW_DIR = Path(args.features_dir)
     MODEL_DIR = Path(args.model)
-    output_dir = Path(args.output)
-    output_dir.mkdir(parents=True, exist_ok=False)
     # Change the gene name; peak IDs are resolved automatically from annotations.
     GENE = args.gene
     PEAK_REGION = None if args.peak_region == "all" else args.peak_region  # None includes all candidate regions in the table.
     MAX_PEAKS = args.max_peaks             # None includes all eligible candidate peaks.
-    PLOT_LAYOUT = args.layout # "separate" creates a gene figure and a peak figure.
+    PLOT_LAYOUT = args.layout # RNA and all peaks on one axis; "separate" uses separate figures.
+    NORMALIZATION = "zscore" # Standardize each temporal profile independently.
+    SHOW_IQR = args.show_iqr         # Optional across-path spread, in the same standardized units.
     SHOW_OBSERVED = args.show_observed     # Optional measured snapshot-cohort means.
-
 
     rna = ad.read_h5ad(LATENT_DIR / "rna.h5ad")
     atac = ad.read_h5ad(LATENT_DIR / "atac.h5ad")
@@ -65,24 +67,20 @@ def main():
     initial_barcodes = cells.obs_names[initial_mask].to_numpy(dtype=str)
     print("NMP starting cells:", len(initial_barcodes), "Start / end time:", trajectory["times"][[0, -1]])
 
-
     lineage = ds.select_lineage(
         trajectory, cells, terminal_celltypes="Somitic mesoderm",
         use_rep="X_latent", n_neighbors=15, min_probability=.6,
     )
     lineage.assignments.insert(1, "initial_barcode", initial_barcodes)
-    lineage.assignments.to_csv(output_dir / "lineage_assignments.csv", index=False)
     print("Accepted NMP → Somitic paths:", len(lineage.indices), "/", len(initial_barcodes))
     print("Empirical terminal support distance:", lineage.support_cutoff)
     lineage.assignments.groupby("assigned_celltype").agg(paths=("path", "size"), selected=("selected", "sum"))
-
 
     links = ds.find_gene_peaks(
         GENE, RAW_DIR / "nmp_peak_gene_links.csv",
         region_type=PEAK_REGION, max_peaks=MAX_PEAKS,
     )
     genes, peaks = [GENE], links["peak"].tolist()
-    links.to_csv(output_dir / "candidate_peak_gene_links.csv", index=False)
 
     cache_path = project_dir / "outputs/lineage-nmp-features/observed_features.npz"
     signature_path = cache_path.with_name("source_signature.json")
@@ -132,9 +130,7 @@ def main():
     gene_quality.insert(0, "modality", "RNA")
     peak_quality.insert(0, "modality", "ATAC")
     quality = pd.concat([gene_quality, peak_quality], ignore_index=True)
-    quality.to_csv(output_dir / "readout_validation.csv", index=False)
     quality.round(4)
-
 
     reference_times = [1., 2., 2.5]
     reference_types = ["NMP", "Somitic mesoderm", "Somitic mesoderm"]
@@ -148,16 +144,15 @@ def main():
                 observed_rows.append(dict(modality=modality, feature=feature, time=time,
                                           mean=float(values[mask, j].mean()), n_cells=int(mask.sum()), cohort=celltype))
     observed_summary = pd.DataFrame(observed_rows)
-    observed_summary.to_csv(output_dir / "observed_snapshot_means.csv", index=False)
     weighting = "growth" if "log_weights" in trajectory else "uniform"
     if len(lineage.indices):
         lineage_pair = ds.compute_gene_peak_dynamics(
             GENE, trajectory, gene_decoder=rna_decoder, peak_decoder=atac_decoder,
             peak_gene_links=links, selection=lineage, weighting=weighting,
         )
-        lineage_pair.plot(layout=PLOT_LAYOUT, show_observed=SHOW_OBSERVED, observed=observed_summary)
-        lineage_pair.rna.summary.to_csv(output_dir / "lineage_gene_dynamics.csv", index=False)
-        lineage_pair.atac.summary.to_csv(output_dir / "lineage_peak_dynamics.csv", index=False)
+        lineage_pair.plot(layout=PLOT_LAYOUT, normalization=NORMALIZATION,
+                          show_observed=SHOW_OBSERVED, observed=observed_summary, show_iqr=SHOW_IQR)
+        plt.show()
     else:
         print("No accepted NMP → Somitic lineage in this checkpoint. No lineage-specific molecular curves are reported.")
 
@@ -165,53 +160,39 @@ def main():
         GENE, trajectory, gene_decoder=rna_decoder, peak_decoder=atac_decoder,
         peak_gene_links=links, weighting=weighting,
     )
-    diagnostic_genes, diagnostic_peaks = diagnostic_pair.rna, diagnostic_pair.atac
 
-    def format_and_save(axes_by_modality, filename):
-        figures = []
-        for group, axes in axes_by_modality.items():
-            for ax in axes:
-                ax.set_xticks(reference_times, ["E8.0", "E8.5", "E8.75"])
-            if group == "peaks":
-                for peak, ax in zip(diagnostic_pair.atac.features, axes):
-                    if peak_quality.set_index("feature").loc[peak, "skill_vs_training_mean"] <= 0:
-                        ax.set_title(peak + " · readout did not beat baseline", fontsize=10)
-            if axes[0].figure not in figures:
-                figures.append(axes[0].figure)
-        for index, figure in enumerate(figures):
-            figure.suptitle(f"{GENE} · NMP-origin diagnostic · {len(lineage.indices)} accepted Somitic paths", fontsize=12)
-            suffix = "" if len(figures) == 1 else ("_gene" if index == 0 else "_peaks")
-            figure.savefig(output_dir / (filename + suffix + ".png"), dpi=180, bbox_inches="tight")
-            figure.savefig(output_dir / (filename + suffix + ".pdf"), bbox_inches="tight")
-        for figure in figures:
-            plt.close(figure)
+    def format_plot(axes_by_modality):
+        unique_axes = list(dict.fromkeys([*axes_by_modality["gene"], *axes_by_modality["peaks"]]))
+        for ax in unique_axes:
+            ax.set_xticks(reference_times, ["E8.0", "E8.5", "E8.75"])
+            ax.set_xlabel("Stage")
+        for peak, ax in zip(diagnostic_pair.atac.features, axes_by_modality["peaks"]):
+            if peak_quality.set_index("feature").loc[peak, "skill_vs_training_mean"] <= 0:
+                for line in ax.lines:
+                    if line.get_label().startswith(f"ATAC · {peak}"):
+                        line.set_label(line.get_label() + " *")
+        for ax in unique_axes:
+            ax.legend(frameon=False, fontsize=9, loc="best")
+        for figure in dict.fromkeys(ax.figure for ax in unique_axes):
+            if len(figure.axes) == 1:
+                figure.axes[0].set_title(f"{GENE} · NMP-origin diagnostic", fontsize=12)
+            else:
+                figure.suptitle(f"{GENE} · NMP-origin diagnostic", fontsize=12)
+        if output_dir is not None:
+            prefix = "combined" if len(unique_axes) == 1 else "separate"
+            for index, figure in enumerate(dict.fromkeys(ax.figure for ax in unique_axes)):
+                figure.savefig(output_dir / f"{prefix}_{index}.png", dpi=180, bbox_inches="tight")
+                figure.savefig(output_dir / f"{prefix}_{index}.pdf", bbox_inches="tight")
+        else:
+            plt.show()
 
-    axes = diagnostic_pair.plot(layout=PLOT_LAYOUT, show_observed=SHOW_OBSERVED, observed=observed_summary)
-    format_and_save(axes, "diagnostic_gene_peaks")
-    diagnostic_genes.summary.to_csv(output_dir / "diagnostic_genes.csv", index=False)
-    diagnostic_peaks.summary.to_csv(output_dir / "diagnostic_peaks.csv", index=False)
+    axes = diagnostic_pair.plot(layout=PLOT_LAYOUT, normalization=NORMALIZATION,
+                                show_observed=SHOW_OBSERVED, observed=observed_summary, show_iqr=SHOW_IQR)
+    format_plot(axes)
 
-    axes = diagnostic_pair.plot(layout="separate", show_observed=SHOW_OBSERVED, observed=observed_summary)
-    format_and_save(axes, "diagnostic_separate")
-
-    np.savez_compressed(output_dir / "trajectory.npz", **trajectory, initial_barcodes=initial_barcodes)
-    report = {
-        "requested_lineage": "E8.0 NMP → E8.75 Somitic mesoderm",
-        "initial_paths": len(initial_barcodes), "accepted_paths": len(lineage.indices),
-        "model_directory": str(MODEL_DIR.resolve()), "model_iterations": result.metadata["config"]["niters"],
-        "lineage_threshold": .6, "terminal_support_cutoff": lineage.support_cutoff,
-        "readout_test_cells": len(test_rows), "readout_validation": quality.astype(object).where(pd.notna(quality), None).to_dict(orient="records"),
-        "gene_support": diagnostic_genes.summary.groupby("time").coverage.first().tolist(),
-        "peak_support": diagnostic_peaks.summary.groupby("time").coverage.first().tolist(),
-        "weighting": weighting, "genes": genes, "peaks": peaks,
-        "gene_query": GENE, "peak_region": PEAK_REGION, "max_peaks": MAX_PEAKS,
-        "peak_selection": "Existing annotation table; absolute TSS distance, not readout scores",
-        "plot_layout": PLOT_LAYOUT, "show_observed": SHOW_OBSERVED,
-        "molecular_readout": "Distance-weighted interpolation; binary ATAC targets give local open probabilities",
-        "scope": "Current short checkpoint has no accepted Somitic branch; NMP-origin diagnostic curves are not lineage validation or evidence of priming.",
-    }
-    (output_dir / "downstream_report.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
-    print("Output:", output_dir.resolve())
+    axes = diagnostic_pair.plot(layout="separate", normalization=NORMALIZATION,
+                                show_observed=SHOW_OBSERVED, observed=observed_summary, show_iqr=SHOW_IQR)
+    format_plot(axes)
 
 
 if __name__ == "__main__":

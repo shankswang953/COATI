@@ -113,7 +113,8 @@ Each run directory must be new. Results include the resolved config, input snaps
 ## Molecular readouts along a lineage
 
 `coati.downstream` supports a gene-name query with `find_gene_peaks` and
-`compute_gene_peak_dynamics`, combined/separate plots and optional observed
+`compute_gene_peak_dynamics`, RNA/peak overlays on one axis after separate
+temporal z-score normalization, separate plots and optional observed
 snapshot overlays. It also provides `select_lineage`, `fit_feature_decoder`,
 `compute_feature_dynamics`, curve/heat-map plots and block-based
 `read_h5ad_features`. The [lineage tutorial](notebooks/09_lineage_features.ipynb)
