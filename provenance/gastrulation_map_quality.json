@@ -384,6 +384,8 @@
       "Mapped ATAC recall (%)": 90.65420560747664
     }
   ],
+  "stored_npz_roundtrip": true,
+  "stored_npz_requires_pickle": false,
   "exact_map_reload": true,
   "disjoint_split_roles": true,
   "atac_umap_fit_rows": "optimization only",

@@ -49,8 +49,8 @@ def main():
     )
     x, y = cells.obsm["X_latent"], cells.obsm["X_atac"]
     times = cells.obs["time"].to_numpy()
-    stages = cells.obs["stage"].astype(str).to_numpy()
-    labels = cells.obs["celltype"].astype(str).to_numpy()
+    stages = cells.obs["stage"].astype(str).to_numpy(dtype=str)
+    labels = cells.obs["celltype"].astype(str).to_numpy(dtype=str)
     print("Paired cells:", cells.n_obs, "RNA:", x.shape, "ATAC:", y.shape)
 
 
@@ -253,6 +253,10 @@ def main():
     np.savez_compressed(output_dir / "test_predictions.npz", rna=x[test_rows], real_atac=y[test_rows], mapped_atac=predicted,
                         time=times[test_rows], celltype=labels[test_rows], barcode=cells.obs_names[test_rows].to_numpy(dtype=str),
                         test_rows=test_rows, real_umap=real_atac_umap, mapped_umap=mapped_atac_umap)
+    with np.load(output_dir / "test_predictions.npz", allow_pickle=False) as saved:
+        assert all(len(saved[key]) == len(test_rows) for key in ("rna", "real_atac", "mapped_atac", "time", "celltype", "barcode", "real_umap", "mapped_umap"))
+        np.testing.assert_array_equal(saved["barcode"], cells.obs_names[test_rows].to_numpy(dtype=str))
+        np.testing.assert_array_equal(saved["mapped_atac"], predicted)
     joblib.dump({"celltype": celltype_reader, "stage": stage_reader}, output_dir / "reference_classifiers.joblib")
     report = {
         "dataset": "gastrulation", "accession": "GSE205117", "map_kind": map_kind,
@@ -262,6 +266,7 @@ def main():
         "map_config": map_config.to_dict(), "map_report": map_report,
         "quality": quality.reset_index().to_dict(orient="records"), "stage_quality": stage_quality.reset_index().to_dict(orient="records"),
         "celltype_quality": type_quality.reset_index().to_dict(orient="records"),
+        "stored_npz_roundtrip": True, "stored_npz_requires_pickle": False,
         "exact_map_reload": True, "disjoint_split_roles": True,
         "atac_umap_fit_rows": "optimization only", "atac_shared_transform": True,
         "classifier_reference": "real optimization ATAC14; 15 neighbors; distance weights",
