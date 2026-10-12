@@ -31,22 +31,37 @@ settings for your data. Paired runs require corresponding primary/secondary rows
 within each snapshot. A run with secondary data can still select multimodal=False.
 The automatic FiLM/MLP map is trained first and frozen, as before.
 
-## Use your AnnData
+## Prepare your AnnData first
+
+COATI recommends `obs["celltype"]`, `obs["time"]`, `obs["barcode"]` and matching
+`obs_names`, with UMAP in `obsm["X_umap"]`. The preparation helper maps existing
+fields on a copy and reports the conversion. See [input conventions](inputs.md).
 
 ```python
-data = ct.TemporalData.from_anndata(
-    adata, time_key="time", obsm_key="X_pca",
-    secondary_obsm_key="X_atac",  # omit for a primary-only input
-)
-result = ct.train_vector_field(data, multimodal=True, balanced=True)
-result.plot_velocity(adata, use_rep="X_pca", time_key="time",
-                     color="cell_type", style="stream")
+cells = ct.prepare_anndata(adata, use_rep="X_pca", time_key="time",
+                           celltype_key="cell_type")
+result = ct.train_vector_field(cells, multimodal=False, balanced=False)
+result.plot_dynamics(cells)
 ```
 
-For a single-modality run omit secondary_obsm_key and use multimodal=False.
-Use the same features and preprocessing for plotting as for training. Existing
-UMAP coordinates must already be stored in adata.obsm["X_umap"]. Plotting supports
-string stage labels with an explicit numeric `time_mapping`; see [velocity](velocity.md).
+For arrays, assemble AnnData automatically:
+
+```python
+cells = ct.prepare_anndata(embedding, time=cell_times, celltype=cell_types,
+                           barcode=cell_ids, compute_umap=True)
+result = ct.train_vector_field(cells, balanced=False)
+result.plot_dynamics(cells)
+```
+
+If UMAP already exists, omit `compute_umap`; use the same original model features
+for training and plotting. With a paired secondary representation select
+`multimodal=True, secondary_obsm_key="X_atac"`. Categorical stages need an explicit
+`time_mapping` into your intended training units.
+
+The unbalanced view shows cell-type-colored streams beside instantaneous growth
+with the same streams and labels. A balanced result produces only the motion
+panel. For one-stage views, subset `cells`; pass `time=.5` only when you intend
+a common-time field evaluation. See [growth and flow](velocity.md).
 
 ## Override or reuse settings
 

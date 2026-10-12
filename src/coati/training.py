@@ -121,14 +121,18 @@ def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
 def train_vector_field(data, config=None, *, multimodal=None, balanced=None,
                        output_dir=None, map_config=None, T_model=None, map_model=None,
                        primal_norm_path=None, sec_norm_path=None, warm_start_path=None,
-                       verbose=False, **parameters):
+                       verbose=False, use_rep="auto", time_key=None, celltype_key=None,
+                       barcode_key=None, time_mapping=None, secondary_obsm_key=None, **parameters):
     """Train the vector field with explicit modality and mass-conservation modes.
 
     Without a config, defaults are single-modality and balanced. An explicit
     multimodal mode defaults to secondary_weight=0.35; an explicit unbalanced
     mode enables growth and count-based mass matching. A supplied Config is
     copied and overrides use clear names (iterations, batch_size, learning_rate)
-    or existing engine names. Existing fit calls continue to work unchanged.
+    or existing engine names. AnnData is accepted directly: canonical metadata
+    is prepared on a copy, and use_rep selects the original training features.
+    prepare_anndata is the first step for arrays and categorical stage labels.
+    Existing fit calls continue to work unchanged.
     """
     if config is not None and not isinstance(config, Config):
         raise TypeError("config must be a Config.")
@@ -138,6 +142,16 @@ def train_vector_field(data, config=None, *, multimodal=None, balanced=None,
     if balanced is not None:
         options["balanced"] = balanced
     cfg = Config(**options) if config is None else config.with_parameters(**options)
+    if not isinstance(data, TemporalData):
+        from .anndata_io import prepare_anndata
+        prepared = prepare_anndata(data, use_rep=use_rep, time_key=time_key,
+            celltype_key=celltype_key, barcode_key=barcode_key, time_mapping=time_mapping,
+            secondary_key=secondary_obsm_key)
+        secondary_key = secondary_obsm_key or prepared.uns["coati_input"].get("secondary_rep")
+        if cfg.multimodal and not secondary_key:
+            raise ValueError("Multimodal AnnData training requires a paired secondary_obsm_key.")
+        data = TemporalData.from_anndata(prepared,
+            secondary_obsm_key=secondary_key if cfg.multimodal else None)
     return fit(data, cfg, output_dir=output_dir, map_config=map_config,
                T_model=T_model, map_model=map_model, primal_norm_path=primal_norm_path,
                sec_norm_path=sec_norm_path, warm_start_path=warm_start_path, verbose=verbose)

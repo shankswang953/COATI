@@ -76,3 +76,21 @@ Machine-readable records are in `provenance/`: `equivalence.json`, `toy_metrics.
 ## Scope
 
 CPU results only. GPU/MPS, long biological training runs, full flow-matching pipelines and downstream molecular analyses have not been validated here. The toy checks and short biological holdout establish execution for these examples, not biological superiority.
+
+## AnnData conventions and UMAP growth
+
+On 2026-10-12, all 47 package checks passed after adding input preparation and
+UMAP dynamics functions. Direct AnnData and TemporalData training produced
+identical model parameters for the tested single- and multimodal unbalanced
+examples. Analytic growth checks matched the saved ODE derivative, including its
+`alpha_growth` multiplier. Tests covered metadata ambiguities, array conversion,
+categorical time mappings, paired features, reordered cells, colors and labels,
+copy-based storage and h5ad reload.
+
+The unbalanced script ran for 300 iterations; the balanced script ran for 200.
+Both produced a fitted UMAP, figure and stored vectors, with exact numerical
+save/reload checks. The new dynamics notebook executed all six code cells.
+Balanced results did not fabricate growth values. This validates the interfaces
+and plotting behavior, not converged population mass or biological accuracy.
+Records are in `provenance/anndata_dynamics_validation.json`. The training
+algorithm under `src/coati/_core/` was not changed.

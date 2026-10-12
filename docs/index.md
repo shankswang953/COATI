@@ -28,7 +28,7 @@ result = ct.train_vector_field(data, multimodal=True, balanced=True)
 result.plot_trajectory()
 ```
 
-Start with a small CPU example, inspect the trajectory, and then substitute your own prepared embeddings. The current validation covers synthetic problems; biological runs are intentionally outside this release's verification.
+Start with a small CPU example, inspect the trajectory, and then substitute your own prepared embeddings. Validation includes synthetic workflows and a short biological temporal-holdout tutorial; it does not establish biological superiority.
 
 ```{toctree}
 :maxdepth: 2

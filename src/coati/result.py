@@ -213,7 +213,7 @@ class Result:
         return project_velocity(points, velocity, embedding, time=time, basis=basis,
                                 n_neighbors=n_neighbors, ridge=ridge)
 
-    def compute_velocity_embedding(self, adata, *, use_rep="X_pca", time_key="time",
+    def compute_velocity_embedding(self, adata, *, use_rep="auto", time_key="time",
                                    basis="umap", time=None, time_mapping=None,
                                    n_neighbors=30, ridge=1e-3):
         """Return projected vectors for AnnData rows, without modifying AnnData.
@@ -234,7 +234,8 @@ class Result:
         from .velocity import _matrix
         target = adata.copy() if copy else adata
         field = self.compute_velocity_embedding(target, **kwargs)
-        use_rep = kwargs.get("use_rep", "X_pca")
+        from .anndata_io import resolve_representation
+        use_rep = resolve_representation(target, kwargs.get("use_rep", "auto"))
         points = _matrix(target.X if use_rep is None else target.obsm[use_rep], "training representation")
         target.obsm[key] = self.compute_velocity(points, time=field.time)
         target.obsm[f"{key}_{field.basis}"] = field.velocity
@@ -244,11 +245,11 @@ class Result:
         return target
 
     def plot_velocity(self, adata=None, *, embedding=None, points=None, time=None,
-                      use_rep="X_pca", time_key="time", time_mapping=None, basis="umap",
+                      use_rep="auto", time_key="time", time_mapping=None, basis="umap",
                       n_neighbors=30, ridge=1e-3, color=None, **plot_options):
         """Draw streamlines, grid arrows or cell arrows on an existing embedding.
 
-        AnnData example: result.plot_velocity(adata, use_rep="X_pca", time_key="time",
+        AnnData example: result.plot_velocity(adata, use_rep="auto", time_key="time",
         color="cell_type", style="stream"). NumPy inputs instead use embedding,
         points and time. Plotting never changes AnnData or fits an embedding.
         """
@@ -258,10 +259,100 @@ class Result:
             field = self.compute_velocity_embedding(adata, use_rep=use_rep, time_key=time_key,
                        time_mapping=time_mapping, basis=basis, time=time, n_neighbors=n_neighbors, ridge=ridge)
             if isinstance(color, str) and color in adata.obs:
-                color = adata.obs[color].to_numpy()
+                color = adata.obs[color]
         else:
             if embedding is None:
                 raise ValueError("Provide AnnData or an existing two-dimensional embedding.")
             field = self.project_velocity(embedding, points=points, time=time, basis=basis,
                                            n_neighbors=n_neighbors, ridge=ridge)
         return field.plot(color=color, n_neighbors=n_neighbors, **plot_options)
+
+    def compute_growth(self, points=None, *, time=None, raw=True, chunk_size=1024):
+        """Evaluate instantaneous d log(weight)/dt for an unbalanced model.
+
+        The rate follows the saved engine's actual ODE: growth_net(x,t) times
+        model.alpha_growth. raw controls input coordinate units, not rate units.
+        Time units are exactly those supplied during training. This is distinct
+        from cumulative log_weights or total population mass.
+        """
+        import torch
+        from .velocity import _matrix
+        if not self.metadata["config"]["unbalancedModel"] or not hasattr(self.model, "growth_net"):
+            raise ValueError("Growth rates require an unbalanced model trained with balanced=False.")
+        if not isinstance(chunk_size, int) or isinstance(chunk_size, bool) or chunk_size < 1:
+            raise ValueError("chunk_size must be a positive integer.")
+        if points is None:
+            points = np.concatenate(self.data.primary)
+            if not raw:
+                points = points / self.metadata["primary_scale"]
+            if time is None:
+                time = np.repeat(self.data.times, [len(x) for x in self.data.primary])
+        elif time is None:
+            raise ValueError("Provide a numeric time when evaluating explicit points.")
+        points = _matrix(points, "points", self.metadata["dimension"])
+        try:
+            times = np.broadcast_to(np.asarray(time, dtype=float), (len(points),))
+        except ValueError as exc:
+            raise ValueError("time must be a scalar or one numeric value per cell.") from exc
+        if not np.isfinite(times).all():
+            raise ValueError("time must contain finite numeric values.")
+        parameter = next(self.model.parameters())
+        scale = self.metadata["primary_scale"] if raw else 1.
+        output = []
+        with torch.no_grad():
+            for start in range(0, len(points), chunk_size):
+                x = torch.tensor(points[start:start+chunk_size] / scale, dtype=parameter.dtype, device=parameter.device)
+                t = torch.tensor(times[start:start+chunk_size, None].copy(), dtype=x.dtype, device=x.device)
+                rate = self.model.growth_net(torch.cat([x, t], dim=1)) * self.model.alpha_growth
+                if rate.shape != (len(x), 1) or not torch.isfinite(rate).all():
+                    raise ValueError("The growth model must return one finite scalar rate per cell.")
+                output.append(rate[:, 0].cpu().numpy())
+        return np.concatenate(output)
+
+    def plot_growth(self, adata, *, use_rep="auto", time_key="time", time=None,
+                    time_mapping=None, basis="umap", celltype_key="celltype", labels=True,
+                    show_velocity=False, n_neighbors=30, ridge=1e-3, ax=None, **plot_options):
+        """Plot instantaneous growth on UMAP, optionally with streams and labels.
+
+        Set show_velocity=True to overlay COATI flow. Growth uses original model
+        features; color is the actual d log(weight)/dt, not cumulative log weight.
+        """
+        from .dynamics import plot_growth
+        return plot_growth(self, adata, use_rep=use_rep, time_key=time_key, time=time,
+            time_mapping=time_mapping, basis=basis, celltype_key=celltype_key, labels=labels,
+            show_velocity=show_velocity, n_neighbors=n_neighbors, ridge=ridge, ax=ax, **plot_options)
+
+    def plot_dynamics(self, adata, *, use_rep="auto", time_key="time", time=None,
+                      time_mapping=None, basis="umap", celltype_key="celltype", labels=True,
+                      include_growth=None, palette=None, n_neighbors=30, ridge=1e-3,
+                      axes=None, **plot_options):
+        """Plot cell types and COATI streams; add growth for unbalanced models.
+
+        Returns a flat array of Axes. Each cell uses its observation time unless
+        time is supplied. Subset AnnData for a one-stage view. See coati.dynamics.
+        """
+        from .dynamics import plot_dynamics
+        return plot_dynamics(self, adata, use_rep=use_rep, time_key=time_key, time=time,
+            time_mapping=time_mapping, basis=basis, celltype_key=celltype_key, labels=labels,
+            include_growth=include_growth, palette=palette, n_neighbors=n_neighbors, ridge=ridge,
+            axes=axes, **plot_options)
+
+    def write_dynamics(self, adata, *, copy=False, growth_key="coati_growth", **kwargs):
+        """Store velocity vectors and, for unbalanced models, instantaneous growth.
+
+        Returns AnnData. copy=True preserves the caller's input. Observation
+        identities and row order are retained; no UMAP is fitted here.
+        """
+        from .anndata_io import resolve_representation, observation_times
+        from .velocity import _matrix
+        target = adata.copy() if copy else adata
+        rep = resolve_representation(target, kwargs.get("use_rep", "auto"))
+        times = observation_times(target, time=kwargs.get("time"), time_key=kwargs.get("time_key", "time"),
+                                  time_mapping=kwargs.get("time_mapping"))
+        target = self.write_velocity(target, **kwargs)
+        if self.metadata["config"]["unbalancedModel"]:
+            points = _matrix(target.X if rep is None else target.obsm[rep], "training representation")
+            target.obs[growth_key] = self.compute_growth(points, time=times)
+            target.uns[growth_key] = dict(definition="d log(weight) / dt", units="per model time unit",
+                                         source="COATI saved unbalanced ODE")
+        return target

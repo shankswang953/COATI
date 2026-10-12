@@ -1,4 +1,55 @@
-# Vector fields and UMAP velocity
+# UMAP flow and growth
+
+Prepare `celltype`, `time` and `barcode` with `ct.prepare_anndata` before
+training or plotting; see [input conventions](inputs.md). AnnData copies preserve
+source fields and order, and arrays can be assembled automatically.
+
+![Cell types and instantaneous growth with the same COATI flow](_static/dynamics-umap-example.png)
+
+## Cell types, growth and flow together
+
+```python
+cells = ct.prepare_anndata(adata, use_rep="X_pca", time_key="day", celltype_key="cell_type")
+result = ct.train_vector_field(cells, balanced=False)
+axes = result.plot_dynamics(cells)
+axes[0].figure.savefig("dynamics_umap.pdf", bbox_inches="tight")
+
+# A growth heat map alone, or with streams:
+result.plot_growth(cells)
+result.plot_growth(cells, show_velocity=True)
+
+# Explicitly store results on a copy:
+stored = result.write_dynamics(cells, copy=True)
+stored.obs["coati_growth"]
+stored.obsm["coati_velocity_umap"]
+```
+
+An unbalanced model has two panels; a balanced model has a motion panel and no
+constructed growth values. Supplied cell-type labels are displayed at observed
+points near each group's median. Existing Scanpy `celltype_colors` are reused;
+`palette={"type_a": "#0072ce", "type_b": "#f28c28"}` can override them. Both panels
+share the UMAP coordinates, cell order, axes limits and projected vectors.
+
+The heat map displays **instantaneous d log(weight)/dt**, evaluated using the
+original training features and each cell's observation time. It follows the
+saved ODE exactly, including its `alpha_growth` multiplier. It is different from
+cumulative `log_weights`, total population mass, or an experimental proliferation
+measurement. Positive rates increase mass; negative rates reduce it.
+
+```python
+growth = result.compute_growth()
+growth = result.compute_growth(cells.obsm["X_pca"], time=cells.obs["time"].to_numpy())
+# Subset a stage to avoid mixing different observation-time fields:
+result.plot_dynamics(cells[cells.obs["time"] == 1.].copy())
+```
+
+`time=.5` evaluates a field at one common time on the displayed coordinates;
+it does not transport those cells to that time. Growth is unavailable for
+balanced models. The example image and [tutorial](tutorials/07_dynamics.ipynb)
+use a short synthetic unbalanced run; they demonstrate these functions, not
+converged population growth or biological cell-type inference.
+
+## Existing velocity interface
 
 A trained COATI model exposes its primary-space velocity field without integrating
 trajectories. It supports single- or multi-modal training, and balanced or

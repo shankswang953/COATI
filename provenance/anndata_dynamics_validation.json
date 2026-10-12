@@ -1,0 +1,55 @@
+{
+  "tests_passed": 47,
+  "core_modified": false,
+  "checks": [
+    "AnnData versus TemporalData exact parameter equality",
+    "growth equals saved ODE derivative, including alpha_growth",
+    "reordered cell identity, palette and label alignment",
+    "explicit write on a copy and h5ad reload",
+    "balanced mode rejects growth and draws motion only"
+  ],
+  "toy_runs": {
+    "balanced": {
+      "balanced": true,
+      "iterations": 200,
+      "fields": [
+        "time",
+        "celltype",
+        "barcode"
+      ],
+      "obsm": [
+        "X_coati",
+        "X_umap",
+        "coati_velocity",
+        "coati_velocity_umap"
+      ],
+      "growth_definition": "unavailable",
+      "save_reload_agrees": true
+    },
+    "unbalanced": {
+      "balanced": false,
+      "iterations": 300,
+      "fields": [
+        "time",
+        "celltype",
+        "barcode",
+        "coati_growth"
+      ],
+      "obsm": [
+        "X_coati",
+        "X_umap",
+        "coati_velocity",
+        "coati_velocity_umap"
+      ],
+      "growth_definition": "d log(weight) / dt",
+      "save_reload_agrees": true
+    }
+  },
+  "executed_notebook": "notebooks/07_dynamics.ipynb",
+  "recommended_fields": [
+    "celltype",
+    "time",
+    "barcode"
+  ],
+  "prepare_signature": "(data, *, time=None, celltype=None, barcode=None, obs=None, time_key=None, celltype_key=None, barcode_key=None, time_mapping=None, use_rep='auto', secondary=None, secondary_key=None, umap=None, compute_umap=False, n_neighbors=30, min_dist=0.35, seed=0, copy=True, warn=True)"
+}

@@ -74,30 +74,18 @@ def project_velocity(points, velocity, embedding, *, n_neighbors=30, ridge=1e-3,
     return VelocityEmbedding(y.copy(), projected, time, basis)
 
 
-def from_anndata(result, adata, *, use_rep="X_pca", time_key="time", basis="umap",
+def from_anndata(result, adata, *, use_rep="auto", time_key="time", basis="umap",
                  time=None, time_mapping=None, n_neighbors=30, ridge=1e-3):
     """Read an AnnData without sorting or mutating rows or fitting preprocessing."""
     key = basis if basis.startswith("X_") else "X_" + basis
     if key not in adata.obsm:
         raise KeyError(f"Missing adata.obsm[{key!r}]; provide an existing embedding.")
-    if use_rep is not None and use_rep not in adata.obsm:
-        raise KeyError(f"Missing adata.obsm[{use_rep!r}]; use the representation used in training.")
+    from .anndata_io import resolve_representation, observation_times
+    use_rep = resolve_representation(adata, use_rep)
     points = _matrix(adata.X if use_rep is None else adata.obsm[use_rep], "training representation")
     if len(points) != adata.n_obs:
         raise ValueError("Representation rows must match adata.obs.")
-    if time is None:
-        if time_key not in adata.obs:
-            raise KeyError(f"Missing adata.obs[{time_key!r}]; supply cell times or a scalar time.")
-        values = adata.obs[time_key].to_numpy()
-        if time_mapping is not None:
-            try:
-                values = np.asarray([time_mapping[label] for label in values], dtype=float)
-            except KeyError as exc:
-                raise ValueError(f"time_mapping is missing label {exc.args[0]!r}.") from exc
-        try:
-            time = np.asarray(values, dtype=float)
-        except (TypeError, ValueError) as exc:
-            raise ValueError("Non-numeric observation times require an explicit time_mapping.") from exc
+    time = observation_times(adata, time=time, time_key=time_key, time_mapping=time_mapping)
     velocity = result.compute_velocity(points, time=time)
     return project_velocity(points, velocity, adata.obsm[key], time=np.broadcast_to(time, (len(points),)).copy(),
                             basis=basis.removeprefix("X_"), n_neighbors=n_neighbors, ridge=ridge)
@@ -132,7 +120,8 @@ def _grid(field, *, grid_size, n_neighbors, smooth, min_mass):
 def plot_velocity_embedding(field, *, style="stream", color=None, ax=None,
                             grid_size=45, n_neighbors=30, smooth=1., min_mass=.03,
                             density=1.2, point_size=12, alpha=.55, arrow_color="#263445",
-                            cmap="viridis", linewidth=.8, arrow_size=1., title=None):
+                            cmap="viridis", linewidth=.8, arrow_size=1., title=None,
+                            palette=None, labels=False, legend=True, norm=None, colorbar_label=None):
     """Plot a learned velocity field over observed cells; return the Axes.
 
     color can be numeric values, category labels or a Matplotlib color. Stream
@@ -144,8 +133,8 @@ def plot_velocity_embedding(field, *, style="stream", color=None, ax=None,
     from matplotlib.colors import is_color_like
     from matplotlib.lines import Line2D
     import pandas as pd
-    if style not in {"stream", "grid", "arrows"}:
-        raise ValueError("style must be 'stream', 'grid' or 'arrows'.")
+    if style not in {"stream", "grid", "arrows", "cells"}:
+        raise ValueError("style must be 'stream', 'grid', 'arrows' or 'cells'.")
     if not isinstance(grid_size, int) or grid_size < 5:
         raise ValueError("grid_size must be an integer of at least five.")
     if not isinstance(n_neighbors, int) or n_neighbors < 2:
@@ -163,19 +152,26 @@ def plot_velocity_embedding(field, *, style="stream", color=None, ax=None,
         values = np.asarray(color)
         if values.shape != (len(x),) or pd.isna(values).any():
             raise ValueError("color must contain one non-missing value per cell.")
-        if np.issubdtype(values.dtype, np.number):
-            scatter = ax.scatter(*x.T, c=values, cmap=cmap, s=point_size, alpha=alpha, linewidths=0)
-            ax.figure.colorbar(scatter, ax=ax, shrink=.6)
+        if np.issubdtype(values.dtype, np.number) and not isinstance(getattr(color, "dtype", None), pd.CategoricalDtype):
+            scatter = ax.scatter(*x.T, c=values, cmap=cmap, norm=norm, s=point_size, alpha=alpha, linewidths=0)
+            bar = ax.figure.colorbar(scatter, ax=ax, shrink=.6)
+            if colorbar_label is not None:
+                bar.set_label(colorbar_label)
         else:
-            codes, labels = pd.factorize(values, sort=False)
-            palette = plt.get_cmap("tab10" if len(labels) <= 10 else "tab20")
-            colors = [palette(j % palette.N) for j in range(len(labels))]
+            categories = pd.Categorical(color)
+            names = list(categories.categories)
+            codes = categories.codes
+            colors = category_colors(names, palette)
             ax.scatter(*x.T, c=[colors[j] for j in codes], s=point_size, alpha=alpha, linewidths=0)
-            ax.legend(handles=[Line2D([], [], marker="o", ls="", color=colors[j], label=str(label)) for j, label in enumerate(labels)],
-                      frameon=False, loc="best", markerscale=.7)
+            if legend:
+                ax.legend(handles=[Line2D([], [], marker="o", ls="", color=colors[j], label=str(label))
+                                   for j, label in enumerate(names) if np.any(codes == j)],
+                          frameon=False, loc="best", markerscale=.7)
+            if labels:
+                annotate_celltypes(ax, x, categories)
     if style == "arrows":
         ax.quiver(*x.T, *v.T, color=arrow_color, angles="xy", scale_units="xy", width=.003, alpha=.8)
-    else:
+    elif style != "cells":
         axes, flow, supported = _grid(field, grid_size=grid_size, n_neighbors=n_neighbors, smooth=smooth, min_mass=min_mass)
         if style == "stream":
             u, w = [np.ma.array(flow[..., j], mask=~supported) for j in range(2)]
@@ -192,3 +188,38 @@ def plot_velocity_embedding(field, *, style="stream", color=None, ax=None,
     ax.set_aspect("equal", adjustable="datalim")
     ax.spines[["top", "right"]].set_visible(False)
     return ax
+
+
+def category_colors(names, palette=None):
+    """Resolve stable colors in categorical order, including unused categories."""
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import is_color_like
+    if palette is None:
+        cmap = plt.get_cmap("tab10" if len(names) <= 10 else "tab20")
+        colors = [cmap(i % cmap.N) for i in range(len(names))]
+    elif isinstance(palette, dict):
+        missing = [name for name in names if name not in palette]
+        if missing:
+            raise ValueError(f"palette is missing cell types: {missing}.")
+        colors = [palette[name] for name in names]
+    else:
+        colors = list(palette)
+        if len(colors) != len(names):
+            raise ValueError("palette must provide one color per categorical cell type.")
+    if not all(is_color_like(color) for color in colors):
+        raise ValueError("palette values must be Matplotlib colors.")
+    return colors
+
+
+def annotate_celltypes(ax, coordinates, celltypes):
+    """Place labels on observed cells near each group's coordinate median."""
+    import pandas as pd
+    categories = pd.Categorical(celltypes)
+    for code, name in enumerate(categories.categories):
+        points = coordinates[categories.codes == code]
+        if not len(points):
+            continue
+        median = np.median(points, axis=0)
+        location = points[np.argmin(np.sum((points - median) ** 2, axis=1))]
+        ax.text(*location, str(name), ha="center", va="center", fontsize=9, color="#233342",
+                bbox=dict(boxstyle="round,pad=.2", fc="white", ec="none", alpha=.85), zorder=5)

@@ -18,6 +18,28 @@ python -m pip install -e '.[notebooks,docs,dev,visualization]'
 
 Run these commands from this repository. The distribution name is `coati-trajectory`; import it as `coati`. This package is not yet published on PyPI.
 
+## Prepare inputs first
+
+COATI recommends Scanpy-compatible fields `celltype`, `time`, `barcode` in
+AnnData.obs, matching unique `obs_names`, and `X_umap` in AnnData.obsm.
+Common aliases are mapped on a copy; ambiguous columns need an explicit key.
+
+```python
+import coati as ct
+cells = ct.prepare_anndata(adata, use_rep="X_pca", time_key="day", celltype_key="cell_type")
+# Arrays are also assembled automatically, with explicit metadata:
+cells = ct.prepare_anndata(embedding, time=cell_times, celltype=cell_types,
+                           barcode=cell_ids, compute_umap=True)
+result = ct.train_vector_field(cells, balanced=False)
+result.plot_dynamics(cells)
+```
+
+Unbalanced results show cell-type-colored flow alongside instantaneous growth
+with the same streams and labels. Balanced results show motion only. Use
+`result.plot_growth`, `result.compute_growth` and `result.write_dynamics(copy=True)`
+for individual analyses. Preparation does not normalize features or infer cell
+types; reuse prepared inputs and existing UMAPs whenever available.
+
 ## Train a vector field
 
 ```python
@@ -70,6 +92,7 @@ python examples/run_toy.py --dataset split --output outputs/split
 python examples/run_toy.py --dataset paired --output outputs/paired
 coati toy --dataset split --unbalanced --output outputs/unbalanced
 python examples/run_velocity.py --multimodal --unbalanced --output outputs/velocity
+python examples/run_dynamics.py --output outputs/dynamics
 python -m jupyterlab notebooks/
 ```
 
@@ -81,6 +104,7 @@ Each run directory must be new. Results include the resolved config, input snaps
 - [04 · Input formats](notebooks/04_inputs.ipynb)
 - [05 · Vector fields and AnnData UMAP velocity](notebooks/05_velocity.ipynb)
 - [06 · Held-out biological distribution reconstruction](notebooks/06_heldout_biological.ipynb)
+- [07 · Cell types, growth and UMAP flow](notebooks/07_dynamics.ipynb)
 
 ## Your own data
 

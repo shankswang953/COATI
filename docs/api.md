@@ -1,6 +1,8 @@
 # Python API
 
 ```{eval-rst}
+.. autofunction:: coati.anndata_io.prepare_anndata
+
 .. autoclass:: coati.data.TemporalData
    :members:
 

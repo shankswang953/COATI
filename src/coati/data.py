@@ -88,9 +88,12 @@ class TemporalData:
         return cls.from_dataframe(pd.read_csv(path), **kwargs)
 
     @classmethod
-    def from_anndata(cls, adata, *, time_key, obsm_key=None, secondary_obsm_key=None, time_order=None, times=None):
+    def from_anndata(cls, adata, *, time_key="time", obsm_key="auto", secondary_obsm_key=None, time_order=None, times=None):
         """Use X or an explicit embedding. Both modalities share adata.obs row identities."""
         import pandas as pd
+        if obsm_key == "auto":
+            recorded = adata.uns.get("coati_input", {}).get("use_rep", "X")
+            obsm_key = None if recorded == "X" else recorded
         x = _array(adata.X if obsm_key is None else adata.obsm[obsm_key])
         frame = pd.DataFrame(x, columns=[f"x{i}" for i in range(x.shape[1])])
         features = list(frame)
@@ -133,3 +136,8 @@ class TemporalData:
         return TemporalData([self.primary[i] for i in keep], self.times[keep],
                             None if self.secondary is None else [self.secondary[i] for i in keep],
                             [self.labels[i] for i in keep])
+
+    def to_anndata(self, **kwargs):
+        """Assemble snapshots with canonical time, celltype and barcode metadata."""
+        from .anndata_io import prepare_anndata
+        return prepare_anndata(self, **kwargs)

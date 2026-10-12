@@ -11,6 +11,7 @@ saved results and figures, with the same navigation and theme as the rest of the
 | [Input adapters](tutorials/04_inputs.ipynb) | Arrays, dictionary, NPZ, CSV and AnnData inputs |
 | [Vector fields and UMAP velocity](tutorials/05_velocity.ipynb) | Training controls, AnnData velocities, arrows, grids and streamlines |
 | [Held-out biological reconstruction](tutorials/06_heldout_biological.ipynb) | Optional W2 normalization, a held-out pancreas stage, 1,000 training iterations and shared UMAP reconstruction |
+| [Cell types, growth and UMAP flow](tutorials/07_dynamics.ipynb) | Standardize AnnData or arrays, plot growth and flow with cell-type labels, and store aligned results |
 
 ```{toctree}
 :hidden:
@@ -21,4 +22,5 @@ Splitting and growth <tutorials/03_split>
 Input adapters <tutorials/04_inputs>
 Vector fields and UMAP velocity <tutorials/05_velocity>
 Held-out biological reconstruction <tutorials/06_heldout_biological>
+Cell types, growth and UMAP flow <tutorials/07_dynamics>
 ```

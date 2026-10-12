@@ -19,3 +19,6 @@ def train_vector_field(*args, **kwargs):
     """Train with explicit multimodal/balanced controls; see coati.training."""
     from .training import train_vector_field as _train
     return _train(*args, **kwargs)
+
+
+from .anndata_io import prepare_anndata, InputConventionWarning
