@@ -10,47 +10,14 @@
   "readout_validation": [
     {
       "modality": "RNA",
-      "feature": "T",
-      "test_cells": 7101,
-      "RMSE": 0.3058356350589305,
-      "baseline_RMSE": 0.5244355657985167,
-      "squared_error": 0.09353543567189934,
-      "skill_vs_training_mean": 0.6599115364612942,
-      "support_coverage": 0.9881706801858893,
-      "error_type": "MSE"
-    },
-    {
-      "modality": "RNA",
-      "feature": "Sox2",
-      "test_cells": 7101,
-      "RMSE": 0.3338289284295431,
-      "baseline_RMSE": 0.40496087655155927,
-      "squared_error": 0.11144175345641699,
-      "skill_vs_training_mean": 0.32044939874882106,
-      "support_coverage": 0.9881706801858893,
-      "error_type": "MSE"
-    },
-    {
-      "modality": "RNA",
       "feature": "Tbx6",
       "test_cells": 7101,
-      "RMSE": 0.1754631112604186,
-      "baseline_RMSE": 0.21545488492453302,
-      "squared_error": 0.030787303413186036,
-      "skill_vs_training_mean": 0.3367779426411439,
+      "RMSE": 0.17546311126041836,
+      "baseline_RMSE": 0.21545488492452203,
+      "squared_error": 0.030787303413185956,
+      "skill_vs_training_mean": 0.33677794264107785,
       "support_coverage": 0.9881706801858893,
       "error_type": "MSE"
-    },
-    {
-      "modality": "ATAC",
-      "feature": "chr3:34653105-34653705",
-      "test_cells": 7101,
-      "RMSE": 0.28628936394586496,
-      "baseline_RMSE": 0.2835348617987101,
-      "squared_error": 0.08196159990852793,
-      "skill_vs_training_mean": -0.019524103203145016,
-      "support_coverage": 0.9907055344317701,
-      "error_type": "Brier"
     },
     {
       "modality": "ATAC",
@@ -113,23 +80,30 @@
   ],
   "weighting": "growth",
   "genes": [
-    "T",
-    "Sox2",
     "Tbx6"
   ],
   "peaks": [
-    "chr3:34653105-34653705",
     "chr7:126785067-126785667",
     "chr7:126785767-126786367"
   ],
+  "gene_query": "Tbx6",
+  "peak_region": "promoter",
+  "max_peaks": 2,
+  "peak_selection": "Existing annotation table; absolute TSS distance, not readout scores",
+  "plot_layout": "combined",
+  "show_observed": false,
   "molecular_readout": "Distance-weighted interpolation; binary ATAC targets give local open probabilities",
   "scope": "Current short checkpoint has no accepted Somitic branch; NMP-origin diagnostic curves are not lineage validation or evidence of priming.",
   "date": "2026-10-12",
-  "package_checks_passed": 56,
+  "package_checks_passed": 59,
   "notebook": "notebooks/09_lineage_features.ipynb",
   "standalone_script": "examples/run_lineage_features.py",
   "training_algorithm_modified": false,
-  "inference_change": "Optional later start_time with supplied initial states; default numerical outputs unchanged",
-  "raw_source_access": "Read-only H5AD block extraction; aligned barcodes; selected genes and peaks only",
-  "source_selected_features_sha256": "6d6b3c68aea567e34631d2ff0cd6a826eeadc342979a38213aa0a944fe9bb47d"
+  "raw_source_access": "Read-only source-verified selected-feature cache; original source files and TraInf untouched",
+  "biological_checks": [
+    "Tbx6 notebook: combined and separate, observed off",
+    "Sox2 script: separate, observed on"
+  ],
+  "source_selected_features_hash_format": "SHA256 of float32 RNA, float32 binary ATAC, then UTF-8 newline-delimited barcodes",
+  "source_selected_features_sha256": "0f93026b8c74095f2acb6e827437af9e99e11fefe7a07b77f51db0c38c71b693"
 }

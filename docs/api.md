@@ -50,6 +50,15 @@
 ## Molecular trajectory readouts
 
 ```{eval-rst}
+.. autofunction:: coati.downstream.find_gene_peaks
+
+.. autofunction:: coati.downstream.compute_gene_peak_dynamics
+
+.. autoclass:: coati.downstream.GenePeakDynamics
+   :members: plot
+
+.. autofunction:: coati.downstream.plot_gene_peak_dynamics
+
 .. autofunction:: coati.downstream.read_h5ad_features
 
 .. autofunction:: coati.downstream.fit_feature_decoder
