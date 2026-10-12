@@ -87,7 +87,7 @@ an RNA-velocity-style visualization. See [velocity plotting](docs/velocity.md).
 ## Scripts and notebooks
 
 ```bash
-python examples/run_gaussian_sync.py --output outputs/gaussian-sync --iterations 1000
+python examples/run_gaussian_sync.py --output outputs/gaussian-sync --iterations 3000
 python examples/run_toy.py --dataset split --output outputs/split
 python examples/run_toy.py --dataset paired --output outputs/paired
 coati toy --dataset split --unbalanced --output outputs/unbalanced

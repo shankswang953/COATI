@@ -7,7 +7,14 @@ from scipy.stats import multivariate_normal
 def plot_gaussian_sync(data, mapping, results, predictions):
     import torch
     plt.rcParams.update({'font.family': 'Arial', 'font.size': 11})
-    xx, yy = np.meshgrid(np.linspace(-1.28,1.32,80), np.linspace(-.83,.85,70))
+    from sklearn.mixture import GaussianMixture
+    # Fit the two observed terminal components once, independently of model paths.
+    mixture = GaussianMixture(n_components=2, random_state=7).fit(data.primary[-1])
+    order = np.argsort(mixture.means_[:,1])
+    centers, covariances = mixture.means_[order], mixture.covariances_[order]
+    clouds = [(data.primary[0].mean(0), np.cov(data.primary[0].T))]
+    clouds += list(zip(centers, covariances))
+    xx, yy = np.meshgrid(np.linspace(0.,1.,100), np.linspace(0.,1.,100))
     mesh = np.stack([xx,yy],-1)
     with torch.no_grad(): surface = mapping(torch.tensor(mesh,dtype=torch.float32)).numpy()[...,2]
     fig=plt.figure(figsize=(12,9),layout='constrained')
@@ -17,33 +24,45 @@ def plot_gaussian_sync(data, mapping, results, predictions):
         pred=predictions[name];color=colors[name]
         ax=fig.add_subplot(2,2,col+1)
         ax.contourf(xx,yy,surface,levels=np.linspace(0,float(surface.max()),18),cmap='Oranges',alpha=.24)
-        for points,cloud_color in zip(data.primary,['#334155','#334155']):
-            density=multivariate_normal(points.mean(0),np.cov(points.T)).pdf(mesh)
-            ax.contour(xx,yy,density,levels=density.max()*np.array([.12,.4,.75]),colors=cloud_color,linewidths=.9,alpha=.7)
+        for cloud_center, covariance in clouds:
+            density=multivariate_normal(cloud_center,covariance).pdf(mesh)
+            ax.contour(xx,yy,density,levels=density.max()*np.array([.12,.4,.75]),colors='#334155',linewidths=.9,alpha=.7)
+            ax.scatter(*cloud_center,s=38,color='#334155',zorder=4)
         for index in paths:
             ax.plot(pred['primary'][:,index,0],pred['primary'][:,index,1],color=color,lw=1.15,alpha=.45)
-        mean=pred['primary'].mean(1)
-        ax.plot(mean[:,0],mean[:,1],color=color,lw=3,label='Mean learned trajectory')
-        ax.scatter(*data.primary[0].mean(0),s=38,color='#334155',zorder=4)
-        ax.scatter(*data.primary[-1].mean(0),s=38,color='#334155',zorder=4)
-        gx,gy=np.meshgrid(np.linspace(-1.05,1.05,13),np.linspace(-.62,.64,9))
+        endpoint_group = np.linalg.norm(pred['primary'][-1,:,None,:]-centers[None,:,:],axis=-1).argmin(1)
+        for group in range(2):
+            mask = endpoint_group == group
+            if mask.any():
+                mean=pred['primary'][:,mask].mean(1)
+                ax.plot(mean[:,0],mean[:,1],color=color,lw=3,label=f'Terminal {group+1} mean')
+        gx,gy=np.meshgrid(np.linspace(.12,.9,13),np.linspace(.12,.9,13))
         grid=np.column_stack([gx.ravel(),gy.ravel()])
         velocity=result.compute_velocity(grid,time=.5)
         ax.quiver(grid[:,0],grid[:,1],velocity[:,0],velocity[:,1],color=color,alpha=.32,
-                  angles='xy',scale_units='xy',scale=13,width=.0025)
-        ax.set(title=name,xlim=(-1.28,1.32),ylim=(-.83,.85),xlabel='Primary dimension 1',ylabel='Primary dimension 2',aspect='equal')
+                  angles='xy',scale_units='xy',scale=10,width=.0025)
+        ax.set(title=name,xlim=(0.,1.),ylim=(0.,1.),xlabel='Primary dimension 1',ylabel='Primary dimension 2',aspect='equal')
         ax.spines[['top','right']].set_visible(False)
         ax3=fig.add_subplot(2,2,col+3,projection='3d')
         ax3.plot_surface(xx,yy,surface,cmap='Oranges',alpha=.48,linewidth=0,antialiased=True,rcount=70,ccount=80)
+        observed_centers = np.vstack([data.primary[0].mean(0), centers])
+        with torch.no_grad():
+            observed_mapped = mapping(torch.tensor(observed_centers,dtype=torch.float32)).numpy()
+        ax3.scatter(observed_mapped[:,0],observed_mapped[:,1],observed_mapped[:,2]+.018,
+                    color='#334155',s=22,depthshade=False,zorder=7)
         mapped=pred['secondary']
         for index in paths:
             ax3.plot(mapped[:,index,0],mapped[:,index,1],mapped[:,index,2]+.018,color=color,alpha=.5,lw=1.15,zorder=5)
-        mean=mapped.mean(1)
-        ax3.plot(mean[:,0],mean[:,1],mean[:,2]+.022,color=color,lw=3,zorder=6)
-        ax3.set(xlim=(-1.28,1.32),ylim=(-.83,.85),zlim=(0,1.6),xlabel='Secondary 1',ylabel='Secondary 2',zlabel='Height')
+        for group in range(2):
+            mask = endpoint_group == group
+            if mask.any():
+                mean=mapped[:,mask].mean(1)
+                ax3.plot(mean[:,0],mean[:,1],mean[:,2]+.022,color=color,lw=3,zorder=6)
+        ax3.set(xlim=(0.,1.),ylim=(0.,1.),zlim=(0,1.08),xlabel='Secondary 1',ylabel='Secondary 2',zlabel='')
+        ax3.text2D(.88,.70,'Height',rotation=90,transform=ax3.transAxes,ha='center')
         ax3.view_init(elev=44,azim=-66)
-        ax3.set_box_aspect((2.6,1.65,1.3))
-        ax3.set_xticks([-1,0,1]);ax3.set_yticks([-.5,0,.5]);ax3.set_zticks([0,.5,1,1.5])
+        ax3.set_box_aspect((1.,1.,.8))
+        ax3.set_xticks([0,.5,1]);ax3.set_yticks([0,.5,1]);ax3.set_zticks([0,.5,1])
         ax3.grid(False)
         for axis in [ax3.xaxis,ax3.yaxis,ax3.zaxis]:axis.pane.fill=False
     fig.suptitle('Gaussian transport · synchronization changes the route',fontsize=16)

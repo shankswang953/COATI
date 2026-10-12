@@ -11,12 +11,18 @@ def test_gaussian_sync_pairing_and_differentiable_known_map():
     assert data.times.tolist() == [0.,1.]
     assert all(x.shape == (128,2) for x in data.primary)
     assert all(y.shape == (128,3) for y in data.secondary)
+    assert (data.primary[-1][:,1] > data.primary[-1][:,0]).sum() == 64
+    assert (data.primary[-1][:,1] < data.primary[-1][:,0]).sum() == 64
+    odd = ct.datasets.gaussian_sync(n=129, seed=7)
+    assert [len(x) for x in odd.primary] == [129,129]
+    assert all(((x >= 0.) & (x <= 1.)).all() for x in data.primary)
     mapping = ct.datasets.gaussian_bump_map()
+    np.testing.assert_allclose(mapping(torch.tensor([[.5,.5]]))[:,-1].numpy(),[1.])
     for x,y,repeated in zip(data.primary,data.secondary,same.primary):
         np.testing.assert_array_equal(x,repeated)
         np.testing.assert_allclose(mapping(torch.tensor(x)).detach().numpy(),y,rtol=1e-6)
         np.testing.assert_array_equal(y[:,:2],x)
-    query = torch.tensor([[.1,.3]],requires_grad=True)
+    query = torch.tensor([[.4,.5]],requires_grad=True)
     mapping(query)[...,-1].sum().backward()
     assert torch.isfinite(query.grad).all() and torch.linalg.norm(query.grad)>0
     assert not list(mapping.parameters())

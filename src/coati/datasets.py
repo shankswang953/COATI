@@ -21,7 +21,7 @@ def paired(n=128, seed=0):
     data=TemporalData(data.primary,data.times,[np.column_stack([x, .3*np.sin(np.pi*x[:,0])*np.sin(np.pi*x[:,1])]) for x in data.primary])
     return data
 
-def gaussian_bump_map(*, height=1.5, width=.28, center=(0., .12)):
+def gaussian_bump_map(*, height=1., width=.08, center=(.5, .5)):
     """Return the known differentiable 2D-to-3D map for the Gaussian sync toy.
 
     The returned torch.nn.Module accepts forward(points, t=None). A fixed
@@ -49,11 +49,15 @@ def gaussian_bump_map(*, height=1.5, width=.28, center=(0., .12)):
     return GaussianBumpMap()
 
 
-def gaussian_sync(n=128, seed=7, *, height=1.5, width=.28, center=(0., .12)):
-    """Endpoint Gaussian clouds paired through a known Gaussian-bump surface.
+def gaussian_sync(n=128, seed=7, *, height=1., width=.08, center=(.5, .5)):
+    """One Gaussian source and two terminal Gaussians on a known bump surface.
 
     Only t=0 and t=1 are observed: no intermediate detour is given to training.
-    The two primary clouds have different covariance shapes and orientations.
+    Centers and bump geometry follow the paper Gaussian-bump example.
+    Compact, distinct covariances follow the original toy data generator; all
+    observations are sampled inside [0,1]^2. No intermediate path is specified.
+    n is the total cell count at each endpoint; terminal components share it,
+    so the default balanced example does not double the observed population.
     Each secondary row is the exact image of its corresponding primary row.
     gaussian_bump_map with the same parameters supplies the known map for fitting.
     Secondary clouds are pushforwards, not Gaussians in three dimensions.
@@ -61,11 +65,24 @@ def gaussian_sync(n=128, seed=7, *, height=1.5, width=.28, center=(0., .12)):
     if not isinstance(n, int) or isinstance(n, bool) or n < 2:
         raise ValueError("n must be an integer of at least two.")
     rng = np.random.default_rng(seed)
-    primary = []
-    for mean, std, angle in [((-1., -.4), (.065, .045), 25.), ((1., .4), (.09, .05), -20.)]:
-        theta = np.deg2rad(angle)
-        rotation = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
-        primary.append(rng.normal(size=(n,2)) * std @ rotation.T + mean)
+
+    def cloud(count, mean, covariance):
+        # Rejection sampling keeps the Gaussian observations inside the unit square.
+        samples = []
+        remaining = count
+        while remaining:
+            batch = rng.multivariate_normal(mean, covariance, size=max(2*remaining, 128))
+            valid = batch[((batch >= 0.) & (batch <= 1.)).all(axis=1)][:remaining]
+            samples.append(valid)
+            remaining -= len(valid)
+        return np.concatenate(samples)
+
+    initial = cloud(n, (.30, .30), [[.0042, .0002], [.0002, .0038]])
+    terminal = np.concatenate([
+        cloud(n//2, (.5, .8), [[.0030, .0001], [.0001, .0030]]),
+        cloud(n-n//2, (.8, .5), [[.0032, -.0001], [-.0001, .0032]]),
+    ])
+    primary = [initial, terminal]
     mapping = gaussian_bump_map(height=height, width=width, center=center)
     import torch
     with torch.no_grad():

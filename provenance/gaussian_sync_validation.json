@@ -1,21 +1,83 @@
 {
   "date": "2026-10-12",
-  "dataset": "Gaussian endpoint clouds mapped onto a known Gaussian-bump surface",
+  "dataset": "One Gaussian source and two equally weighted terminal Gaussian components around a central Gaussian bump",
   "observed_times": [
     0.0,
     1.0
   ],
   "n_per_snapshot": 128,
   "seed": 7,
-  "iterations_per_model": 1000,
-  "known_map": {
-    "height": 1.5,
-    "width": 0.28,
-    "center": [
+  "iterations_per_model": 3000,
+  "initial_center": [
+    0.3,
+    0.3
+  ],
+  "terminal_centers": [
+    [
+      0.5,
+      0.8
+    ],
+    [
+      0.8,
+      0.5
+    ]
+  ],
+  "terminal_components": 2,
+  "observed_terminal_component_counts": [
+    64,
+    64
+  ],
+  "sampling_domain": [
+    [
       0.0,
-      0.12
+      1.0
+    ],
+    [
+      0.0,
+      1.0
+    ]
+  ],
+  "sampling_covariances": [
+    [
+      [
+        0.0042,
+        0.0002
+      ],
+      [
+        0.0002,
+        0.0038
+      ]
+    ],
+    [
+      [
+        0.003,
+        0.0001
+      ],
+      [
+        0.0001,
+        0.003
+      ]
+    ],
+    [
+      [
+        0.0032,
+        -0.0001
+      ],
+      [
+        -0.0001,
+        0.0032
+      ]
+    ]
+  ],
+  "known_map": {
+    "height": 1.0,
+    "width": 0.08,
+    "center": [
+      0.5,
+      0.5
     ]
   },
+  "geometry_reference": "Gaussian-bump example in the manuscript benchmark section; tutorial uses compact sampling covariances from the original toy generator rather than manuscript identity covariances.",
   "same_input_snapshots": true,
   "same_initial_weights": true,
   "shared_initial_checkpoint_sha256": "3607b37f511a1f79a8000cd05f5d20b9b0c327b28ce1bf7e2fffcdcd61b771c5",
@@ -30,30 +92,84 @@
     ]
   },
   "training_algorithm_modified": false,
-  "run_directory": "outputs/gaussian-sync-269fa260",
+  "run_directory": "outputs/gaussian-sync-ce28b20a",
   "notebook": "notebooks/01_gaussian.ipynb",
-  "figure": "Native primary vector fields and trajectories, and the same mapped trajectories in secondary 3D geometry",
+  "figure": "Native primary vector fields and learned trajectories, and the same mapped trajectories in secondary 3D geometry. Thick curves are endpoint-group means, not additional trajectories.",
   "scope": "Purpose-designed single-seed geometry demonstration; endpoint constraints are soft. No imposed intermediate route or biological superiority claim.",
-  "displayed_cost_table": "              Primary endpoint Sinkhorn  Primary kinetic energy  \\\nModel                                                             \nWithout sync                     0.0008                 2.26106   \nWith sync                        0.0023                 2.69303   \n\n              Secondary kinetic energy  Median maximum bump height  \nModel                                                               \nWithout sync                   8.93417                     1.41638  \nWith sync                      2.97350                     0.27780  ",
-  "shared_primary_input_sha256": "17fc5784c61e67e86a366823a6967f4bd33f5c6d05fb7c143c1ba1c4f9a9baec",
-  "shared_secondary_input_sha256": "b07f7aa3d078eae851ffbda31c9a4f5eb4135b26fdfa37d6a0838659bdce7194",
   "measured_costs": [
     {
       "Model": "Without sync",
-      "Primary endpoint Sinkhorn": 0.0007958838250488043,
-      "Primary kinetic energy": 2.2610630989074707,
-      "Secondary kinetic energy": 8.93416541712213,
-      "Median maximum bump height": 1.416382074356079
+      "Primary endpoint Sinkhorn": 0.00025501364143565297,
+      "Primary kinetic energy": 0.12890779972076416,
+      "Secondary kinetic energy": 0.5170084393910201,
+      "Median maximum bump height": 0.21687841415405273
     },
     {
       "Model": "With sync",
-      "Primary endpoint Sinkhorn": 0.0023038573563098907,
-      "Primary kinetic energy": 2.693032741546631,
-      "Secondary kinetic energy": 2.9734963639566563,
-      "Median maximum bump height": 0.2778018116950989
+      "Primary endpoint Sinkhorn": 0.0004355010751169175,
+      "Primary kinetic energy": 0.15397077798843384,
+      "Secondary kinetic energy": 0.26209938071133365,
+      "Median maximum bump height": 0.09118477255105972
     }
   ],
+  "endpoint_groups_nearest_requested_terminal_center": {
+    "Without sync": [
+      {
+        "count": 63,
+        "endpoint_mean": [
+          0.49627959728240967,
+          0.8001700639724731
+        ],
+        "closest_mean_to_bump": [
+          0.3838690519332886,
+          0.5490505695343018
+        ],
+        "x_minus_y_near_bump": -0.16518151760101318
+      },
+      {
+        "count": 65,
+        "endpoint_mean": [
+          0.7829480767250061,
+          0.48514115810394287
+        ],
+        "closest_mean_to_bump": [
+          0.5640539526939392,
+          0.368959903717041
+        ],
+        "x_minus_y_near_bump": 0.1950940489768982
+      }
+    ],
+    "With sync": [
+      {
+        "count": 67,
+        "endpoint_mean": [
+          0.5130672454833984,
+          0.8081016540527344
+        ],
+        "closest_mean_to_bump": [
+          0.34954485297203064,
+          0.5944068431854248
+        ],
+        "x_minus_y_near_bump": -0.24486199021339417
+      },
+      {
+        "count": 61,
+        "endpoint_mean": [
+          0.7983446717262268,
+          0.500205397605896
+        ],
+        "closest_mean_to_bump": [
+          0.5807240605354309,
+          0.3515133261680603
+        ],
+        "x_minus_y_near_bump": 0.2292107343673706
+      }
+    ]
+  },
   "package_checks_passed": 62,
   "standalone_script": "examples/run_gaussian_sync.py",
-  "script_entrypoint_verified_iterations": 2
+  "script_entrypoint_verified_iterations": 2,
+  "plot_refreshed_from_saved_checkpoints": true,
+  "shared_primary_input_sha256": "b898daaeec9362ce3e3e8d81a4378b9135c12e2ea503177d5d7f2a0d10a34723",
+  "shared_secondary_input_sha256": "0f602a854baa4d07deac90115bfa658593f44f7f64c07a3fe317161fb2b6bb59"
 }

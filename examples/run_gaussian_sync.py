@@ -19,7 +19,7 @@ from coati.toy_comparison import (
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", required=True, help="A fresh comparison directory")
-    parser.add_argument("--iterations", type=int, default=1000)
+    parser.add_argument("--iterations", type=int, default=3000)
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--secondary-weight", type=float, default=.7)
     args = parser.parse_args()
@@ -27,7 +27,7 @@ def main():
     N_CELLS = 128
     ITERATIONS = args.iterations
     SECONDARY_WEIGHT = args.secondary_weight
-    HEIGHT, WIDTH, CENTER = 1.5, .28, (0., .12)
+    HEIGHT, WIDTH, CENTER = 1., .08, (.5, .5)
     data = ct.datasets.gaussian_sync(n=N_CELLS, seed=SEED, height=HEIGHT, width=WIDTH, center=CENTER)
     T = ct.datasets.gaussian_bump_map(height=HEIGHT, width=WIDTH, center=CENTER)
     print("Observed times:", data.times)
@@ -36,7 +36,7 @@ def main():
     base = ct.Config(
         multimodal=False, balanced=True, iterations=ITERATIONS,
         batch_size=64, learning_rate=.003, hidden_dim=64, n_layers=3,
-        activation="tanh", matching_weight=100., energy_weight=1.,
+        activation="tanh", matching_weight=300., energy_weight=1.,
         manifold_weight=0., dt=.05, seed=SEED,
     )
     configs = {
