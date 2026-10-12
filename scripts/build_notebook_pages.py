@@ -28,7 +28,8 @@ def main():
                   "03_split": "Splitting and growth", "04_inputs": "Input adapters",
                   "05_velocity": "Vector fields and UMAP velocity",
                   "06_heldout_biological": "Held-out biological reconstruction",
-                  "07_dynamics": "Cell types, growth and UMAP flow"}
+                  "07_dynamics": "Cell types, growth and UMAP flow",
+                  "08_map_quality": "Train and inspect a cross-modal map"}
         if notebook.cells and notebook.cells[0].cell_type == "markdown":
             first = notebook.cells[0].source.splitlines()
             first[0] = "# " + titles.get(source.stem, first[0].lstrip("# "))

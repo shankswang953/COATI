@@ -1,5 +1,44 @@
 # Cross-modal maps
 
+## Train T without a vector field
+
+The existing `coati.maps.train_map` function can fit T independently. The
+[biological map tutorial](tutorials/08_map_quality.ipynb) shows paired gastrulation
+inputs, map fitting, checkpoint reload, a shared ATAC UMAP and cell-type/stage
+checks on unseen pairs.
+
+```python
+import coati as ct
+from coati.maps import train_map, load_map
+
+paired = ct.TemporalData.from_anndata(cells, secondary_obsm_key="X_atac")
+T, report = train_map(paired, kind="film", config=ct.MapConfig(epochs=300),
+                      directory="outputs/new-map", device="cpu", seed=0)
+restored_T = load_map("outputs/new-map/model.pt", device="cpu")
+```
+
+`cells` is a prepared AnnData with the selected primary representation and row-paired `X_atac` features. Use a fresh directory for each map. `T` accepts primary training features and
+numeric times, and returns secondary features in the corresponding training
+units. `kind="mlp"` selects a map without time conditioning. The returned model
+is frozen and can subsequently be supplied as `T_model=T` to synchronized
+trajectory training, with matching input preprocessing and normalization.
+
+Internal validation selects the checkpoint. For independent paired-cell checks,
+reserve test RNA/ATAC rows together before calling `train_map`. Fit any reference
+classifier and ATAC UMAP on optimization rows, then use that same UMAP's
+`transform` on both true and mapped test ATAC. UMAP resemblance is a visual check;
+quantify label agreement in the original secondary features. For FiLM, stage
+consistency is conditional on the provided time, not independent time inference.
+
+The same biological example runs as a script:
+
+```bash
+python examples/run_map_quality.py --data-dir /path/to/gastrulation --output outputs/map-quality
+```
+
+Use `--map-kind mlp` for time-independent fitting or `--reuse` with an existing
+run to repeat its quality checks without retraining.
+
 ## Default paired training
 
 ```python

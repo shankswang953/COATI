@@ -35,3 +35,14 @@
 
 .. autofunction:: coati.velocity.project_velocity
 ```
+
+## Paired map training
+
+```{eval-rst}
+.. autofunction:: coati.maps.train_map
+
+.. autofunction:: coati.maps.load_map
+
+.. autoclass:: coati.maps.PairedMap
+   :members: forward
+```

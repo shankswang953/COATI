@@ -118,3 +118,37 @@ convergence, lineage accuracy or measured proliferation. The resolved configurat
 source hashes, map diagnostics and growth summaries are in
 `provenance/gastrulation_dynamics_1000.json`. No training algorithm or original
 TraInf file was changed.
+
+## Standalone gastrulation map quality
+
+On 2026-10-12, [the map-only tutorial](tutorials/08_map_quality.ipynb) trained the
+existing FiLM mapper on paired RNA50 / ATAC14 gastrulation features. An outer
+within-stage split reserved 7,101 test pairs before calling `train_map`. The map's
+saved internal splits contain 22,722 optimization and 5,680 validation pairs;
+these three roles are disjoint. The map completed 79 epochs of a 300-epoch budget,
+selected epoch 49, and passed its configured internal validation diagnostics.
+No vector-field training was run for this tutorial.
+
+The source RNA UMAP is a visualization with fixed source preprocessing. The ATAC
+UMAP and both 15-neighbor classifiers were fitted only on real optimization ATAC.
+True and mapped test ATAC use the same frozen UMAP transform. Labels and stage
+agreement were scored in ATAC14, not UMAP. The 6,516 annotated test cells exclude
+unknown labels from cell-type scores; all test pairs remain in stage checks.
+
+| Test input | Celltype agreement | Macro recall | Stage agreement |
+| --- | ---: | ---: | ---: |
+| Real ATAC | 82.27% | 66.17% | 76.59% |
+| T-mapped ATAC | 83.81% | 67.42% | 80.23% |
+
+These one-seed readouts assess preservation under a fixed reference classifier,
+not biological superiority of predictions over observations. FiLM receives time,
+so stage agreement is conditional on supplied time, not independent time inference.
+Mapped cell-type agreement at E7.5 was 67.61%; per-type counts and recalls identify
+weaker groups. Precomputed source PCA/LSI and scales were not refitted, and this is
+not a new-stage or raw-data preprocessing holdout.
+
+Map outputs agreed exactly after reload. The notebook's analysis cells were also
+verified from its own directory, and the standalone script reproduced the saved
+map checks using `--reuse`. Numerical settings, data hashes, subgroup tables and
+validation details are in `provenance/gastrulation_map_quality.json`. Original
+TraInf files and the packaged training algorithm were not changed.

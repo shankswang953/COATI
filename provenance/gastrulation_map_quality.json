@@ -1,0 +1,400 @@
+{
+  "dataset": "gastrulation",
+  "accession": "GSE205117",
+  "map_kind": "film",
+  "seed": 0,
+  "split_seed": 17,
+  "input_dimensions": [
+    50,
+    14
+  ],
+  "source_sha256": {
+    "rna.h5ad": "e88124e28b33ce9a21890275af8bde5de96ad9fa1d85bcf16d8109badbe7b27d",
+    "atac.h5ad": "9a53bad7987710a161596cf37e31ecd828845ef130a20dd3baae4aa24a863631"
+  },
+  "counts": {
+    "optimization": 22722,
+    "validation": 5680,
+    "test": 7101,
+    "annotated_test": 6516
+  },
+  "map_config": {
+    "hidden_dim": 128,
+    "n_layers": 3,
+    "time_hidden_dim": 32,
+    "epochs": 300,
+    "batch_size": 1024,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "validation_fraction": 0.2,
+    "patience": 30,
+    "eval_samples": 256,
+    "eval_repeats": 5,
+    "min_validation_cells": 20,
+    "max_normalized_mse": 0.5,
+    "max_sinkhorn_ratio": 5.0,
+    "quality_action": "warn"
+  },
+  "map_report": {
+    "status": "passed",
+    "kind": "film",
+    "seed": 0,
+    "training_times": [
+      0.0,
+      1.0,
+      2.0,
+      2.5
+    ],
+    "training_labels": [
+      "0.0",
+      "1.0",
+      "2.0",
+      "2.5"
+    ],
+    "primary_scale": 1.0,
+    "secondary_scale": 1.0,
+    "epochs_completed": 79,
+    "best_epoch": 49,
+    "best_validation_standardized_mse": 0.20149630694322182,
+    "validation_scope": "Paired cells withheld within supplied stages; also used for checkpoint selection. Not an independent test of unseen stages or cell-type alignment.",
+    "normalized_mse_definition": "Paired validation MSE divided by validation MSE of the training-stage target mean; lower is better, 1 is the baseline.",
+    "distribution_definition": "Debiased Sinkhorn divergence with half squared Euclidean cost, using equal-sized validation subsamples. The split floor is an empirical reference, not a bound.",
+    "thresholds": {
+      "max_normalized_mse": 0.5,
+      "max_sinkhorn_ratio": 5.0,
+      "min_validation_cells": 20
+    },
+    "stages": [
+      {
+        "label": "0.0",
+        "time": 0.0,
+        "train_cells": 5771,
+        "validation_cells": 1443,
+        "paired_mse": 0.014505751430988312,
+        "paired_rmse": 0.12043982493755258,
+        "stage_mean_baseline_mse": 0.07278576493263245,
+        "normalized_mse": 0.19929379658803129,
+        "sinkhorn_divergence": 0.06998730897903442,
+        "observed_split_floor": 0.10835838168859482,
+        "sinkhorn_ratio": 0.6458873590431342,
+        "sinkhorn_sample_size": 256,
+        "regularization_length": 0.0654645323753357
+      },
+      {
+        "label": "1.0",
+        "time": 1.0,
+        "train_cells": 4990,
+        "validation_cells": 1247,
+        "paired_mse": 0.01719284988939762,
+        "paired_rmse": 0.13112150811136067,
+        "stage_mean_baseline_mse": 0.15985600650310516,
+        "normalized_mse": 0.10755210433124172,
+        "sinkhorn_divergence": 0.09009525775909424,
+        "observed_split_floor": 0.18774998784065247,
+        "sinkhorn_ratio": 0.4798682481703278,
+        "sinkhorn_sample_size": 256,
+        "regularization_length": 0.09141867756843568
+      },
+      {
+        "label": "2.0",
+        "time": 2.0,
+        "train_cells": 7341,
+        "validation_cells": 1835,
+        "paired_mse": 0.013946411199867725,
+        "paired_rmse": 0.11809492453051369,
+        "stage_mean_baseline_mse": 0.1394629180431366,
+        "normalized_mse": 0.10000085610967949,
+        "sinkhorn_divergence": 0.06964371949434281,
+        "observed_split_floor": 0.15123143196105956,
+        "sinkhorn_ratio": 0.46051087787276457,
+        "sinkhorn_sample_size": 256,
+        "regularization_length": 0.08840519189834595
+      },
+      {
+        "label": "2.5",
+        "time": 2.5,
+        "train_cells": 4620,
+        "validation_cells": 1155,
+        "paired_mse": 0.012522824108600616,
+        "paired_rmse": 0.11190542483990942,
+        "stage_mean_baseline_mse": 0.11703339219093323,
+        "normalized_mse": 0.1070021459189216,
+        "sinkhorn_divergence": 0.06439316496253014,
+        "observed_split_floor": 0.1298612877726555,
+        "sinkhorn_ratio": 0.49586113049534397,
+        "sinkhorn_sample_size": 256,
+        "regularization_length": 0.07876672148704529
+      }
+    ],
+    "warnings": []
+  },
+  "quality": [
+    {
+      "Input": "Real test ATAC",
+      "Annotated cells": 6516,
+      "Celltype agreement (%)": 82.27440147329649,
+      "Celltype macro recall (%)": 66.16523394186278,
+      "Stage agreement (%)": 76.59484579636671
+    },
+    {
+      "Input": "Mapped test ATAC",
+      "Annotated cells": 6516,
+      "Celltype agreement (%)": 83.80908532842236,
+      "Celltype macro recall (%)": 67.42475891375503,
+      "Stage agreement (%)": 80.22813688212928
+    }
+  ],
+  "stage_quality": [
+    {
+      "Stage": "E7.5",
+      "Test pairs": 1804,
+      "Annotated pairs": 1630,
+      "Paired RMSE": 0.12121584336202812,
+      "Normalized paired MSE": 0.2039534953468975,
+      "Real celltype (%)": 65.6441717791411,
+      "Mapped celltype (%)": 67.60736196319019,
+      "Real stage (%)": 97.89356984478935,
+      "Mapped stage (%)": 98.8359201773836
+    },
+    {
+      "Stage": "E8.0",
+      "Test pairs": 1559,
+      "Annotated pairs": 1441,
+      "Paired RMSE": 0.13035176165973927,
+      "Normalized paired MSE": 0.1100452240084756,
+      "Real celltype (%)": 85.91256072172104,
+      "Mapped celltype (%)": 87.64746703678001,
+      "Real stage (%)": 66.38871071199488,
+      "Mapped stage (%)": 68.37716484926236
+    },
+    {
+      "Stage": "E8.5",
+      "Test pairs": 2294,
+      "Annotated pairs": 2095,
+      "Paired RMSE": 0.11742460582702324,
+      "Normalized paired MSE": 0.0955181791849875,
+      "Real celltype (%)": 87.44630071599046,
+      "Mapped celltype (%)": 89.11694510739856,
+      "Real stage (%)": 75.02179598953792,
+      "Mapped stage (%)": 80.20924149956407
+    },
+    {
+      "Stage": "E8.75",
+      "Test pairs": 1444,
+      "Annotated pairs": 1350,
+      "Paired RMSE": 0.11235484785991881,
+      "Normalized paired MSE": 0.10917015444147793,
+      "Real celltype (%)": 90.44444444444444,
+      "Mapped celltype (%)": 91.03703703703704,
+      "Real stage (%)": 63.504155124653735,
+      "Mapped stage (%)": 69.80609418282549
+    }
+  ],
+  "celltype_quality": [
+    {
+      "Cell type": "Allantois",
+      "Test cells": 121,
+      "Real ATAC recall (%)": 92.56198347107438,
+      "Mapped ATAC recall (%)": 94.21487603305785
+    },
+    {
+      "Cell type": "Anterior Primitive Streak",
+      "Test cells": 13,
+      "Real ATAC recall (%)": 15.384615384615385,
+      "Mapped ATAC recall (%)": 15.384615384615385
+    },
+    {
+      "Cell type": "Blood progenitors 1",
+      "Test cells": 55,
+      "Real ATAC recall (%)": 40.0,
+      "Mapped ATAC recall (%)": 50.90909090909091
+    },
+    {
+      "Cell type": "Blood progenitors 2",
+      "Test cells": 119,
+      "Real ATAC recall (%)": 71.42857142857143,
+      "Mapped ATAC recall (%)": 79.83193277310924
+    },
+    {
+      "Cell type": "Cardiomyocytes",
+      "Test cells": 174,
+      "Real ATAC recall (%)": 91.95402298850574,
+      "Mapped ATAC recall (%)": 96.55172413793103
+    },
+    {
+      "Cell type": "Caudal Mesoderm",
+      "Test cells": 33,
+      "Real ATAC recall (%)": 45.45454545454545,
+      "Mapped ATAC recall (%)": 51.515151515151516
+    },
+    {
+      "Cell type": "Caudal epiblast",
+      "Test cells": 130,
+      "Real ATAC recall (%)": 68.46153846153847,
+      "Mapped ATAC recall (%)": 67.6923076923077
+    },
+    {
+      "Cell type": "Caudal neurectoderm",
+      "Test cells": 7,
+      "Real ATAC recall (%)": 0.0,
+      "Mapped ATAC recall (%)": 0.0
+    },
+    {
+      "Cell type": "Def. endoderm",
+      "Test cells": 76,
+      "Real ATAC recall (%)": 67.10526315789474,
+      "Mapped ATAC recall (%)": 67.10526315789474
+    },
+    {
+      "Cell type": "Endothelium",
+      "Test cells": 127,
+      "Real ATAC recall (%)": 90.5511811023622,
+      "Mapped ATAC recall (%)": 93.7007874015748
+    },
+    {
+      "Cell type": "Epiblast",
+      "Test cells": 100,
+      "Real ATAC recall (%)": 25.0,
+      "Mapped ATAC recall (%)": 49.0
+    },
+    {
+      "Cell type": "Erythroid1",
+      "Test cells": 229,
+      "Real ATAC recall (%)": 63.31877729257642,
+      "Mapped ATAC recall (%)": 63.75545851528385
+    },
+    {
+      "Cell type": "Erythroid2",
+      "Test cells": 200,
+      "Real ATAC recall (%)": 84.5,
+      "Mapped ATAC recall (%)": 81.0
+    },
+    {
+      "Cell type": "Erythroid3",
+      "Test cells": 29,
+      "Real ATAC recall (%)": 3.4482758620689653,
+      "Mapped ATAC recall (%)": 3.4482758620689653
+    },
+    {
+      "Cell type": "Forebrain/Midbrain/Hindbrain",
+      "Test cells": 684,
+      "Real ATAC recall (%)": 86.8421052631579,
+      "Mapped ATAC recall (%)": 89.91228070175438
+    },
+    {
+      "Cell type": "Gut",
+      "Test cells": 387,
+      "Real ATAC recall (%)": 92.50645994832041,
+      "Mapped ATAC recall (%)": 94.57364341085271
+    },
+    {
+      "Cell type": "Haematoendothelial progenitors",
+      "Test cells": 165,
+      "Real ATAC recall (%)": 72.12121212121212,
+      "Mapped ATAC recall (%)": 76.96969696969697
+    },
+    {
+      "Cell type": "Intermediate mesoderm",
+      "Test cells": 168,
+      "Real ATAC recall (%)": 69.04761904761905,
+      "Mapped ATAC recall (%)": 66.07142857142857
+    },
+    {
+      "Cell type": "Mesenchyme",
+      "Test cells": 621,
+      "Real ATAC recall (%)": 93.07568438003221,
+      "Mapped ATAC recall (%)": 94.68599033816425
+    },
+    {
+      "Cell type": "Mixed mesoderm",
+      "Test cells": 39,
+      "Real ATAC recall (%)": 28.205128205128204,
+      "Mapped ATAC recall (%)": 17.94871794871795
+    },
+    {
+      "Cell type": "NMP",
+      "Test cells": 299,
+      "Real ATAC recall (%)": 90.3010033444816,
+      "Mapped ATAC recall (%)": 88.62876254180601
+    },
+    {
+      "Cell type": "Nascent mesoderm",
+      "Test cells": 206,
+      "Real ATAC recall (%)": 87.86407766990291,
+      "Mapped ATAC recall (%)": 93.68932038834951
+    },
+    {
+      "Cell type": "Neural crest",
+      "Test cells": 93,
+      "Real ATAC recall (%)": 89.24731182795699,
+      "Mapped ATAC recall (%)": 93.54838709677419
+    },
+    {
+      "Cell type": "Notochord",
+      "Test cells": 25,
+      "Real ATAC recall (%)": 76.0,
+      "Mapped ATAC recall (%)": 84.0
+    },
+    {
+      "Cell type": "PGC",
+      "Test cells": 8,
+      "Real ATAC recall (%)": 25.0,
+      "Mapped ATAC recall (%)": 0.0
+    },
+    {
+      "Cell type": "Paraxial mesoderm",
+      "Test cells": 456,
+      "Real ATAC recall (%)": 89.25438596491229,
+      "Mapped ATAC recall (%)": 87.06140350877193
+    },
+    {
+      "Cell type": "Pharyngeal mesoderm",
+      "Test cells": 311,
+      "Real ATAC recall (%)": 78.45659163987139,
+      "Mapped ATAC recall (%)": 82.95819935691318
+    },
+    {
+      "Cell type": "Primitive Streak",
+      "Test cells": 65,
+      "Real ATAC recall (%)": 35.38461538461539,
+      "Mapped ATAC recall (%)": 27.692307692307693
+    },
+    {
+      "Cell type": "Rostral neurectoderm",
+      "Test cells": 361,
+      "Real ATAC recall (%)": 79.22437673130193,
+      "Mapped ATAC recall (%)": 75.06925207756233
+    },
+    {
+      "Cell type": "Somitic mesoderm",
+      "Test cells": 343,
+      "Real ATAC recall (%)": 86.88046647230321,
+      "Mapped ATAC recall (%)": 88.92128279883383
+    },
+    {
+      "Cell type": "Spinal cord",
+      "Test cells": 337,
+      "Real ATAC recall (%)": 88.4272997032641,
+      "Mapped ATAC recall (%)": 91.0979228486647
+    },
+    {
+      "Cell type": "Surface ectoderm",
+      "Test cells": 535,
+      "Real ATAC recall (%)": 90.28037383177569,
+      "Mapped ATAC recall (%)": 90.65420560747664
+    }
+  ],
+  "exact_map_reload": true,
+  "disjoint_split_roles": true,
+  "atac_umap_fit_rows": "optimization only",
+  "atac_shared_transform": true,
+  "classifier_reference": "real optimization ATAC14; 15 neighbors; distance weights",
+  "time_is_map_input": true,
+  "unknown_labels_excluded_from_celltype_scores": true,
+  "scope": "Unseen paired cells within observed stages; precomputed source PCA/LSI and scales fixed. Stage consistency is conditional on supplied time for FiLM.",
+  "date": "2026-10-12",
+  "notebook": "notebooks/08_map_quality.ipynb",
+  "script": "examples/run_map_quality.py",
+  "training_algorithm_modified": false,
+  "original_TraInf_modified": false
+}

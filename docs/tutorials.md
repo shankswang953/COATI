@@ -12,6 +12,7 @@ saved results and figures, with the same navigation and theme as the rest of the
 | [Vector fields and UMAP velocity](tutorials/05_velocity.ipynb) | Training controls, AnnData velocities, arrows, grids and streamlines |
 | [Held-out biological reconstruction](tutorials/06_heldout_biological.ipynb) | Optional W2 normalization, a held-out pancreas stage, 1,000 training iterations and shared UMAP reconstruction |
 | [Cell types, growth and UMAP flow](tutorials/07_dynamics.ipynb) | Paired gastrulation data, a 1,000-step unbalanced model, E8.5 growth and flow with supplied cell types, and aligned AnnData results |
+| [Train and inspect a cross-modal map](tutorials/08_map_quality.ipynb) | Map-only gastrulation training, held-out pairs, shared ATAC UMAP and cell-type/stage consistency |
 
 ```{toctree}
 :hidden:
@@ -23,4 +24,5 @@ Input adapters <tutorials/04_inputs>
 Vector fields and UMAP velocity <tutorials/05_velocity>
 Held-out biological reconstruction <tutorials/06_heldout_biological>
 Cell types, growth and UMAP flow <tutorials/07_dynamics>
+Train and inspect a cross-modal map <tutorials/08_map_quality>
 ```
