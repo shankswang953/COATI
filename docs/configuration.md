@@ -58,3 +58,28 @@ Matching uses the existing W2-based Sinkhorn loss (`p=2`). MMD matching and cust
 Riemannian metric arguments are no longer supported. This does not remove
 `result.evaluate()` or its evaluation metrics. See [migration](migration.md)
 for loading older configurations.
+
+## Clear mode controls and parameter names
+
+`Config(multimodal=False, balanced=True)` selects the basic single-modality balanced
+model. Explicit multimodal=True supplies secondary_weight=.35; explicit balanced=False
+supplies growth_weight=1, mass_loss=True and mass_weight=1. Overrides remain available.
+Calling Config() or using original engine names retains the original defaults.
+
+| Clear name | Existing engine name |
+| --- | --- |
+| iterations | niters |
+| batch_size | num_samples |
+| learning_rate | lr |
+| secondary_weight | sync_weight |
+| matching_weight | pdf_coefficient |
+| manifold_weight | density_coefficient |
+| energy_weight | energy_coefficient |
+| growth_weight | alpha_growth |
+| mass_weight | mass_coefficient |
+
+Supplying both names for the same parameter is rejected. `config.to_dict()` and saved
+JSON retain engine keys for reproducibility. `config.with_parameters(...)` returns a
+new configuration. `train_vector_field(data, config, iterations=500)` uses the same
+mechanism, leaving the supplied configuration unchanged. Explicit mode changes select
+the preset for the new mode; explicitly supplied numerical overrides take precedence.

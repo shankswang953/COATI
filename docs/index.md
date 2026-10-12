@@ -10,7 +10,7 @@
 
 [Download video](_static/coati-intro.mp4) · [Animation source and formula notes](https://github.com/shankswang953/COATI/tree/main/animations)
 
-COATI reconstructs continuous trajectories from paired snapshots. A Neural ODE evolves cells in the primary space, and a fixed cross-modal map carries that same trajectory into the second space. Both spaces constrain the learned flow; a weight controls the balance of energy and manifold penalties while marginal matching remains separately weighted.
+COATI learns vector fields from time-indexed snapshots, using one modality or paired modalities, with balanced or unbalanced population dynamics. A Neural ODE evolves cells in the primary space, and a fixed cross-modal map carries that same trajectory into the second space. Both spaces constrain the learned flow; a weight controls the balance of energy and manifold penalties while marginal matching remains separately weighted.
 
 ```{raw} html
 <details>
@@ -24,8 +24,8 @@ COATI reconstructs continuous trajectories from paired snapshots. A Neural ODE e
 import coati as ct
 
 data = ct.datasets.paired()
-result = ct.fit(data, ct.Config(sync_loss=True, sync_weight=0.35))
-result.plot()
+result = ct.train_vector_field(data, multimodal=True, balanced=True)
+result.plot_trajectory()
 ```
 
 Start with a small CPU example, inspect the trajectory, and then substitute your own prepared embeddings. The current validation covers synthetic problems; biological runs are intentionally outside this release's verification.
@@ -45,6 +45,7 @@ tutorials
 :caption: Understand and extend
 
 configuration
+velocity
 maps
 api
 migration

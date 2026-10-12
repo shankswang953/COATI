@@ -116,3 +116,28 @@ def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
         np.savez(out/"kernel_bandwidths.npz", **{f"t{i}": x.cpu().numpy() for i,x in enumerate(args.sigma_per_cell_primary)})
     result = Result(trained["func"], data, metadata, out, T_model=T_model, map_model=map_model)
     return result
+
+
+def train_vector_field(data, config=None, *, multimodal=None, balanced=None,
+                       output_dir=None, map_config=None, T_model=None, map_model=None,
+                       primal_norm_path=None, sec_norm_path=None, warm_start_path=None,
+                       verbose=False, **parameters):
+    """Train the vector field with explicit modality and mass-conservation modes.
+
+    Without a config, defaults are single-modality and balanced. An explicit
+    multimodal mode defaults to secondary_weight=0.35; an explicit unbalanced
+    mode enables growth and count-based mass matching. A supplied Config is
+    copied and overrides use clear names (iterations, batch_size, learning_rate)
+    or existing engine names. Existing fit calls continue to work unchanged.
+    """
+    if config is not None and not isinstance(config, Config):
+        raise TypeError("config must be a Config.")
+    options = dict(parameters)
+    if multimodal is not None:
+        options["multimodal"] = multimodal
+    if balanced is not None:
+        options["balanced"] = balanced
+    cfg = Config(**options) if config is None else config.with_parameters(**options)
+    return fit(data, cfg, output_dir=output_dir, map_config=map_config,
+               T_model=T_model, map_model=map_model, primal_norm_path=primal_norm_path,
+               sec_norm_path=sec_norm_path, warm_start_path=warm_start_path, verbose=verbose)

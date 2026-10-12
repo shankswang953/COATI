@@ -26,3 +26,12 @@ Open `http://localhost:8000`. `.readthedocs.yaml` provides a build configuration
 ## Existing conda environments
 
 Prefer the fresh environment above. Mixed conda/pip OpenMP runtimes can conflict on macOS. COATI does not set `KMP_DUPLICATE_LIB_OK`, change global tensor defaults or silently select a different solver to mask environment issues.
+
+For the AnnData/UMAP velocity tutorial:
+
+```bash
+python -m pip install -e '.[visualization,notebooks]'
+```
+
+UMAP fitting is optional: plotting an existing embedding only needs the base
+plotting dependencies and AnnData if that input type is used.

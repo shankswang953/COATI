@@ -1,0 +1,50 @@
+{
+  "baseline_commit": "b5641d2",
+  "core_unchanged": true,
+  "tests": {
+    "passed": 38,
+    "warnings": 1
+  },
+  "training_equivalence_cases": [
+    "single_balanced",
+    "single_unbalanced",
+    "multimodal_balanced",
+    "multimodal_unbalanced"
+  ],
+  "training_equivalence": "parameters and predicted trajectories exactly equal to fit with the same resolved config",
+  "velocity_checks": [
+    "analytic linear field with per-cell times and normalization reversal",
+    "affine embedding projection matches analytic transformed velocity",
+    "zero input velocity remains zero",
+    "AnnData row reordering and categorical time mapping",
+    "reload produces identical velocities",
+    "stream/grid support mask",
+    "CLI training and plotting"
+  ],
+  "notebook": "05_velocity.ipynb: all cells executed; inline figures exported",
+  "toy_runs": {
+    "single_balanced": {
+      "iterations": 100,
+      "biological_data": false,
+      "metrics": {
+        "endpoint_sinkhorn_before": 0.15261565148830414,
+        "endpoint_sinkhorn_after": 0.01641431637108326,
+        "kinetic_energy_mean": 0.13641740381717682,
+        "endpoint_sampling_floor": 0.0014929494354873896
+      }
+    },
+    "multimodal_unbalanced": {
+      "iterations": 100,
+      "biological_data": false,
+      "metrics": {
+        "endpoint_sinkhorn_before": 0.1518813967704773,
+        "endpoint_sinkhorn_after": 0.00019318792328704149,
+        "kinetic_energy_mean": 0.0011517087696120143,
+        "endpoint_sampling_floor": 0.00027152098482474685,
+        "secondary_endpoint_sinkhorn": 0.0017257760046049953,
+        "predicted_mass_ratio": 0.9794909954071045,
+        "observed_count_ratio": 1.0
+      }
+    }
+  }
+}

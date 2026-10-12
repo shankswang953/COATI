@@ -57,7 +57,38 @@ class Config:
     No normalization is applied by default. Call fit with normalization parameter paths
     to reuse the research pipeline's normalization exactly.
     """
-    def __init__(self, *, extra=None, **kwargs):
+    def __init__(self, *, multimodal=None, balanced=None, extra=None, **kwargs):
+        aliases = {"iterations": "niters", "learning_rate": "lr", "batch_size": "num_samples",
+                   "secondary_weight": "sync_weight", "matching_weight": "pdf_coefficient",
+                   "manifold_weight": "density_coefficient", "energy_weight": "energy_coefficient",
+                   "growth_weight": "alpha_growth", "mass_weight": "mass_coefficient"}
+        kwargs = dict(kwargs)
+        extra = dict(extra or {})
+        for alias, original in aliases.items():
+            if alias in kwargs:
+                if original in kwargs or original in extra:
+                    raise ValueError(f"Supply either {alias} or {original}, not both.")
+                kwargs[original] = kwargs.pop(alias)
+        supplied = {**kwargs, **extra}
+        for name, mode in (("multimodal", multimodal), ("balanced", balanced)):
+            if mode is not None and not isinstance(mode, bool):
+                raise TypeError(f"{name} must be True or False.")
+        if multimodal is not None:
+            if "sync_loss" in supplied and supplied["sync_loss"] != multimodal:
+                raise ValueError("multimodal conflicts with sync_loss.")
+            kwargs["sync_loss"] = multimodal
+            if "sync_weight" not in supplied:
+                kwargs["sync_weight"] = .35 if multimodal else 0.
+        if balanced is not None:
+            if "unbalancedModel" in supplied and supplied["unbalancedModel"] != (not balanced):
+                raise ValueError("balanced conflicts with unbalancedModel.")
+            kwargs["unbalancedModel"] = not balanced
+            # Only explicit mode selection supplies the growth/mass preset.
+            for key, value in {"alpha_growth": 0. if balanced else 1.,
+                               "mass_loss": not balanced,
+                               "mass_coefficient": 0. if balanced else 1.}.items():
+                if key not in supplied:
+                    kwargs[key] = value
         # Old W2-only saved configs contain disabled MMD flags. Drop only False;
         # never silently reinterpret a configuration that requested MMD matching.
         kwargs = dict(kwargs)
@@ -83,6 +114,42 @@ class Config:
             raise ValueError("sync_weight must be between zero and one.")
         if defaults["support_points"]:
             raise ValueError("The public API supports snapshot data only; support_points requires the advanced engine API.")
+
+    @property
+    def multimodal(self):
+        """Whether synchronization through a secondary modality is enabled."""
+        return bool(self.values["sync_loss"])
+
+    @property
+    def balanced(self):
+        """Whether population mass is conserved by the trajectory model."""
+        return not bool(self.values["unbalancedModel"])
+
+    def with_parameters(self, **kwargs):
+        """Return a new config with clear names or original engine names overridden."""
+        aliases = {"iterations": "niters", "learning_rate": "lr", "batch_size": "num_samples",
+                   "secondary_weight": "sync_weight", "matching_weight": "pdf_coefficient",
+                   "manifold_weight": "density_coefficient", "energy_weight": "energy_coefficient",
+                   "growth_weight": "alpha_growth", "mass_weight": "mass_coefficient"}
+        kwargs = dict(kwargs)
+        advanced = dict(kwargs.pop("extra", {}) or {})
+        values = self.to_dict()
+        values.update(advanced)
+        for key in kwargs:
+            values.pop(aliases.get(key, key), None)
+        if "multimodal" in kwargs:
+            values.pop("sync_loss", None)
+            if (bool(kwargs["multimodal"]) != self.multimodal
+                and not {"secondary_weight", "sync_weight"} & kwargs.keys()
+                and "sync_weight" not in advanced):
+                values.pop("sync_weight", None)
+        if "balanced" in kwargs:
+            values.pop("unbalancedModel", None)
+            if bool(kwargs["balanced"]) != self.balanced:
+                for key in ("alpha_growth", "mass_loss", "mass_coefficient"):
+                    if key not in advanced:
+                        values.pop(key, None)
+        return Config(extra=values, **kwargs)
 
     def to_dict(self):
         return copy.deepcopy(self.values)

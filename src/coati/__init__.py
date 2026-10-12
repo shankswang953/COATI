@@ -1,4 +1,4 @@
-"""COATI: Cross-Omics Alignment for Trajectory Inference."""
+"""COATI: Cross-Omics Aligned Trajectory Inference."""
 from .data import TemporalData
 from .config import Config, MapConfig
 __version__ = "0.1.0"
@@ -13,3 +13,9 @@ def load_result(*args, **kwargs):
     return Result.load(*args, **kwargs)
 
 from . import datasets
+
+
+def train_vector_field(*args, **kwargs):
+    """Train with explicit multimodal/balanced controls; see coati.training."""
+    from .training import train_vector_field as _train
+    return _train(*args, **kwargs)

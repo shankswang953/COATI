@@ -1,49 +1,78 @@
 # Quick start
 
-## A complete Python run
-
 ```python
 import coati as ct
 
-data = ct.datasets.gaussian(n=128, seed=0)
-config = ct.Config(niters=200, num_samples=64, seed=0)
-result = ct.fit(data, config)
-trajectory = result.predict()
-print(trajectory["primary"].shape)  # time × cells × features
-print(result.evaluate())
-ax = result.plot()
+result = ct.train_vector_field(ct.datasets.gaussian(), iterations=200)
+trajectory = result.predict_trajectory()
+result.plot_trajectory()
 ```
 
-`fit` returns a `Result` and saves a unique run under `outputs/`. Use `output_dir="outputs/my-run"` for a named, empty directory. Reusing a nonempty directory raises an error, protecting previous notebook results.
+## Choose modalities and population dynamics
 
-## Reload without retraining
+| `multimodal` | `balanced` | Model |
+| --- | --- | --- |
+| `False` | `True` | Single-modality transport; default |
+| `True` | `True` | Paired multi-modal transport |
+| `False` | `False` | Single-modality transport with growth/mass change |
+| `True` | `False` | Paired multi-modal transport with growth/mass change |
 
 ```python
+config = ct.Config(multimodal=True, balanced=False,
+                   iterations=500, learning_rate=1e-3, batch_size=64,
+                   secondary_weight=.35)
+result = ct.train_vector_field(ct.datasets.paired(), config)
+```
+
+An explicit multimodal choice uses secondary_weight=.35 unless overridden.
+Explicit unbalanced mode uses growth_weight=1, mass_loss=True and mass_weight=1.
+These presets are example starting values; inspect `config.to_dict()` and provide
+settings for your data. Paired runs require corresponding primary/secondary rows
+within each snapshot. A run with secondary data can still select multimodal=False.
+The automatic FiLM/MLP map is trained first and frozen, as before.
+
+## Use your AnnData
+
+```python
+data = ct.TemporalData.from_anndata(
+    adata, time_key="time", obsm_key="X_pca",
+    secondary_obsm_key="X_atac",  # omit for a primary-only input
+)
+result = ct.train_vector_field(data, multimodal=True, balanced=True)
+result.plot_velocity(adata, use_rep="X_pca", time_key="time",
+                     color="cell_type", style="stream")
+```
+
+For a single-modality run omit secondary_obsm_key and use multimodal=False.
+Use the same features and preprocessing for plotting as for training. Existing
+UMAP coordinates must already be stored in adata.obsm["X_umap"]. Plotting supports
+string stage labels with an explicit numeric `time_mapping`; see [velocity](velocity.md).
+
+## Override or reuse settings
+
+```python
+config = ct.Config(iterations=500, learning_rate=1e-3)
+result = ct.train_vector_field(data, config, iterations=1000, output_dir="outputs/run1")
+config.save("config.json")
+config = ct.Config.load("config.json")
 restored = ct.load_result(result.output_dir)
-restored.predict()
+velocity = restored.compute_velocity()  # evaluates at each observed cell's time
 ```
 
-## Paired modalities with an automatically trained map
+Overrides do not mutate the original Config. Output directories must be new.
+Old fit/predict/plot names remain available for existing scripts.
 
-```python
-data = ct.datasets.paired(n=128)
-result = ct.fit(data, ct.Config(sync_loss=True, sync_weight=.35))
-print(result.map_report["status"])
-secondary = result.project_secondary()
-restored = ct.load_result(result.output_dir)  # restores the FiLM map too
-```
-
-The map is fitted to paired cells, validated within each supplied stage and frozen before trajectory fitting. Choose `map_type="mlp"` for a map without time input. The run contains `map/report.txt`, `map/report.json`, training history and the saved map. Quality warnings are visible even when trajectory logs are redirected. See [Cross-modal maps](maps.md) for held-out stages, custom maps and the configurable quality gate.
-
-## Command line
+## Scripts and notebooks
 
 ```bash
-python examples/run_toy.py --dataset gaussian --output outputs/gaussian
-coati toy --dataset paired --niters 200 --output outputs/paired
+python examples/run_velocity.py --output outputs/velocity-single
+python examples/run_velocity.py --multimodal --unbalanced --output outputs/velocity-multi
+coati train-vector-field primary.npz --keys t0 t1 --times 0 1 --iterations 200 --output outputs/run
+coati plot-velocity outputs/run cells.h5ad --use-rep X_pca --time-key time --color cell_type --output velocity.pdf
+python -m jupyterlab notebooks/05_velocity.ipynb
 ```
 
-Each CLI run writes `metrics.json` and `trajectories.png`, as well as model and training artifacts. Training diagnostics go to `training.log`; use `fit(..., verbose=True)` to print them interactively.
-
-## Interpreting a toy run
-
-Compare endpoint Sinkhorn before and after training against the measured sampling floor. Short training is a functional sanity check, not proof of convergence. Kinetic energy is in training coordinates; the familiar normalized lower bound near one applies only when the corresponding global W2 normalization was actually applied.
+Install the visualization extra for the AnnData/UMAP toy script. It exports an
+AnnData with computed vectors and arrow/grid/stream figures. Existing embeddings
+can be plotted without fitting UMAP. Short toy runs verify functionality; they do
+not establish convergence or biological accuracy.

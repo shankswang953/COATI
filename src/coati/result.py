@@ -151,3 +151,117 @@ class Result:
         ax.set(xlabel="Primary dimension 1",ylabel="Primary dimension 2",title="COATI · inferred trajectories")
         ax.legend(frameon=False)
         return ax
+
+
+    def predict_trajectory(self, initial=None, **kwargs):
+        """Integrate the trained vector field; explicit name for predict()."""
+        return self.predict(initial, **kwargs)
+
+    def plot_trajectory(self, **kwargs):
+        """Plot integrated paths; explicit name for plot()."""
+        return self.plot(**kwargs)
+
+    def compute_velocity(self, points=None, *, time=None, raw=True, chunk_size=1024):
+        """Evaluate the learned field without integrating trajectories.
+
+        points must use the same features, order and preprocessing as training.
+        time is a scalar or one numeric time per cell. With points=None, snapshot
+        rows are concatenated in data order and use their observed times. Explicit
+        points require explicit times. raw=True returns input-unit displacement
+        per unit of the numeric time supplied to training.
+        """
+        import torch
+        from .velocity import _matrix
+        if not isinstance(chunk_size, int) or isinstance(chunk_size, bool) or chunk_size < 1:
+            raise ValueError("chunk_size must be a positive integer.")
+        if points is None:
+            points = np.concatenate(self.data.primary)
+            if not raw:
+                points = points / self.metadata["primary_scale"]
+            if time is None:
+                time = np.repeat(self.data.times, [len(x) for x in self.data.primary])
+        elif time is None:
+            raise ValueError("Provide a numeric time when evaluating explicit points.")
+        points = _matrix(points, "points", self.metadata["dimension"])
+        try:
+            times = np.broadcast_to(np.asarray(time, dtype=float), (len(points),))
+        except ValueError as exc:
+            raise ValueError("time must be a scalar or one numeric value per cell.") from exc
+        if not np.isfinite(times).all():
+            raise ValueError("time must contain finite numeric values.")
+        parameter = next(self.model.parameters())
+        scale = self.metadata["primary_scale"] if raw else 1.
+        output = []
+        with torch.no_grad():
+            for start in range(0, len(points), chunk_size):
+                x = torch.tensor(points[start:start+chunk_size] / scale, dtype=parameter.dtype, device=parameter.device)
+                t = torch.tensor(times[start:start+chunk_size, None].copy(), dtype=x.dtype, device=x.device)
+                output.append(self.model.vector_field_net(torch.cat([x, t], dim=1)).cpu().numpy() * scale)
+        return np.concatenate(output)
+
+    def project_velocity(self, embedding, *, points=None, time=None, raw=True,
+                         n_neighbors=30, ridge=1e-3, basis="umap"):
+        """Project corresponding representation vectors into an existing 2D embedding."""
+        from .velocity import project_velocity
+        velocity = self.compute_velocity(points, time=time, raw=raw)
+        if points is None:
+            points = np.concatenate(self.data.primary)
+            if not raw:
+                points = points / self.metadata["primary_scale"]
+            if time is None:
+                time = np.repeat(self.data.times, [len(x) for x in self.data.primary])
+        return project_velocity(points, velocity, embedding, time=time, basis=basis,
+                                n_neighbors=n_neighbors, ridge=ridge)
+
+    def compute_velocity_embedding(self, adata, *, use_rep="X_pca", time_key="time",
+                                   basis="umap", time=None, time_mapping=None,
+                                   n_neighbors=30, ridge=1e-3):
+        """Return projected vectors for AnnData rows, without modifying AnnData.
+
+        use_rep=None selects adata.X. Numeric observation times must match training
+        units; categorical stages require an explicit label-to-time mapping.
+        """
+        from .velocity import from_anndata
+        return from_anndata(self, adata, use_rep=use_rep, time_key=time_key, basis=basis,
+                            time=time, time_mapping=time_mapping, n_neighbors=n_neighbors, ridge=ridge)
+
+    def write_velocity(self, adata, *, key="coati_velocity", copy=False, **kwargs):
+        """Explicitly store primary and embedding velocities in AnnData.obsm.
+
+        Returns the input AnnData or a copy. Reordered cells retain their own
+        representation, times and embedding; training row order is not assumed.
+        """
+        from .velocity import _matrix
+        target = adata.copy() if copy else adata
+        field = self.compute_velocity_embedding(target, **kwargs)
+        use_rep = kwargs.get("use_rep", "X_pca")
+        points = _matrix(target.X if use_rep is None else target.obsm[use_rep], "training representation")
+        target.obsm[key] = self.compute_velocity(points, time=field.time)
+        target.obsm[f"{key}_{field.basis}"] = field.velocity
+        target.uns[key] = dict(basis=field.basis, use_rep="X" if use_rep is None else use_rep,
+                               time_key=kwargs.get("time_key", "time"), projection=field.projection,
+                               source="COATI learned primary-space vector field")
+        return target
+
+    def plot_velocity(self, adata=None, *, embedding=None, points=None, time=None,
+                      use_rep="X_pca", time_key="time", time_mapping=None, basis="umap",
+                      n_neighbors=30, ridge=1e-3, color=None, **plot_options):
+        """Draw streamlines, grid arrows or cell arrows on an existing embedding.
+
+        AnnData example: result.plot_velocity(adata, use_rep="X_pca", time_key="time",
+        color="cell_type", style="stream"). NumPy inputs instead use embedding,
+        points and time. Plotting never changes AnnData or fits an embedding.
+        """
+        if adata is not None:
+            if embedding is not None or points is not None:
+                raise ValueError("Use either AnnData or explicit embedding/points arrays.")
+            field = self.compute_velocity_embedding(adata, use_rep=use_rep, time_key=time_key,
+                       time_mapping=time_mapping, basis=basis, time=time, n_neighbors=n_neighbors, ridge=ridge)
+            if isinstance(color, str) and color in adata.obs:
+                color = adata.obs[color].to_numpy()
+        else:
+            if embedding is None:
+                raise ValueError("Provide AnnData or an existing two-dimensional embedding.")
+            field = self.project_velocity(embedding, points=points, time=time, basis=basis,
+                                           n_neighbors=n_neighbors, ridge=ridge)
+        return field.plot(color=color, n_neighbors=n_neighbors, **plot_options)

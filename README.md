@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/coati-logo.png" alt="COATI — Cross-Omics Alignment for Trajectory Inference" width="400"></p>
+<p align="center"><img src="assets/coati-logo.png" alt="COATI — Cross-Omics Aligned Trajectory Inference" width="400"></p>
 
 <p align="center"><a href="assets/coati-overview.pdf"><img src="assets/coati-overview.png" alt="COATI overview: inputs, coupled dynamics and model architecture" width="100%"></a></p>
 
@@ -6,35 +6,61 @@
 
 # COATI
 
-Cross-Omics Alignment for Trajectory Inference. A portable Python interface around the TraInf neural dynamic optimal transport engine, with optional synchronized secondary-modality constraints.
+Cross-Omics Aligned Trajectory Inference. A portable Python interface around the TraInf neural dynamic optimal transport engine, with optional synchronized secondary-modality constraints.
 
 ## Install
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e '.[notebooks,docs,dev,anndata]'
+python -m pip install -e '.[notebooks,docs,dev,visualization]'
 ```
 
 Run these commands from this repository. The distribution name is `coati-trajectory`; import it as `coati`. This package is not yet published on PyPI.
 
-## Python
+## Train a vector field
 
 ```python
 import coati as ct
 
-data = ct.datasets.paired()
-config = ct.Config(niters=200, sync_loss=True, sync_weight=0.35)
-result = ct.fit(data, config)  # trains FiLM first, freezes it, then trains the synchronized flow
-trajectory = result.predict()
-result.plot()
-print(result.map_report["status"])
-print(result.evaluate())
+# Single-modality, balanced training is the default.
+data = ct.datasets.gaussian()
+result = ct.train_vector_field(data, iterations=200)
+trajectory = result.predict_trajectory()
+velocity = result.compute_velocity()
+result.plot_trajectory()
 ```
 
-No separately trained map is needed. Use `Config(..., map_type="mlp")` for a map without time input, or pass your own `T_model` to `fit`. Built-in maps and validation reports are saved with the run and restored by `ct.load_result`. Poor validation results raise a warning; `MapConfig(quality_action="error")` stops before trajectory training instead. See [cross-modal maps](docs/maps.md) for settings and report definitions.
+The two basic controls are `multimodal` and `balanced`. A paired run can use:
 
-For a held-out stage, pass only the retained snapshots, for example `training_data = data.without_times([0.5])`. Both the default map and the flow then use only those snapshots. Keep the original numeric times and query the missing time with `result.predict(times=[0.0, 0.5, 1.0])`. This exclusion does not undo any preprocessing performed before creating `TemporalData`.
+```python
+config = ct.Config(multimodal=True, balanced=False,
+                   iterations=500, learning_rate=1e-3, batch_size=64,
+                   secondary_weight=0.35)
+result = ct.train_vector_field(paired_data, config)
+```
+
+Explicit unbalanced mode supplies growth and count-based mass-matching defaults.
+You can override every numerical setting. Existing `ct.fit`, `result.predict`,
+`result.plot` and original engine parameter names remain supported.
+
+## Velocity on an existing UMAP
+
+```python
+# adata uses the same X_pca features/preprocessing as the trained model.
+ax = result.plot_velocity(adata, use_rep="X_pca", time_key="time",
+                          color="cell_type", style="stream")
+ax.figure.savefig("velocity_umap.pdf", bbox_inches="tight")
+
+# Optional: explicitly store vectors in AnnData for downstream use.
+result.write_velocity(adata, use_rep="X_pca", time_key="time")
+# adata.obsm["coati_velocity"], adata.obsm["coati_velocity_umap"]
+```
+
+Use `style="arrows"`, `"grid"` or `"stream"`. Plotting reads the existing UMAP,
+keeps AnnData row order and does not modify it. High-dimensional velocities are
+projected by a local linear approximation; these are COATI model velocities in
+an RNA-velocity-style visualization. See [velocity plotting](docs/velocity.md).
 
 ## Scripts and notebooks
 
@@ -43,6 +69,7 @@ python examples/run_toy.py --dataset gaussian --output outputs/gaussian
 python examples/run_toy.py --dataset split --output outputs/split
 python examples/run_toy.py --dataset paired --output outputs/paired
 coati toy --dataset split --unbalanced --output outputs/unbalanced
+python examples/run_velocity.py --multimodal --unbalanced --output outputs/velocity
 python -m jupyterlab notebooks/
 ```
 
@@ -52,6 +79,7 @@ Each run directory must be new. Results include the resolved config, input snaps
 - [02 · Paired modalities](notebooks/02_paired.ipynb)
 - [03 · Splitting and growth](notebooks/03_split.ipynb)
 - [04 · Input formats](notebooks/04_inputs.ipynb)
+- [05 · Vector fields and AnnData UMAP velocity](notebooks/05_velocity.ipynb)
 
 ## Your own data
 

@@ -7,6 +7,7 @@ Start JupyterLab with `python -m jupyterlab notebooks/` after installation. Each
 | [Gaussian translation](_static/notebooks/01_gaussian.html) | Basic balanced transport across three snapshots |
 | [Paired modalities](_static/notebooks/02_paired.html) | 2D primary → 3D secondary kernel synchronization |
 | [Splitting and growth](_static/notebooks/03_split.html) | Two terminal branches with doubled observed counts |
+| [Vector fields and UMAP velocity](_static/notebooks/05_velocity.html) | Explicit modes, AnnData velocities, arrows, grid and streamlines |
 | [Input adapters](_static/notebooks/04_inputs.html) | Arrays, dictionary, NPZ, CSV and AnnData equivalence |
 
 ## A paired run, step by step
@@ -47,3 +48,5 @@ secondary = result.project_secondary(trajectory)
 ```
 
 Kernel prediction uses all paired observations as its deterministic basis; training still uses the original randomly sampled paired basis. Both primary and secondary outputs default to input units.
+
+- [Download 05_velocity.ipynb](_static/notebooks/05_velocity.ipynb)

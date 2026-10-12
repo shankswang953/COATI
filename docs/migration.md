@@ -49,3 +49,16 @@ Old configurations with `mmd_loss=false` and `sync_mmd_loss=false` load normally
 these obsolete keys are discarded. An enabled MMD option is rejected rather than
 silently changing the requested objective. Remove custom metric arguments from
 calls to `fit` or the low-level training functions.
+
+## Vector-field usability API
+
+New `train_vector_field`, `predict_trajectory`, `plot_trajectory` and `compute_velocity`
+names make training, integration, plotting and field evaluation explicit. Existing
+fit/predict/plot calls remain supported. The new multimodal/balanced controls resolve
+into the original sync_loss/unbalancedModel fields, with documented presets only on
+explicit mode selection. Clear numerical parameter aliases resolve into existing keys.
+No `_core` training, loss, map or integration code changes are part of this update.
+
+AnnData embedding plots estimate a local linear projection of learned primary-space
+velocities. They do not change training and do not fit preprocessing implicitly.
+See [velocity plotting](velocity.md) for row alignment, units and limitations.
