@@ -21,7 +21,7 @@ def paired(n=128, seed=0):
     data=TemporalData(data.primary,data.times,[np.column_stack([x, .3*np.sin(np.pi*x[:,0])*np.sin(np.pi*x[:,1])]) for x in data.primary])
     return data
 
-def gaussian_bump_map(*, height=1., width=.08, center=(.5, .5)):
+def gaussian_bump_map(*, height=1., width=.10, center=(.5, .5)):
     """Return the known differentiable 2D-to-3D map for the Gaussian sync toy.
 
     The returned torch.nn.Module accepts forward(points, t=None). A fixed
@@ -49,11 +49,13 @@ def gaussian_bump_map(*, height=1., width=.08, center=(.5, .5)):
     return GaussianBumpMap()
 
 
-def gaussian_sync(n=128, seed=7, *, height=1., width=.08, center=(.5, .5)):
+def gaussian_sync(n=128, seed=7, *, height=1., width=.10, center=(.5, .5),
+                  terminal_centers=((.50, .72), (.72, .50))):
     """One Gaussian source and two terminal Gaussians on a known bump surface.
 
     Only t=0 and t=1 are observed: no intermediate detour is given to training.
-    Centers and bump geometry follow the paper Gaussian-bump example.
+    The paper-inspired geometry has two nearby destinations beyond the bump.
+    terminal_centers can adjust their separation without prescribing trajectories.
     Compact, distinct covariances follow the original toy data generator; all
     observations are sampled inside [0,1]^2. No intermediate path is specified.
     n is the total cell count at each endpoint; terminal components share it,
@@ -64,6 +66,9 @@ def gaussian_sync(n=128, seed=7, *, height=1., width=.08, center=(.5, .5)):
     """
     if not isinstance(n, int) or isinstance(n, bool) or n < 2:
         raise ValueError("n must be an integer of at least two.")
+    terminal_centers = np.asarray(terminal_centers, dtype=float)
+    if terminal_centers.shape != (2,2) or not np.isfinite(terminal_centers).all() or not ((terminal_centers >= 0.) & (terminal_centers <= 1.)).all():
+        raise ValueError("terminal_centers must contain two finite 2D centers inside [0,1]^2.")
     rng = np.random.default_rng(seed)
 
     def cloud(count, mean, covariance):
@@ -79,8 +84,8 @@ def gaussian_sync(n=128, seed=7, *, height=1., width=.08, center=(.5, .5)):
 
     initial = cloud(n, (.30, .30), [[.0042, .0002], [.0002, .0038]])
     terminal = np.concatenate([
-        cloud(n//2, (.5, .8), [[.0030, .0001], [.0001, .0030]]),
-        cloud(n-n//2, (.8, .5), [[.0032, -.0001], [-.0001, .0032]]),
+        cloud(n//2, terminal_centers[0], [[.0030, .0001], [.0001, .0030]]),
+        cloud(n-n//2, terminal_centers[1], [[.0032, -.0001], [-.0001, .0032]]),
     ])
     primary = [initial, terminal]
     mapping = gaussian_bump_map(height=height, width=width, center=center)

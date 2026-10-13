@@ -21,14 +21,15 @@ def main():
     parser.add_argument("--output", required=True, help="A fresh comparison directory")
     parser.add_argument("--iterations", type=int, default=3000)
     parser.add_argument("--seed", type=int, default=7)
-    parser.add_argument("--secondary-weight", type=float, default=.7)
+    parser.add_argument("--secondary-weight", type=float, default=.9)
     args = parser.parse_args()
     SEED = args.seed
     N_CELLS = 128
     ITERATIONS = args.iterations
     SECONDARY_WEIGHT = args.secondary_weight
-    HEIGHT, WIDTH, CENTER = 1., .08, (.5, .5)
-    data = ct.datasets.gaussian_sync(n=N_CELLS, seed=SEED, height=HEIGHT, width=WIDTH, center=CENTER)
+    HEIGHT, WIDTH, CENTER = 1., .10, (.5, .5)
+    TERMINAL_CENTERS = ((.50, .72), (.72, .50))
+    data = ct.datasets.gaussian_sync(n=N_CELLS, seed=SEED, height=HEIGHT, width=WIDTH, center=CENTER, terminal_centers=TERMINAL_CENTERS)
     T = ct.datasets.gaussian_bump_map(height=HEIGHT, width=WIDTH, center=CENTER)
     print("Observed times:", data.times)
     print("Primary / secondary:", data.primary[0].shape, data.secondary[0].shape)

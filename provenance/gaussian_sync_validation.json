@@ -1,6 +1,6 @@
 {
-  "date": "2026-10-12",
-  "dataset": "One Gaussian source and two equally weighted terminal Gaussian components around a central Gaussian bump",
+  "date": "2026-10-13",
+  "dataset": "One source and two radial terminal Gaussian populations with a central Gaussian bump",
   "observed_times": [
     0.0,
     1.0
@@ -15,10 +15,10 @@
   "terminal_centers": [
     [
       0.5,
-      0.8
+      0.72
     ],
     [
-      0.8,
+      0.72,
       0.5
     ]
   ],
@@ -27,6 +27,7 @@
     64,
     64
   ],
+  "terminal_separation": 0.31112698372208086,
   "sampling_domain": [
     [
       0.0,
@@ -71,13 +72,13 @@
   ],
   "known_map": {
     "height": 1.0,
-    "width": 0.08,
+    "width": 0.1,
     "center": [
       0.5,
       0.5
     ]
   },
-  "geometry_reference": "Gaussian-bump example in the manuscript benchmark section; tutorial uses compact sampling covariances from the original toy generator rather than manuscript identity covariances.",
+  "geometry_reference": "Tutorial variant of the manuscript Gaussian-bump example: closer radial destinations and a slightly wider bump. Compact sampling covariances follow the original toy generator rather than manuscript identity covariances.",
   "same_input_snapshots": true,
   "same_initial_weights": true,
   "shared_initial_checkpoint_sha256": "3607b37f511a1f79a8000cd05f5d20b9b0c327b28ce1bf7e2fffcdcd61b771c5",
@@ -88,81 +89,81 @@
     ],
     "sync_weight": [
       0.0,
-      0.7
+      0.9
     ]
   },
   "training_algorithm_modified": false,
-  "run_directory": "outputs/gaussian-sync-ce28b20a",
+  "run_directory": "outputs/gaussian-sync-e0d45b95",
   "notebook": "notebooks/01_gaussian.ipynb",
-  "figure": "Native primary vector fields and learned trajectories, and the same mapped trajectories in secondary 3D geometry. Thick curves are endpoint-group means, not additional trajectories.",
-  "scope": "Purpose-designed single-seed geometry demonstration; endpoint constraints are soft. No imposed intermediate route or biological superiority claim.",
+  "figure": "Native primary vector fields and trajectories, plus the same mapped trajectories in secondary 3D geometry. Thick curves are endpoint-group means. A common view includes all observed and predicted points.",
+  "scope": "Tuned single-seed teaching geometry; nearby-center, coefficient and initialization pilots were inspected for visual clarity. No intermediate paths are supplied. Endpoint constraints are soft; no robustness, biological superiority or global optimum claim.",
   "measured_costs": [
     {
       "Model": "Without sync",
-      "Primary endpoint Sinkhorn": 0.00025501364143565297,
-      "Primary kinetic energy": 0.12890779972076416,
-      "Secondary kinetic energy": 0.5170084393910201,
-      "Median maximum bump height": 0.21687841415405273
+      "Primary endpoint Sinkhorn": 0.0005053177010267973,
+      "Primary kinetic energy": 0.09661510586738586,
+      "Secondary kinetic energy": 0.7201546474959744,
+      "Median maximum bump height": 0.4984579086303711
     },
     {
       "Model": "With sync",
-      "Primary endpoint Sinkhorn": 0.0004355010751169175,
-      "Primary kinetic energy": 0.15397077798843384,
-      "Secondary kinetic energy": 0.26209938071133365,
-      "Median maximum bump height": 0.09118477255105972
+      "Primary endpoint Sinkhorn": 0.0003267412830609828,
+      "Primary kinetic energy": 0.10976152122020721,
+      "Secondary kinetic energy": 0.41136489801630216,
+      "Median maximum bump height": 0.29926636815071106
     }
   ],
   "endpoint_groups_nearest_requested_terminal_center": {
     "Without sync": [
       {
-        "count": 63,
+        "count": 70,
         "endpoint_mean": [
-          0.49627959728240967,
-          0.8001700639724731
+          0.5031059384346008,
+          0.7268736362457275
         ],
         "closest_mean_to_bump": [
-          0.3838690519332886,
-          0.5490505695343018
+          0.41021600365638733,
+          0.5453925132751465
         ],
-        "x_minus_y_near_bump": -0.16518151760101318
+        "x_minus_y_near_bump": -0.13517650961875916
       },
       {
-        "count": 65,
+        "count": 58,
         "endpoint_mean": [
-          0.7829480767250061,
-          0.48514115810394287
+          0.6967894434928894,
+          0.4793427884578705
         ],
         "closest_mean_to_bump": [
-          0.5640539526939392,
-          0.368959903717041
+          0.569140613079071,
+          0.39490067958831787
         ],
-        "x_minus_y_near_bump": 0.1950940489768982
+        "x_minus_y_near_bump": 0.17423993349075317
       }
     ],
     "With sync": [
       {
         "count": 67,
         "endpoint_mean": [
-          0.5130672454833984,
-          0.8081016540527344
+          0.5181571841239929,
+          0.7025826573371887
         ],
         "closest_mean_to_bump": [
-          0.34954485297203064,
-          0.5944068431854248
+          0.39114993810653687,
+          0.6233171820640564
         ],
-        "x_minus_y_near_bump": -0.24486199021339417
+        "x_minus_y_near_bump": -0.23216724395751953
       },
       {
         "count": 61,
         "endpoint_mean": [
-          0.7983446717262268,
-          0.500205397605896
+          0.6967175602912903,
+          0.482299268245697
         ],
         "closest_mean_to_bump": [
-          0.5807240605354309,
-          0.3515133261680603
+          0.5425869822502136,
+          0.3879108130931854
         ],
-        "x_minus_y_near_bump": 0.2292107343673706
+        "x_minus_y_near_bump": 0.1546761691570282
       }
     ]
   },
@@ -170,6 +171,6 @@
   "standalone_script": "examples/run_gaussian_sync.py",
   "script_entrypoint_verified_iterations": 2,
   "plot_refreshed_from_saved_checkpoints": true,
-  "shared_primary_input_sha256": "b898daaeec9362ce3e3e8d81a4378b9135c12e2ea503177d5d7f2a0d10a34723",
-  "shared_secondary_input_sha256": "0f602a854baa4d07deac90115bfa658593f44f7f64c07a3fe317161fb2b6bb59"
+  "shared_primary_input_sha256": "7d8a79ff820117d1a64d7ede6c0e0df128a94b6b4d6b3dc8c7d9f0244558c33e",
+  "shared_secondary_input_sha256": "b6efc52cf7912ca3911179e34f6d7e105fc99706bb633541fd504fdd3c14b695"
 }

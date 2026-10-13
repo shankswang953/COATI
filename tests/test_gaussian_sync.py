@@ -11,8 +11,8 @@ def test_gaussian_sync_pairing_and_differentiable_known_map():
     assert data.times.tolist() == [0.,1.]
     assert all(x.shape == (128,2) for x in data.primary)
     assert all(y.shape == (128,3) for y in data.secondary)
-    assert (data.primary[-1][:,1] > data.primary[-1][:,0]).sum() == 64
-    assert (data.primary[-1][:,1] < data.primary[-1][:,0]).sum() == 64
+    assert np.linalg.norm(data.primary[-1][:64].mean(0)-[.50,.72]) < .03
+    assert np.linalg.norm(data.primary[-1][64:].mean(0)-[.72,.50]) < .03
     odd = ct.datasets.gaussian_sync(n=129, seed=7)
     assert [len(x) for x in odd.primary] == [129,129]
     assert all(((x >= 0.) & (x <= 1.)).all() for x in data.primary)
@@ -27,6 +27,10 @@ def test_gaussian_sync_pairing_and_differentiable_known_map():
     assert torch.isfinite(query.grad).all() and torch.linalg.norm(query.grad)>0
     assert not list(mapping.parameters())
     with pytest.raises(ValueError):ct.datasets.gaussian_sync(n=1)
+    with pytest.raises(ValueError):ct.datasets.gaussian_sync(terminal_centers=[[.5,.8]])
+    original=ct.datasets.gaussian_sync(terminal_centers=((.5,.8),(.8,.5)))
+    np.testing.assert_array_equal(original.primary[0],data.primary[0])
+    np.testing.assert_allclose(original.primary[-1]-data.primary[-1],np.repeat([[0.,.08],[.08,0.]],64,axis=0),atol=1e-7)
     with pytest.raises(ValueError):ct.datasets.gaussian_bump_map(width=0)
 
 

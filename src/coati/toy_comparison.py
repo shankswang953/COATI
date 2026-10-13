@@ -11,10 +11,14 @@ def plot_gaussian_sync(data, mapping, results, predictions):
     # Fit the two observed terminal components once, independently of model paths.
     mixture = GaussianMixture(n_components=2, random_state=7).fit(data.primary[-1])
     order = np.argsort(mixture.means_[:,1])
-    centers, covariances = mixture.means_[order], mixture.covariances_[order]
-    clouds = [(data.primary[0].mean(0), np.cov(data.primary[0].T))]
-    clouds += list(zip(centers, covariances))
-    xx, yy = np.meshgrid(np.linspace(0.,1.,100), np.linspace(0.,1.,100))
+    centers = mixture.means_[order]
+    # Use one common view that includes every observed and predicted point.
+    all_points = np.concatenate(list(data.primary) + [p['primary'].reshape(-1,2) for p in predictions.values()])
+    lower, upper = float(all_points.min()-.04), float(all_points.max()+.04)
+    if (all_points >= 0.).all() and (all_points <= 1.).all():
+        lower, upper = max(0.,lower), min(1.,upper)
+    limits = (lower,upper)
+    xx, yy = np.meshgrid(np.linspace(*limits,100), np.linspace(*limits,100))
     mesh = np.stack([xx,yy],-1)
     with torch.no_grad(): surface = mapping(torch.tensor(mesh,dtype=torch.float32)).numpy()[...,2]
     fig=plt.figure(figsize=(12,9),layout='constrained')
@@ -24,9 +28,13 @@ def plot_gaussian_sync(data, mapping, results, predictions):
         pred=predictions[name];color=colors[name]
         ax=fig.add_subplot(2,2,col+1)
         ax.contourf(xx,yy,surface,levels=np.linspace(0,float(surface.max()),18),cmap='Oranges',alpha=.24)
-        for cloud_center, covariance in clouds:
-            density=multivariate_normal(cloud_center,covariance).pdf(mesh)
+        initial_center = data.primary[0].mean(0)
+        initial_density = multivariate_normal(initial_center,np.cov(data.primary[0].T)).pdf(mesh)
+        terminal_density = np.exp(mixture.score_samples(mesh.reshape(-1,2))).reshape(xx.shape)
+        # Contour the full mixture so nearby components share outer level sets.
+        for density in [initial_density, terminal_density]:
             ax.contour(xx,yy,density,levels=density.max()*np.array([.12,.4,.75]),colors='#334155',linewidths=.9,alpha=.7)
+        for cloud_center in np.vstack([initial_center,centers]):
             ax.scatter(*cloud_center,s=38,color='#334155',zorder=4)
         for index in paths:
             ax.plot(pred['primary'][:,index,0],pred['primary'][:,index,1],color=color,lw=1.15,alpha=.45)
@@ -36,12 +44,12 @@ def plot_gaussian_sync(data, mapping, results, predictions):
             if mask.any():
                 mean=pred['primary'][:,mask].mean(1)
                 ax.plot(mean[:,0],mean[:,1],color=color,lw=3,label=f'Terminal {group+1} mean')
-        gx,gy=np.meshgrid(np.linspace(.12,.9,13),np.linspace(.12,.9,13))
+        gx,gy=np.meshgrid(np.linspace(lower+.04,upper-.04,13),np.linspace(lower+.04,upper-.04,13))
         grid=np.column_stack([gx.ravel(),gy.ravel()])
         velocity=result.compute_velocity(grid,time=.5)
         ax.quiver(grid[:,0],grid[:,1],velocity[:,0],velocity[:,1],color=color,alpha=.32,
                   angles='xy',scale_units='xy',scale=10,width=.0025)
-        ax.set(title=name,xlim=(0.,1.),ylim=(0.,1.),xlabel='Primary dimension 1',ylabel='Primary dimension 2',aspect='equal')
+        ax.set(title=name,xlim=limits,ylim=limits,xlabel='Primary dimension 1',ylabel='Primary dimension 2',aspect='equal')
         ax.spines[['top','right']].set_visible(False)
         ax3=fig.add_subplot(2,2,col+3,projection='3d')
         ax3.plot_surface(xx,yy,surface,cmap='Oranges',alpha=.48,linewidth=0,antialiased=True,rcount=70,ccount=80)
@@ -58,11 +66,13 @@ def plot_gaussian_sync(data, mapping, results, predictions):
             if mask.any():
                 mean=mapped[:,mask].mean(1)
                 ax3.plot(mean[:,0],mean[:,1],mean[:,2]+.022,color=color,lw=3,zorder=6)
-        ax3.set(xlim=(0.,1.),ylim=(0.,1.),zlim=(0,1.08),xlabel='Secondary 1',ylabel='Secondary 2',zlabel='')
+        ax3.set(xlim=limits,ylim=limits,zlim=(0,1.08),xlabel='Secondary 1',ylabel='Secondary 2',zlabel='')
         ax3.text2D(.88,.70,'Height',rotation=90,transform=ax3.transAxes,ha='center')
         ax3.view_init(elev=44,azim=-66)
-        ax3.set_box_aspect((1.,1.,.8))
-        ax3.set_xticks([0,.5,1]);ax3.set_yticks([0,.5,1]);ax3.set_zticks([0,.5,1])
+        ax3.set_box_aspect((upper-lower,upper-lower,.8))
+        ticks = np.array([0.,.25,.5,.75,1.])
+        ticks = ticks[(ticks >= lower) & (ticks <= upper)]
+        ax3.set_xticks(ticks);ax3.set_yticks(ticks);ax3.set_zticks([0,.5,1])
         ax3.grid(False)
         for axis in [ax3.xaxis,ax3.yaxis,ax3.zaxis]:axis.pane.fill=False
     fig.suptitle('Gaussian transport · synchronization changes the route',fontsize=16)
