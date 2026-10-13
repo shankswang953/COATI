@@ -24,6 +24,7 @@ coati-downstream = "coati.downstream.cli:main"
 
 [project.urls]
 Repository = "https://github.com/shankswang953/COATI"
+Documentation = "https://coati-trajectory-docs.shankswang.chatgpt.site/"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -2,7 +2,7 @@
 
 <p align="center"><a href="assets/coati-overview.pdf"><img src="assets/coati-overview.png" alt="COATI overview: inputs, coupled dynamics and model architecture" width="100%"></a></p>
 
-[View overview PDF](assets/coati-overview.pdf) · [Watch the animated introduction](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Manim source](animations/)
+[Documentation](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Tutorials](https://coati-trajectory-docs.shankswang.chatgpt.site/tutorials) · [View overview PDF](assets/coati-overview.pdf) · [Watch the animated introduction](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Manim source](animations/)
 
 # COATI
 
@@ -10,13 +10,28 @@ Cross-Omics Aligned Trajectory Inference. A portable Python interface around the
 
 ## Install
 
+Use Python 3.10 or newer. Install the package directly from GitHub, including
+AnnData and UMAP plotting support:
+
 ```bash
+python -m pip install "coati-trajectory[visualization] @ git+https://github.com/shankswang953/COATI.git"
+```
+
+Import it as `coati`. COATI includes its training engine; the original TraInf
+repositories are not required. This package is not yet published on PyPI, so
+use the GitHub command rather than `pip install coati-trajectory`.
+
+For editable development and the example notebooks, clone the repository:
+
+```bash
+git clone https://github.com/shankswang953/COATI.git
+cd COATI
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[notebooks,docs,dev,visualization]'
 ```
 
-Run these commands from this repository. The distribution name is `coati-trajectory`; import it as `coati`. This package is not yet published on PyPI.
+Read the [installation guide](https://coati-trajectory-docs.shankswang.chatgpt.site/installation) for optional dependencies and CPU/GPU configuration.
 
 ## Prepare inputs first
 
@@ -144,6 +159,13 @@ Cross-modal inputs must be paired **within each snapshot**, including row identi
 [TraInfBench](https://github.com/shankswang953/TraInfBench) hosts the external-method portion of our benchmark comparison, including the code for running external methods and comparing them with COATI.
 
 ## Documentation
+
+Read the [online documentation](https://coati-trajectory-docs.shankswang.chatgpt.site/)
+and [embedded tutorials](https://coati-trajectory-docs.shankswang.chatgpt.site/tutorials).
+The tutorials include code cells and executed figures, so they can be read in
+the browser without downloading a notebook.
+
+To build the documentation locally:
 
 ```bash
 python -m sphinx -W --keep-going -b html docs docs/_build/html

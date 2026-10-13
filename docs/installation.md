@@ -1,11 +1,30 @@
 # Installation
 
-Use Python 3.10 or newer in a fresh environment. From the COATI repository:
+Use Python 3.10 or newer in a fresh environment. COATI is an independent
+package: its training engine is included, and the original TraInf repositories
+are not required.
+
+## Install directly from GitHub
 
 ```bash
+python -m pip install "coati-trajectory[visualization] @ git+https://github.com/shankswang953/COATI.git"
+```
+
+This installs COATI plus AnnData and UMAP support. For training only, omit
+`[visualization]`; add `notebooks` to the extras if you use Jupyter. Import the
+package as `coati`. The distribution name is `coati-trajectory`; it is not yet
+published on PyPI.
+
+## Editable installation and notebooks
+
+Clone the repository to obtain the example scripts and notebook files:
+
+```bash
+git clone https://github.com/shankswang953/COATI.git
+cd COATI
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e '.[notebooks,docs,dev,anndata]'
+python -m pip install -e '.[notebooks,docs,dev,visualization]'
 ```
 
 On Windows activate with `.venv\Scripts\activate`. For training only, install `-e .`. AnnData and notebook support are optional extras; the core numerical dependencies install with the package. Import name: `coati`. Distribution name: `coati-trajectory`. No PyPI release is currently assumed.
