@@ -2,7 +2,7 @@
 
 <p align="center"><a href="assets/coati-overview.pdf"><img src="assets/coati-overview.png" alt="COATI overview: inputs, coupled dynamics and model architecture" width="100%"></a></p>
 
-[Documentation](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Tutorials](https://coati-trajectory-docs.shankswang.chatgpt.site/tutorials) · [View overview PDF](assets/coati-overview.pdf) · [Watch the animated introduction](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Manim source](animations/)
+[Website & documentation](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [View overview PDF](assets/coati-overview.pdf) · [Watch the animated introduction](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Manim source](animations/)
 
 # COATI
 
@@ -160,12 +160,11 @@ Cross-modal inputs must be paired **within each snapshot**, including row identi
 
 ## Documentation
 
-Read the [online documentation](https://coati-trajectory-docs.shankswang.chatgpt.site/)
-and [embedded tutorials](https://coati-trajectory-docs.shankswang.chatgpt.site/tutorials).
-The tutorials include code cells and executed figures, so they can be read in
-the browser without downloading a notebook.
+Read the [COATI website](https://coati-trajectory-docs.shankswang.chatgpt.site/).
+The hosted website includes documentation, tutorials and executed figures;
+readers can open the link directly without building the documentation locally.
 
-To build the documentation locally:
+For contributors who want a local preview:
 
 ```bash
 python -m sphinx -W --keep-going -b html docs docs/_build/html
