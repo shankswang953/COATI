@@ -102,6 +102,9 @@ def main():
     parser.add_argument("--output", required=True, help="A new directory for training, or an existing result with --reuse")
     parser.add_argument("--iterations", type=int, default=1000)
     parser.add_argument("--stage", default="E8.5")
+    parser.add_argument("--celltype", default="NMP", help="Cell type for relative mass decomposition")
+    parser.add_argument("--start-time", type=float, default=1.)
+    parser.add_argument("--end-time", type=float, default=2.)
     parser.add_argument("--reuse", action="store_true", help="Reload the saved model instead of training again")
     args = parser.parse_args()
     cells, missing = prepare_inputs(args.data_dir)
@@ -123,6 +126,15 @@ def main():
     report = validate_and_store(result, cells, stage_cells, args.data_dir, missing)
     print(json.dumps({key: report[key] for key in ("checkpoint_iterations", "plot_stage", "plot_cells", "growth_range", "save_reload_agrees")}, indent=2))
     print("Figure:", result.output_dir / "dynamics_umap.png")
+    from coati import downstream as ds
+    grid = np.unique(np.r_[np.linspace(result.data.times[0], result.data.times[-1], 26), args.start_time, args.end_time])
+    trajectory = result.predict_trajectory(times=grid)
+    mass = ds.decompose_mass(trajectory, cells, celltype=args.celltype,
+        start_time=args.start_time, end_time=args.end_time, use_rep="X_latent", n_neighbors=1)
+    print(mass.summary.to_string())
+    ax = mass.plot(show_observed=True)
+    ax.figure.savefig(result.output_dir / "mass_decomposition.png", dpi=180, bbox_inches="tight")
+    plt.close(ax.figure)
 
 
 if __name__ == "__main__":

@@ -151,3 +151,39 @@ physical scale for expression and accessibility.
 Peak-gene pairs must come from explicit annotations or a separately justified
 linking analysis. Comparing two interpolated curves does not prove regulation,
 chromatin priming or temporal precedence.
+
+## Cell-type mass decomposition
+
+The [biological dynamics tutorial](tutorials/07_dynamics.ipynb) decomposes a
+chosen cell type's predicted proportion change over two observed times.
+
+```python
+# Keep the full source population, including other cell types.
+trajectory = result.predict_trajectory(times=np.linspace(0., 2.5, 26))
+mass = ds.decompose_mass(trajectory, cells, celltype="NMP",
+                         start_time=1., end_time=2., use_rep="X_latent",
+                         n_neighbors=1)
+mass.plot(show_observed=True)
+mass.summary       # fractions, with outgoing stored positively
+mass.transitions   # source/destination types and endpoint mass totals
+mass.assignments   # every particle's labels, weights, distances and votes
+```
+
+Endpoint labels come from stage-matched hard distance-weighted kNN in the
+primary training representation. One neighbor matches the paper's mass figure;
+larger counts are an explicit analysis choice. Coordinates must share units and
+preprocessing. Missing annotations become `unknown`. Endpoints must exist on
+both the prediction grid and the observed reference; no stage substitution or
+confidence filtering removes particles.
+
+Weights are normalized over the **full supplied population** independently at
+each endpoint. Incoming uses later weights, outgoing uses earlier weights, and
+retained reweighting uses their differences. They satisfy
+`net_change = incoming - outgoing + reweighting`. Selecting a target-only cohort
+before prediction removes possible incoming particles and changes the question.
+Balanced predictions use uniform weights and have zero retained reweighting.
+
+Figures use percentage points, with outgoing displayed negatively. The optional
+observed marker is an atlas proportion difference across independent snapshots.
+This is a relative-mass accounting identity for a model trajectory, not an
+absolute population-size reconstruction or causal proliferation/death estimate.

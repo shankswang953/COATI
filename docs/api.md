@@ -74,3 +74,14 @@
 
 .. autofunction:: coati.downstream.plot_feature_heatmap
 ```
+
+## Cell-type mass decomposition
+
+```{eval-rst}
+.. autofunction:: coati.downstream.decompose_mass
+
+.. autoclass:: coati.downstream.MassDecomposition
+   :members: plot
+
+.. autofunction:: coati.downstream.plot_mass_decomposition
+```

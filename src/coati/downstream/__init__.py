@@ -9,3 +9,5 @@ from .gene_peaks import (
     GenePeakDynamics, find_gene_peaks, compute_gene_peak_dynamics,
     plot_gene_peak_dynamics,
 )
+
+from .mass import MassDecomposition, decompose_mass, plot_mass_decomposition

@@ -30,7 +30,7 @@ def main():
                   "03_split": "Splitting and growth", "04_inputs": "Input adapters",
                   "05_velocity": "Vector fields and UMAP velocity",
                   "06_heldout_biological": "Held-out biological reconstruction",
-                  "07_dynamics": "Cell types, growth and UMAP flow",
+                  "07_dynamics": "Gastrulation dynamics and mass",
                   "08_map_quality": "Train and inspect a cross-modal map",
                   "09_lineage_features": "Lineage gene and peak dynamics"}
         if notebook.cells and notebook.cells[0].cell_type == "markdown":

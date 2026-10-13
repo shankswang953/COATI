@@ -1,0 +1,44 @@
+{
+  "dataset": "gastrulation",
+  "source": "GSE205117",
+  "reference_representation": "X_latent (RNA50)",
+  "fitted_run": "gastrulation-dynamics-40c4dae2",
+  "training_iterations": 1000,
+  "checkpoint_sha256": "523849a839e301c91e4d68d4d4279eb9a982ffd033c03d3dd8a1b209755f7fc4",
+  "published_notebook": "notebooks/07_dynamics.ipynb",
+  "reused_original_checkpoint": true,
+  "celltype": "NMP",
+  "start_time": 1.0,
+  "end_time": 2.0,
+  "source_time": 0.0,
+  "source_particles": 9018,
+  "prediction_times": {
+    "start": 0.0,
+    "stop": 2.5,
+    "step": 0.1
+  },
+  "solver": "rk4",
+  "n_neighbors": 1,
+  "weighting": "Full population normalization at each endpoint",
+  "contributions_percentage_points": {
+    "incoming": 6.688522,
+    "outgoing": -0.265143,
+    "reweighting": -0.297578,
+    "net_change": 6.125801
+  },
+  "displayed_precision": 6,
+  "exact_identity_checked": true,
+  "reference_input_identity": "All stage arrays compared with the fitted result inputs during notebook reuse",
+  "source_sha256_at_original_training": {
+    "rna.h5ad": "e88124e28b33ce9a21890275af8bde5de96ad9fa1d85bcf16d8109badbe7b27d",
+    "atac.h5ad": "9a53bad7987710a161596cf37e31ecd828845ef130a20dd3baae4aa24a863631"
+  },
+  "observed_change_percentage_points": 4.693196564710493,
+  "tests_passed": 66,
+  "english_only_sources": true,
+  "scope": "Relative-proportion accounting in the existing short fitted model; not causal biological growth estimates or an independent accuracy benchmark",
+  "observed_endpoint_proportions": [
+    0.03040020523345305,
+    0.07733217088055798
+  ]
+}

@@ -182,3 +182,20 @@ its endpoint screening and feature readout results. Machine-readable settings,
 scope and readout values are in `provenance/lineage_feature_validation.json`.
 These checks validate software behavior, not a recovered Somitic lineage,
 regulation or chromatin priming.
+
+## Cell-type mass accounting
+
+The updated [gastrulation dynamics tutorial](tutorials/07_dynamics.ipynb) reuses
+its original 1,000-iteration model and tracks all 9,018 E7.5 particles through
+E8.0 to E8.5. With stage-matched one-neighbor RNA50 labels and globally
+normalized endpoint mass, NMP contributions are +6.688522 incoming,
+-0.265143 outgoing and -0.297578 retained reweighting percentage points.
+Their sum, +6.125801, equals the predicted proportion difference; the
+cross-sectional observed difference is displayed separately. These values
+illustrate the fitted model's relative-mass accounting, not independent
+biological transition estimates or a claim of convergence.
+
+Tests check the exact identity on retained, entering, leaving and unrelated
+particles, normalization over the full population, stability under large log
+mass offsets, balanced weights, explicit stage/time mapping, missing predicted
+types, reference row order, invalid intervals/weight axes and plot signs.
