@@ -6,6 +6,10 @@ The archived numerical results below used the earlier kernel-map default. They a
 
 On 2026-09-20, the default FiLM and time-independent MLP workflows were each run for 300 map epochs and 200 trajectory iterations on the paired toy with its middle stage omitted. Both completed without map-quality warnings and reproduced their primary and secondary predictions exactly after reload. The paired tutorial notebook was also executed with automatic FiLM fitting. These are CPU functional checks, not evidence of accuracy at held-out biological stages. The five original-engine equivalence checks were rerun with explicit kernel mapping and retained zero parameter differences.
 
+The unbalanced synchronized secondary-energy correction dated 2026-10-31 is
+validated separately below. Earlier unbalanced multimodal model outputs were not
+retrained after that correction and remain historical workflow demonstrations.
+
 ## Biological temporal holdout
 
 On 2026-10-12, [the pancreas reconstruction tutorial](tutorials/06_heldout_biological.ipynb)
@@ -199,3 +203,19 @@ Tests check the exact identity on retained, entering, leaving and unrelated
 particles, normalization over the full population, stability under large log
 mass offsets, balanced weights, explicit stage/time mapping, missing predicted
 types, reference row order, invalid intervals/weight axes and plot signs.
+
+## Mass-weighted secondary kinetic energy
+
+On 2026-10-31, eight targeted regression cases checked the real ODE/loss pipeline
+against known particle actions: increasing, decreasing and constant mass; initial
+total mass different from one; agreement with balanced energy at uniform constant
+mass; gradients through growth and initial log mass; particle-specific motion and
+actual solver step lengths; time-dependent mapping; and mass carried between
+successive observed intervals. Balanced energy keeps the original code path.
+See {ref}`the migration note <secondary-energy-mass-weighting>` for the
+formula and the distinction from earlier unbalanced synchronized training.
+
+The complete suite passed 74 tests. A separate 100-iteration multimodal,
+unbalanced Gaussian-bump run completed with finite model parameters,
+trajectories and log masses, and predictions agreed exactly after reload.
+This is a functional training check, not a convergence or accuracy claim.

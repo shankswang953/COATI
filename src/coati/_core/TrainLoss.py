@@ -457,7 +457,14 @@ def short_term_loss(
 
         diff = secondary_trajectory[1:] - secondary_trajectory[:-1]   # (T-1, N, D)
         sq = diff.pow(2).sum(dim=2)           # (T-1, N)
-        secondary_energy_loss = (0.5 * sq.sum(dim=0) / args.dt).mean()
+        if args.unbalancedModel:
+            # Left-endpoint masses match the Euler integration convention.
+            # Initial weights already include 1/N; retain total mass and sum.
+            step_sizes = time_steps_forward[1:] - time_steps_forward[:-1]
+            weights = lnw_t[:-1].squeeze(-1).exp()
+            secondary_energy_loss = (0.5 * weights * sq / step_sizes[:, None]).sum()
+        else:
+            secondary_energy_loss = (0.5 * sq.sum(dim=0) / args.dt).mean()
         #batch_losses = [w2_loss((pc1), (pc2)) for pc1, pc2 in point_cloud_pairs]
         #secondary_energy_loss = torch.sum((torch.stack(disp)**2), dim=0).mean()/args.dt
         results['sync_secondary_energy_loss'] = secondary_energy_loss

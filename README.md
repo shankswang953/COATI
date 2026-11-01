@@ -133,7 +133,9 @@ snapshot overlays. It also provides `select_lineage`, `fit_feature_decoder`,
 `read_h5ad_features`. The [lineage tutorial](notebooks/09_lineage_features.ipynb)
 checks NMP endpoints and held-out gene/peak readouts before interpretation.
 `start_time` on `predict_trajectory` supports a supplied later-stage initial cohort.
-Training objectives and the original TraInf repositories are unchanged.
+These downstream analyses do not change the training objective. The original TraInf repositories remain untouched.
+Unbalanced synchronized training uses evolving particle masses in secondary kinetic energy;
+see the [migration notes](docs/migration.md#unbalanced-secondary-kinetic-energy).
 
 Run `examples/run_lineage_features.py --help` for the script counterpart. Molecular
 features must be supplied separately from PCA/LSI, in verified barcode order.

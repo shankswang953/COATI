@@ -1,0 +1,23 @@
+{
+  "iterations": 100,
+  "model": "multimodal unbalanced Gaussian bump",
+  "particles": 64,
+  "finite_states": true,
+  "exact_reload": true,
+  "final_total_mass": 0.8154897689819336,
+  "date": "2026-10-31",
+  "targeted_tests": 8,
+  "full_suite_tests": 74,
+  "core_file": "src/coati/_core/TrainLoss.py",
+  "base_commit": "f44d661ea44cef19da3b2b54668a4423386a0d03",
+  "core_before_sha256": "f35bb7abbff5d2e620a603ff36da6969e79aa8f1a413dfc7a51d9a18ff1b460d",
+  "core_after_sha256": "8871949985d3e97d257302be9afe7c9bd64e5e363e55109848151ec60f534683",
+  "unbalanced_weight": "exp(lnw) at each solver interval left endpoint",
+  "reduction": "sum over time intervals and particles; no per-time mass normalization",
+  "time_step": "actual solver interval length",
+  "balanced_formula": "unchanged",
+  "mass_gradients_verified": true,
+  "original_trainf_modified": false,
+  "biological_models_retrained": false,
+  "scope": "Functional correction validation; no biological accuracy or convergence claim"
+}

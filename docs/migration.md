@@ -15,14 +15,14 @@ COATI is an independent package. It does not import from, write to or require a 
 
 The neural field, loss assembly, optimizer, scheduler, adaptive blur, kernel projections, mass loss, dual updates and training discretization remain in `coati._core`. Supported engine modules remain available for advanced use; unused MMD matching and custom Riemannian metric support have been removed. The reusable `downstreamSrc` analysis modules are copied unchanged into `coati.downstream`; run `python -m coati.downstream.cli --help` or `coati-downstream --help`. Biological analyses are not executed in this validation. Flow matching, legacy plotting and biological helpers remain low-level modules; this release's high-level tutorials exercise dynamic OT and synchronized OT. Optional legacy plotting imports may require the `legacy` extra.
 
-Only these mechanical changes were made inside the copied core:
+The copied core includes the following packaging changes. The intentional unbalanced secondary-energy correction is described separately below:
 
 1. `from src.*` becomes package-relative imports.
 2. Remove the unused `from Args import get_args` import in `Epoch.py`.
 3. Allow an explicit `args.device`; `device="auto"` follows the original selection.
 4. Return zero gradient in the 100-step diagnostic for disabled scalar/non-differentiable losses. The original crashes in that diagnostic when synchronized density is disabled; training loss and optimizer updates are unchanged.
 
-For retained W2/Sinkhorn matching with Euclidean energy, loss constants, normalization formulas, neural architectures and update rules are unchanged. `evaluation.py` retains its secondary evaluation behavior. The wrapper checks inputs, stages numeric NPZ files, creates output directories, protects existing results and adds a reloadable result interface.
+For retained W2/Sinkhorn matching, normalization formulas, neural architectures and optimizer update rules are preserved. Unbalanced synchronized kinetic energy has the explicit correction documented below. `evaluation.py` retains its secondary evaluation behavior. The wrapper checks inputs, stages numeric NPZ files, creates output directories, protects existing results and adds a reloadable result interface.
 
 The public synchronized default now adds a paired FiLM training step before calling this preserved engine. It freezes the resulting map and passes it through the existing `T_model` interface. `map_type="mlp"` uses an ordinary MLP instead. Explicit `map_type="kernel"` retains the original public default and is used by the original-engine equivalence checks. The automatic map's standardization and checkpoint selection are documented in [Cross-modal maps](maps.md); they do not modify the trajectory engine.
 
@@ -42,8 +42,9 @@ MMD matching (`MMD_loss`, `mmd_loss`, `sync_mmd_loss`) and the custom
 `metric_primal` / `metric_secondary` interfaces have been removed, including
 `coati._core.RiemannMetric`. Distribution matching retains the existing
 W2-based Sinkhorn implementation (`p=2`), with the same blur and weighting.
-The Euclidean secondary energy remains `0.5 * sum(||y[k+1]-y[k]||²) / dt`,
-averaged over cells. Model evaluation diagnostics remain available.
+Balanced Euclidean secondary energy retains `0.5 * sum(||y[k+1]-y[k]||²) / dt`,
+averaged over cells. Unbalanced secondary energy uses the evolving particle masses
+as described below. Model evaluation diagnostics remain available.
 
 Old configurations with `mmd_loss=false` and `sync_mmd_loss=false` load normally;
 these obsolete keys are discarded. An enabled MMD option is rejected rather than
@@ -62,3 +63,28 @@ No `_core` training, loss, map or integration code changes are part of this upda
 AnnData embedding plots estimate a local linear projection of learned primary-space
 velocities. They do not change training and do not fit preprocessing implicitly.
 See [velocity plotting](velocity.md) for row alignment, units and limitations.
+
+(secondary-energy-mass-weighting)=
+## Unbalanced secondary kinetic energy
+
+On 2026-10-31, COATI's unbalanced synchronized objective was corrected to weight
+each mapped displacement by the particle mass at the start of that solver interval:
+
+$$
+E_Y = \sum_{k,i} \exp(\mathrm{lnw}_{k,i})
+      \frac{\|Y_i^{k+1}-Y_i^k\|^2}{2(t_{k+1}-t_k)}.
+$$
+
+This uses the actual solver time differences and the same left-endpoint convention
+as primary Euler integration. Particle masses already start at `1 / batch_size`:
+sum the weighted contributions without another particle mean or per-time mass
+normalization. Gradients pass through both the mapped positions and log masses.
+The external `secondary_weight` and `energy_weight` multipliers are unchanged.
+Balanced synchronized energy retains its original equal-weight formula, and
+single-modality training is unaffected.
+
+This is an intentional correction to the copied research objective, rather than
+a packaging-only change. The original TraInf repositories are not modified.
+Existing checkpoints and their predictions do not change; new training uses the
+corrected objective. Previously executed unbalanced multimodal tutorial outputs
+remain historical results, not results of retraining with this correction.
