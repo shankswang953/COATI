@@ -1,6 +1,4 @@
-<p align="center"><img src="assets/coati-logo.png" alt="COATI — Cross-Omics Aligned Trajectory Inference" width="400"></p>
-
-<p align="center"><a href="assets/coati-overview.pdf"><img src="assets/coati-overview.png" alt="COATI overview: inputs, coupled dynamics and model architecture" width="100%"></a></p>
+<p align="center"><img src="assets/coati-logo.png" alt="COATI — Cross-Omics Aligned Trajectory Inference" width="100%"></p>
 
 [Website & documentation](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [View overview PDF](assets/coati-overview.pdf) · [Watch the animated introduction](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Manim source](animations/)
 
