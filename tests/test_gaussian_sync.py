@@ -45,3 +45,58 @@ def test_shared_initialization_is_identical_and_preserves_rng(tmp_path):
     state_b=torch.load(b,weights_only=True)['func_state_dict']
     assert all(torch.equal(state_a[k],state_b[k]) for k in state_a)
     with pytest.raises(FileExistsError):make_shared_initial_checkpoint(cfg,a)
+
+
+def test_manuscript_identity_kernels_are_truncated_not_compact():
+    from scipy.stats import truncnorm
+    centers = ((.5,.8),(.8,.5))
+    options = dict(width=.08, initial_covariance=np.eye(2),
+                   terminal_covariances=np.repeat(np.eye(2)[None],2,axis=0),
+                   terminal_centers=centers)
+    data = ct.datasets.gaussian_sync(n=5000, seed=7, terminal_mass=2., **options)
+    assert [len(x) for x in data.primary] == [5000,10000]
+    for sample, center in [(data.primary[0],(.3,.3)),
+                           (data.primary[-1][:5000],centers[0]),
+                           (data.primary[-1][5000:],centers[1])]:
+        expected_mean, expected_variance = [], []
+        for mu in center:
+            mean, variance = truncnorm.stats(-mu, 1-mu, loc=mu, scale=1., moments='mv')
+            expected_mean.append(mean); expected_variance.append(variance)
+        np.testing.assert_allclose(sample.mean(0),expected_mean,atol=.015)
+        np.testing.assert_allclose(sample.var(0),expected_variance,atol=.006)
+        assert ((sample>=0.) & (sample<=1.)).all()
+    mapping=ct.datasets.gaussian_bump_map(width=.08)
+    np.testing.assert_allclose(mapping(torch.tensor([[.58,.5]]))[:,-1].numpy(),[np.exp(-.5)],rtol=1e-6)
+    with pytest.raises(ValueError,match='integer'):
+        ct.datasets.gaussian_sync(n=128,terminal_mass=1.001)
+    with pytest.raises(ValueError,match='positive definite'):
+        ct.datasets.gaussian_sync(initial_covariance=[[1,2],[2,1]])
+
+
+def test_reference_density_matches_analytic_normalization():
+    from scipy.stats import norm
+    from coati.toy_comparison import gaussian_density_on_unit_square
+    query=np.array([[0.,0.],[.3,.3],[.5,.5],[1.,1.],[-.01,.5]])
+    mu=np.array([.3,.3])
+    norm_constant=np.prod(norm.cdf(1-mu)-norm.cdf(-mu))
+    expected=np.exp(-.5*np.square(query-mu).sum(1))/(2*np.pi*norm_constant)
+    expected[-1]=0
+    np.testing.assert_allclose(gaussian_density_on_unit_square(query,mu,np.eye(2)),expected,rtol=2e-6)
+
+
+def test_unbalanced_comparison_uses_mass_action_not_path_mean():
+    from types import SimpleNamespace
+    from coati.toy_comparison import compare_gaussian_runs
+    times=np.array([0.,.5,1.])
+    source=np.array([[0.,0.],[0.,1.]])
+    states=source[None]+times[:,None,None]*np.array([1.,0.])
+    mapped=np.concatenate([states,np.zeros((*states.shape[:2],1))],axis=-1)
+    pred=dict(times=times,primary=states,secondary=mapped,energy=np.zeros((3,2,1)),
+              log_weights=np.log(np.array([[.25,.75],[.5,1.5],[1.,3.]]))[...,None])
+    pred['energy'][-1,:,0]=[.25,.75]
+    result=SimpleNamespace(data=SimpleNamespace(primary=[source,states[-1]]),
+        metadata={'primary_scale':1.,'blur_primary':[.05,.05]})
+    row=compare_gaussian_runs({'With sync':result},{'With sync':pred}).iloc[0]
+    assert row['Primary kinetic energy']==pytest.approx(1.)
+    assert row['Secondary kinetic energy']==pytest.approx(.75)
+    assert row['Predicted terminal mass']==pytest.approx(4.)

@@ -219,3 +219,36 @@ The complete suite passed 74 tests. A separate 100-iteration multimodal,
 unbalanced Gaussian-bump run completed with finite model parameters,
 trajectories and log masses, and predictions agreed exactly after reload.
 This is a functional training check, not a convergence or accuracy claim.
+
+## Manuscript-parameter Gaussian comparison
+
+The [Gaussian tutorial](tutorials/01_gaussian.ipynb) now uses the supplied
+manuscript parameters literally: the unit square, centers (0.3, 0.3), (0.5, 0.8)
+and (0.8, 0.5), identity Gaussian-kernel covariances, and a unit-height bump
+of width 0.08 centered at (0.5, 0.5). These kernels are truncated and normalized
+on the square. Identity kernel covariance creates broad overlapping densities;
+it does not reproduce the earlier compact-cloud illustration.
+
+Both regimes were run for 3,000 iterations per model with seed 7. The requested
+large secondary weight is Cy=0.99. No-sync baselines were reused after checking
+identical initial states, inputs and settings. No intermediate paths are supplied.
+The balanced target mass is 1. The unbalanced target mass is 2, using the existing
+global mass penalty and an explicit mass weight of 100; the weaker local-only
+setting did not reach the target. The training core is unchanged by this update.
+
+| Regime | Model | Primary kinetic energy | Secondary kinetic energy | Predicted terminal mass |
+| --- | --- | ---: | ---: | ---: |
+| Balanced | Without sync | 0.023707 | 0.136565 | 1.000000 |
+| Balanced | With sync | 0.019798 | 0.095706 | 1.000000 |
+| Unbalanced | Without sync | 0.003888 | 0.016043 | 1.986726 |
+| Unbalanced | With sync | 0.003411 | 0.014365 | 1.993220 |
+
+Unbalanced actions use raw particle masses at each time. Endpoint Sinkhorn
+uses normalized weights for shape and is reported separately from total mass.
+The figures use the specified mixture density and do not add artificial branch
+means. Any predicted states outside the unit square remain visible and are
+reported in the numerical comparison. This is a finite-sample illustration,
+not a convergence or global-optimum claim. All 77 package checks passed;
+normalization was checked against analytic truncated-normal probabilities.
+The full settings, hashes and costs are recorded in
+`provenance/gaussian_sync_validation.json`.
