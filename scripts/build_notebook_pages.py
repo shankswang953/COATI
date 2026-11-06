@@ -26,7 +26,7 @@ def main():
                            resources={"metadata": {"path": str(root)}}).execute()
             nbformat.write(notebook, source)
         # Keep web titles short and retain all code and scientific outputs.
-        titles = {"01_gaussian": "Gaussian toy: sync vs no sync", "02_paired": "Paired modalities",
+        titles = {"00_introduction": "Introduction", "01_gaussian": "Gaussian toy: sync vs no sync", "02_paired": "Paired modalities",
                   "03_split": "Splitting and growth", "04_inputs": "Input adapters",
                   "05_velocity": "Vector fields and UMAP velocity",
                   "06_heldout_biological": "Held-out biological reconstruction",

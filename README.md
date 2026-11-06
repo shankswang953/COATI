@@ -37,6 +37,7 @@ assets/        Logo and figures
 
 ## Notebooks
 
+- [Introduction](notebooks/00_introduction.ipynb)
 - [Gaussian toy: sync vs no sync](notebooks/01_gaussian.ipynb)
 - [Splitting and growth](notebooks/03_split.ipynb)
 - [Input formats](notebooks/04_inputs.ipynb)

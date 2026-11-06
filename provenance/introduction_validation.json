@@ -1,0 +1,32 @@
+{
+  "date": "2026-11-06",
+  "notebook": "notebooks/00_introduction.ipynb",
+  "all_cells_executed": true,
+  "source_cells": 19,
+  "code_cells": 9,
+  "dataset": "Synthetic paired 2D primary / 3D secondary snapshots",
+  "cells_per_snapshot": 128,
+  "observed_times": [
+    0.0,
+    0.5,
+    1.0
+  ],
+  "iterations_per_mode": 25,
+  "executed_modes": [
+    {
+      "multimodal": false,
+      "balanced": true
+    },
+    {
+      "multimodal": true,
+      "balanced": false
+    }
+  ],
+  "published_mode": {
+    "multimodal": false,
+    "balanced": true
+  },
+  "training_engine_modified": false,
+  "biological_data_used": false,
+  "scope": "Introduction workflow and parameter-switch validation; not model accuracy or convergence."
+}
