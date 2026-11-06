@@ -1,7 +1,6 @@
 """Plot matched Gaussian endpoint transport without prescribing either route."""
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import multivariate_normal
 
 
 def gaussian_density_on_unit_square(points, center, covariance):
@@ -34,96 +33,109 @@ def _normalized_path_weights(prediction):
 
 
 def plot_gaussian_sync(data, mapping, results, predictions, *,
-                       distribution_parameters=None, show_group_means=True):
+                       distribution_parameters=None, show_group_means=False,
+                       show_vector_field=False):
+    """Show the full learned trajectory population against secondary geometry.
+
+    Rows compare methods; columns show primary and mapped secondary states.
+    Grey points are observed endpoints. Black level sets belong to the bump,
+    not to endpoint densities. Every particle is drawn without branch selection,
+    clipping or route smoothing. Optional group means retain the legacy display.
+    Optional arrows
+    show the instantaneous primary field at t=0.5.
+    """
     import torch
+    from matplotlib.collections import LineCollection
+    from mpl_toolkits.mplot3d.art3d import Line3DCollection
+
     plt.rcParams.update({'font.family': 'Arial', 'font.size': 11})
-    from sklearn.mixture import GaussianMixture
-    if distribution_parameters is None:
-        # Legacy compact examples estimate their observed terminal mixture.
-        mixture = GaussianMixture(n_components=2, random_state=7).fit(data.primary[-1])
-        order = np.argsort(mixture.means_[:,1])
-        centers = mixture.means_[order]
-    else:
-        centers = np.asarray(distribution_parameters['terminal_centers'])
-    # Use one common view that includes every observed and predicted point.
-    all_points = np.concatenate(list(data.primary) + [p['primary'].reshape(-1,2) for p in predictions.values()])
-    lower, upper = float(all_points.min()-.04), float(all_points.max()+.04)
+    all_points = np.concatenate(list(data.primary) + [
+        np.asarray(p['primary']).reshape(-1, 2) for p in predictions.values()])
+    lower = min(0., float(all_points.min()) - .025)
+    upper = max(1., float(all_points.max()) + .025)
+    # Keep the unit-square view when every state lies inside the domain.
     if (all_points >= 0.).all() and (all_points <= 1.).all():
-        lower, upper = max(0.,lower), min(1.,upper)
-    if distribution_parameters is not None:
-        lower, upper = min(0., lower), max(1., upper)
-    limits = (lower,upper)
-    xx, yy = np.meshgrid(np.linspace(*limits,121), np.linspace(*limits,121))
-    mesh = np.stack([xx,yy],-1)
-    with torch.no_grad(): surface = mapping(torch.tensor(mesh,dtype=torch.float32)).numpy()[...,2]
-    if distribution_parameters is not None:
-        surface = np.where(((mesh >= 0.) & (mesh <= 1.)).all(-1), surface, np.nan)
-    fig=plt.figure(figsize=(12,9),layout='constrained')
-    paths=np.linspace(0,len(data.primary[0])-1,18,dtype=int)
-    colors={'Without sync':'#64748b','With sync':'#0072b2'}
-    for col,(name,result) in enumerate(results.items()):
-        pred=predictions[name];color=colors[name]
-        ax=fig.add_subplot(2,2,col+1)
-        ax.contourf(xx,yy,surface,levels=np.linspace(0,float(np.nanmax(surface)),18),cmap='Oranges',alpha=.24)
-        if distribution_parameters is None:
-            initial_center = data.primary[0].mean(0)
-            initial_density = multivariate_normal(initial_center,np.cov(data.primary[0].T)).pdf(mesh)
-            terminal_density = np.exp(mixture.score_samples(mesh.reshape(-1,2))).reshape(xx.shape)
-        else:
-            initial_center = np.asarray(distribution_parameters['initial_center'])
-            initial_density = gaussian_density_on_unit_square(mesh, initial_center, distribution_parameters['initial_covariance'])
-            terminal_density = sum(gaussian_density_on_unit_square(mesh, c, covariance)
-                                   for c, covariance in zip(centers, distribution_parameters['terminal_covariances'])) / 2
-        # Contour the full normalized mixture; never draw independent crossing rings.
-        for density, style in zip([initial_density, terminal_density], ['--', '-']):
-            positive = density[density > 0]
-            levels = (np.linspace(positive.min(), positive.max(), 5)[1:-1]
-                      if distribution_parameters is not None else density.max()*np.array([.12,.4,.75]))
-            ax.contour(xx,yy,density,levels=levels,colors='#334155',linestyles=style,linewidths=.9,alpha=.7)
-        for cloud_center in np.vstack([initial_center,centers]):
-            ax.scatter(*cloud_center,s=38,color='#334155',zorder=4)
-        for index in paths:
-            ax.plot(pred['primary'][:,index,0],pred['primary'][:,index,1],color=color,lw=1.15,alpha=.45)
-        endpoint_group = np.linalg.norm(pred['primary'][-1,:,None,:]-centers[None,:,:],axis=-1).argmin(1)
-        for group in range(2):
-            mask = endpoint_group == group
-            if show_group_means and mask.any():
-                mean=pred['primary'][:,mask].mean(1)
-                ax.plot(mean[:,0],mean[:,1],color=color,lw=3,label=f'Terminal {group+1} mean')
-        field_lower, field_upper = max(0., lower) + .04, min(1., upper) - .04
-        gx,gy=np.meshgrid(np.linspace(field_lower,field_upper,13),np.linspace(field_lower,field_upper,13))
-        grid=np.column_stack([gx.ravel(),gy.ravel()])
-        velocity=result.compute_velocity(grid,time=.5)
-        ax.quiver(grid[:,0],grid[:,1],velocity[:,0],velocity[:,1],color=color,alpha=.32,
-                  angles='xy',scale_units='xy',scale=10,width=.0025)
-        display_name = f"{name} (Cy = {result.metadata['config']['sync_weight']:g})" if name == 'With sync' else name
-        ax.set(title=display_name,xlim=limits,ylim=limits,xlabel='Primary dimension 1',ylabel='Primary dimension 2',aspect='equal')
-        ax.spines[['top','right']].set_visible(False)
-        ax3=fig.add_subplot(2,2,col+3,projection='3d')
-        ax3.plot_surface(xx,yy,surface,cmap='Oranges',alpha=.48,linewidth=0,antialiased=True,rcount=70,ccount=80)
-        observed_centers = np.vstack([initial_center, centers])
-        with torch.no_grad():
-            observed_mapped = mapping(torch.tensor(observed_centers,dtype=torch.float32)).numpy()
-        ax3.scatter(observed_mapped[:,0],observed_mapped[:,1],observed_mapped[:,2]+.018,
-                    color='#334155',s=22,depthshade=False,zorder=7)
-        mapped=pred['secondary']
-        for index in paths:
-            ax3.plot(mapped[:,index,0],mapped[:,index,1],mapped[:,index,2]+.018,color=color,alpha=.5,lw=1.15,zorder=5)
-        for group in range(2):
-            mask = endpoint_group == group
-            if show_group_means and mask.any():
-                mean=mapped[:,mask].mean(1)
-                ax3.plot(mean[:,0],mean[:,1],mean[:,2]+.022,color=color,lw=3,zorder=6)
-        ax3.set(xlim=limits,ylim=limits,zlim=(0,1.08),xlabel='Secondary 1',ylabel='Secondary 2',zlabel='')
-        ax3.text2D(.88,.70,'Height',rotation=90,transform=ax3.transAxes,ha='center')
-        ax3.view_init(elev=44,azim=-66)
-        ax3.set_box_aspect((upper-lower,upper-lower,.8))
-        ticks = np.array([0.,.25,.5,.75,1.])
-        ticks = ticks[(ticks >= lower) & (ticks <= upper)]
-        ax3.set_xticks(ticks);ax3.set_yticks(ticks);ax3.set_zticks([0,.5,1])
+        lower, upper = 0., 1.
+    grid = np.linspace(0., 1., 181)
+    xx, yy = np.meshgrid(grid, grid)
+    mesh = np.stack([xx, yy], -1)
+    with torch.no_grad():
+        surface = mapping(torch.tensor(mesh, dtype=torch.float32)).cpu().numpy()[..., 2]
+    observed = np.concatenate(data.primary)
+    fig = plt.figure(figsize=(9.4, 8.0))
+    fig.subplots_adjust(left=.08, right=.99, bottom=.07, top=.94, wspace=.10, hspace=.19)
+    palette = ['#8878ae', '#1688b1']
+    for row, (name, result) in enumerate(results.items()):
+        pred = predictions[name]
+        primary, mapped = np.asarray(pred['primary']), np.asarray(pred['secondary'])
+        if primary.shape[:2] != mapped.shape[:2]:
+            raise ValueError("Primary and secondary predictions must share times and particles.")
+        if show_group_means:
+            if distribution_parameters is None:
+                from sklearn.mixture import GaussianMixture
+                centers = GaussianMixture(n_components=2, random_state=7).fit(data.primary[-1]).means_
+            else:
+                centers = np.asarray(distribution_parameters['terminal_centers'])
+            groups = np.linalg.norm(primary[-1, :, None] - centers[None], axis=-1).argmin(1)
+        colour = palette[row % len(palette)]
+        title = (f"Sync · Cy = {result.metadata['config']['sync_weight']:g}"
+                 if result.metadata['config']['sync_loss'] else 'No sync')
+        ax = fig.add_subplot(len(results), 2, 2*row+1)
+        ax.scatter(observed[:, 0], observed[:, 1], s=3, color='#9ca3af',
+                   alpha=.30, linewidths=0, rasterized=True, zorder=1)
+        # Reference figure contours encode the central Gaussian bump.
+        ax.contour(xx, yy, surface, levels=np.asarray([.05, .3, .7])*surface.max(),
+                   colors='#343a40', linewidths=.8, alpha=.8, zorder=3)
+        lines = LineCollection(primary.transpose(1, 0, 2), colors=colour,
+                               linewidths=.55, alpha=.17, rasterized=True, zorder=2)
+        ax.add_collection(lines)
+        if show_group_means:
+            for group in range(2):
+                mask = groups == group
+                if mask.any():
+                    mean = primary[:, mask].mean(1)
+                    ax.plot(mean[:, 0], mean[:, 1], color=colour, linewidth=2, zorder=4)
+        if show_vector_field:
+            gx, gy = np.meshgrid(np.linspace(.08, .92, 11), np.linspace(.08, .92, 11))
+            points = np.column_stack([gx.ravel(), gy.ravel()])
+            velocity = result.compute_velocity(points, time=.5)
+            ax.quiver(points[:, 0], points[:, 1], velocity[:, 0], velocity[:, 1],
+                      color=colour, alpha=.5, angles='xy', scale_units='xy', scale=12,
+                      width=.0025, zorder=4)
+        ax.set(xlim=(lower, upper), ylim=(lower, upper), aspect='equal',
+               xlabel='$x_1$', ylabel='$x_2$')
+        if row == 0:
+            ax.set_title('Primary', fontsize=14, pad=12)
+        ax.text(.03, .97, title, transform=ax.transAxes, va='top', color=colour,
+                fontsize=12, bbox=dict(facecolor='white', edgecolor='none', alpha=.85, pad=2))
+        ax.set_xticks([0., .5, 1.]); ax.set_yticks([0., .5, 1.])
+        ax.spines[['top', 'right']].set_visible(False)
+        ax.grid(False)
+
+        ax3 = fig.add_subplot(len(results), 2, 2*row+2, projection='3d', computed_zorder=False)
+        ax3.plot_surface(xx, yy, surface, color='#cbd0d6', alpha=.23, linewidth=0,
+                         antialiased=True, rcount=90, ccount=90, zorder=1)
+        lifted_lines = Line3DCollection(mapped.transpose(1, 0, 2), colors=colour,
+                                        linewidths=.55, alpha=.21, rasterized=True, zorder=3)
+        ax3.add_collection3d(lifted_lines)
+        if show_group_means:
+            for group in range(2):
+                mask = groups == group
+                if mask.any():
+                    mean = mapped[:, mask].mean(1)
+                    ax3.plot(mean[:, 0], mean[:, 1], mean[:, 2], color=colour, linewidth=2, zorder=4)
+        ax3.set(xlim=(lower, upper), ylim=(lower, upper), zlim=(0., float(surface.max())*1.05))
+        if row == 0:
+            ax3.set_title('Secondary', fontsize=14, pad=12)
+        ax3.set_xticks([0., 1.]); ax3.set_yticks([0., 1.]); ax3.set_zticks([0., float(surface.max())])
+        ax3.set_xticklabels([]); ax3.set_yticklabels([]); ax3.set_zticklabels([])
+        ax3.tick_params(pad=-1)
+        ax3.view_init(elev=38, azim=-58)
+        ax3.set_box_aspect((1., 1., .8), zoom=.97)
         ax3.grid(False)
-        for axis in [ax3.xaxis,ax3.yaxis,ax3.zaxis]:axis.pane.fill=False
-    fig.suptitle('Gaussian transport · sync vs no sync',fontsize=16)
+        for axis in (ax3.xaxis, ax3.yaxis, ax3.zaxis):
+            axis.pane.fill = False
+            axis.pane.set_edgecolor('#d8dce0')
     return fig
 
 

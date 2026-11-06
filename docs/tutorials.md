@@ -6,7 +6,7 @@ saved results and figures, with the same navigation and theme as the rest of the
 | Tutorial | What it covers |
 | --- | --- |
 | [Introduction](tutorials/00_introduction.ipynb) | Prepare AnnData or arrays, align paired inputs, choose model modes and basic parameters |
-| [Gaussian toy: sync vs no sync](tutorials/01_gaussian.ipynb) | Manuscript Gaussian parameters, Cy=0.99, known bump map, and balanced/unbalanced mass settings |
+| [Gaussian toy: sync vs no sync](tutorials/01_gaussian.ipynb) | Compact Gaussian populations, Cy=0.99, shared warm-up, and full primary/secondary trajectory bands |
 | [Splitting and growth](tutorials/03_split.ipynb) | Branching trajectories and changing population mass |
 | [Input adapters](tutorials/04_inputs.ipynb) | Arrays, dictionary, NPZ, CSV and AnnData inputs |
 | [Held-out biological reconstruction](tutorials/06_heldout_biological.ipynb) | Optional W2 normalization, a held-out pancreas stage, 1,000 training iterations and shared UMAP reconstruction |

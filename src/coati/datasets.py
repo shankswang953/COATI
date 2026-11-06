@@ -66,8 +66,8 @@ def gaussian_sync(n=128, seed=7, *, height=1., width=.10, center=(.5, .5),
     sample counts approximate the equal mixture with counts differing by one.
     Explicit covariances describe Gaussian kernels BEFORE truncation to the
     unit square; the covariance of the resulting observations is different.
-    None retains the earlier compact tutorial covariances. The manuscript
-    reference notebook supplies identity covariances and the map width explicitly.
+    None retains the compact covariances from the original experiment generator.
+    The tutorial lists these values and the known-map width explicitly.
     Each secondary row is the exact image of its corresponding primary row.
     gaussian_bump_map with the same parameters supplies the known map for fitting.
     Secondary clouds are pushforwards, not Gaussians in three dimensions.

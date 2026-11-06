@@ -220,35 +220,35 @@ unbalanced Gaussian-bump run completed with finite model parameters,
 trajectories and log masses, and predictions agreed exactly after reload.
 This is a functional training check, not a convergence or accuracy claim.
 
-## Manuscript-parameter Gaussian comparison
+## Compact Gaussian synchronization comparison
 
-The [Gaussian tutorial](tutorials/01_gaussian.ipynb) now uses the supplied
-manuscript parameters literally: the unit square, centers (0.3, 0.3), (0.5, 0.8)
-and (0.8, 0.5), identity Gaussian-kernel covariances, and a unit-height bump
-of width 0.08 centered at (0.5, 0.5). These kernels are truncated and normalized
-on the square. Identity kernel covariance creates broad overlapping densities;
-it does not reproduce the earlier compact-cloud illustration.
+The [Gaussian tutorial](tutorials/01_gaussian.ipynb) uses compact covariances from
+the original experiment generator, explicitly listed in the notebook, with the
+requested centers (0.3, 0.3), (0.5, 0.8) and (0.8, 0.5). The known map has a
+unit-height bump of width 0.08 centered at (0.5, 0.5). This differs from the
+identity-covariance manuscript text: identity kernels normalized on the square
+are broad and strongly overlapping, whereas the reference figure has compact clouds.
 
-Both regimes were run for 3,000 iterations per model with seed 7. The requested
-large secondary weight is Cy=0.99. No-sync baselines were reused after checking
-identical initial states, inputs and settings. No intermediate paths are supplied.
-The balanced target mass is 1. The unbalanced target mass is 2, using the existing
-global mass penalty and an explicit mass weight of 100; the weaker local-only
-setting did not reach the target. The training core is unchanged by this update.
+A primary-only field is fitted for a common 3,000-iteration warm-up. Both final
+models then start from that same checkpoint with fresh optimizers and receive
+2,000 refinement iterations at learning rate 0.0005. Cy=0.99 is used for sync.
+This initialization avoids unnecessary loops seen when starting the large-Cy
+objective directly from a random field. Only the endpoint observations are used;
+no route or branch assignment is supplied. The training core is unchanged.
 
-| Regime | Model | Primary kinetic energy | Secondary kinetic energy | Predicted terminal mass |
-| --- | --- | ---: | ---: | ---: |
-| Balanced | Without sync | 0.023707 | 0.136565 | 1.000000 |
-| Balanced | With sync | 0.019798 | 0.095706 | 1.000000 |
-| Unbalanced | Without sync | 0.003888 | 0.016043 | 1.986726 |
-| Unbalanced | With sync | 0.003411 | 0.014365 | 1.993220 |
+The plot now draws all 512 predicted paths in each primary and secondary panel.
+Grey points show observed endpoint populations. Three black contours show the
+bump height, rather than endpoint density contours. Every plotted 2D/3D path was
+checked against the full prediction arrays; no particle filtering, clipping,
+smoothing or group-mean curves are used.
 
-Unbalanced actions use raw particle masses at each time. Endpoint Sinkhorn
-uses normalized weights for shape and is reported separately from total mass.
-The figures use the specified mixture density and do not add artificial branch
-means. Any predicted states outside the unit square remain visible and are
-reported in the numerical comparison. This is a finite-sample illustration,
-not a convergence or global-optimum claim. All 77 package checks passed;
-normalization was checked against analytic truncated-normal probabilities.
-The full settings, hashes and costs are recorded in
+| Model | Endpoint Sinkhorn | Primary action | Secondary action | Terminal mass | Paths above half bump |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Without sync | 0.000306 | 0.138928 | 0.608279 | 1.000 | 20.90% |
+| With sync | 0.000482 | 0.173741 | 0.297491 | 1.000 | 1.37% |
+
+All notebook cells executed from scratch. The existing 77 package tests passed,
+and the script's optional unbalanced branch passed a short flow check; no full
+compact unbalanced accuracy claim is made here. This is a finite-sample example,
+not a convergence or global-optimum result. Full settings and hashes are in
 `provenance/gaussian_sync_validation.json`.

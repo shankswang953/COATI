@@ -1,14 +1,15 @@
 {
   "date": "2026-11-06",
-  "reference": "User-provided manuscript screenshot, used literally",
+  "reference": "User-provided compact-cloud reference figure",
+  "supersedes": "570f864 used identity covariance from the text screenshot; this version explicitly uses compact experimental covariances to match the figure.",
   "domain": [
     [
-      0.0,
-      1.0
+      0,
+      1
     ],
     [
-      0.0,
-      1.0
+      0,
+      1
     ]
   ],
   "initial_center": [
@@ -25,39 +26,40 @@
       0.5
     ]
   ],
-  "initial_kernel_covariance": [
+  "initial_covariance": [
     [
-      1.0,
-      0.0
+      0.0042,
+      0.0002
     ],
     [
-      0.0,
-      1.0
+      0.0002,
+      0.0038
     ]
   ],
-  "terminal_kernel_covariances": [
+  "terminal_covariances": [
     [
       [
-        1.0,
-        0.0
+        0.003,
+        0.0001
       ],
       [
-        0.0,
-        1.0
+        0.0001,
+        0.003
       ]
     ],
     [
       [
-        1.0,
-        0.0
+        0.0032,
+        -0.0001
       ],
       [
-        0.0,
-        1.0
+        -0.0001,
+        0.0032
       ]
     ]
   ],
-  "covariance_interpretation": "Gaussian kernel covariance before unit-square truncation, not empirical covariance",
+  "covariance_source": "Original read-only GaussToy/data/generate_gaussian_toy.py; requested centers retained, not its different terminal locations.",
+  "identity_covariance_warning": "Identity kernels on the unit square give broad overlapping densities; they are not the compact-cloud inputs used in the reference figure.",
   "known_map": {
     "height": 1.0,
     "width": 0.08,
@@ -68,114 +70,82 @@
   },
   "secondary_weight": 0.99,
   "seed": 7,
-  "initial_cells": 128,
-  "iterations_per_model": 3000,
-  "prediction_grid_points": 61,
-  "matching_weight": 300.0,
-  "energy_weight": 1.0,
-  "manifold_weight": 0.0,
-  "learning_rate": 0.003,
-  "batch_size": 64,
+  "observed_counts": [
+    512,
+    512
+  ],
+  "balanced": true,
+  "terminal_mass_target": 1.0,
+  "common_warmup_iterations": 3000,
+  "common_warmup_learning_rate": 0.003,
+  "refinement_iterations_per_model": 2000,
+  "refinement_learning_rate": 0.0005,
+  "same_common_checkpoint": true,
+  "common_checkpoint_state_sha256": "9a22cd56ef54bcfb2277894771a26815963395024b6619deff4a410d56e479e5",
+  "initial_states_sha256": "2a3e65f3a52718e1b00da71d6f2c06de69cb3736a5b439375c325e610c0e7811",
+  "batch_size": 128,
   "hidden_dim": 64,
   "n_layers": 3,
   "activation": "tanh",
   "dt": 0.05,
+  "matching_weight": 300.0,
+  "energy_weight": 1.0,
+  "manifold_weight": 0.0,
+  "prediction_grid_points": 101,
+  "training_core_modified": false,
+  "original_project_modified": false,
+  "display": {
+    "paths_per_model": 512,
+    "path_selection": null,
+    "group_mean_curves": false,
+    "contours": "Secondary bump height at levels 0.05, 0.3, 0.7; not endpoint density contours",
+    "grey_points": "Observed initial and terminal populations",
+    "coordinate_integrity_check": "All 2D and 3D plotted paths exactly equal prediction arrays; no clipping or smoothing"
+  },
   "intermediate_observations_supplied": false,
-  "training_core_modified_by_this_update": false,
-  "legacy_dataset_defaults_preserved": true,
-  "package_tests_passed": 77,
-  "cases": {
-    "balanced": {
-      "terminal_mass_target": 1,
-      "observed_cell_counts": [
-        128,
-        128
-      ],
-      "mass_weight": 0.0,
-      "global_mass": false,
-      "shared_initial_state_sha256": "fd6ab37c801ab6dee954f5b6c1c7667c7bddfbbbc5a386d4e99bb754288d261a",
-      "baseline_reused_after_Cy_change": true,
-      "model_directories": {
-        "Without sync": "outputs/gaussian-reference-m1-e9b5adab/without_sync",
-        "With sync": "outputs/gaussian-reference-cy099-m1-dd90686a/with_sync"
-      },
-      "measured_costs": [
-        {
-          "Model": "Without sync",
-          "Primary endpoint Sinkhorn": 0.001692677615210414,
-          "Primary kinetic energy": 0.023706573992967606,
-          "Secondary kinetic energy": 0.13656465644705015,
-          "Predicted terminal mass": 1.0,
-          "Target terminal mass": 1.0,
-          "Median maximum bump height": 9.651748405303806e-05,
-          "States outside unit square": 0.003586065573770492
-        },
-        {
-          "Model": "With sync",
-          "Primary endpoint Sinkhorn": 0.001830067951232195,
-          "Primary kinetic energy": 0.019798381254076958,
-          "Secondary kinetic energy": 0.09570613467307261,
-          "Predicted terminal mass": 1.0,
-          "Target terminal mass": 1.0,
-          "Median maximum bump height": 7.538417412433773e-05,
-          "States outside unit square": 0.002305327868852459
-        }
-      ],
-      "primary_arrays_sha256": "8f463db13b63e24423cba2ea1d2b896e30289cd934c832c5cf1554ea2ff73926"
+  "run_directory": "outputs/gaussian-compact-m1-e403ffe2",
+  "measured_costs": [
+    {
+      "Model": "Without sync",
+      "Primary endpoint Sinkhorn": 0.00030555023113265634,
+      "Primary kinetic energy": 0.13892816007137299,
+      "Secondary kinetic energy": 0.6082793563772173,
+      "Predicted terminal mass": 1.0,
+      "Target terminal mass": 1.0,
+      "Median maximum bump height": 0.2651274800300598,
+      "States outside unit square": 0.0
     },
-    "unbalanced": {
-      "terminal_mass_target": 2,
-      "observed_cell_counts": [
-        128,
-        256
-      ],
-      "mass_weight": 100.0,
-      "global_mass": true,
-      "shared_initial_state_sha256": "d773ade8d66ad26f72772ff2fd6b2c7b9d181b7311d036fac1e773e57fac6411",
-      "baseline_reused_after_Cy_change": true,
-      "model_directories": {
-        "Without sync": "outputs/gaussian-reference-m2-global-2b27a4d8/without_sync",
-        "With sync": "outputs/gaussian-reference-cy099-m2-ebc93640/with_sync"
-      },
-      "measured_costs": [
-        {
-          "Model": "Without sync",
-          "Primary endpoint Sinkhorn": 0.0015856244135648012,
-          "Primary kinetic energy": 0.0038877022452652454,
-          "Secondary kinetic energy": 0.01604259005969873,
-          "Predicted terminal mass": 1.9867264032363892,
-          "Target terminal mass": 2.0,
-          "Median maximum bump height": 2.5014427592395805e-05,
-          "States outside unit square": 0.00038422131147540983
-        },
-        {
-          "Model": "With sync",
-          "Primary endpoint Sinkhorn": 0.0016588883008807898,
-          "Primary kinetic energy": 0.003411094192415476,
-          "Secondary kinetic energy": 0.014364845535318974,
-          "Predicted terminal mass": 1.9932196140289307,
-          "Target terminal mass": 2.0,
-          "Median maximum bump height": 4.43680546595715e-05,
-          "States outside unit square": 0.0
-        }
-      ],
-      "primary_arrays_sha256": "ef113f9d21d0f47bd0b274327367fbb2bb2d5df05e47fc4e0e398b604dbaa0a8"
+    {
+      "Model": "With sync",
+      "Primary endpoint Sinkhorn": 0.0004822054470423609,
+      "Primary kinetic energy": 0.17374122142791748,
+      "Secondary kinetic energy": 0.2974910380933672,
+      "Predicted terminal mass": 1.0,
+      "Target terminal mass": 1.0,
+      "Median maximum bump height": 0.11369681358337402,
+      "States outside unit square": 0.0
+    }
+  ],
+  "height_diagnostics": {
+    "Without sync": {
+      "fraction_paths_exceeding_half_bump": 0.208984375,
+      "maximum_height_quantiles_10_50_90": [
+        0.054221007972955704,
+        0.2651274651288986,
+        0.7084285855293275
+      ]
+    },
+    "With sync": {
+      "fraction_paths_exceeding_half_bump": 0.013671875,
+      "maximum_height_quantiles_10_50_90": [
+        0.019627538323402405,
+        0.11369680985808372,
+        0.3179129242897035
+      ]
     }
   },
-  "density_display": "Three level sets of the specified normalized initial density and joint terminal mixture; no sample-fitted mixture",
-  "paths_displayed": 18,
-  "branch_mean_curves_displayed": false,
-  "normalization_grid_points_per_axis": 401,
-  "scope": "Identity kernels yield broad overlapping truncated densities, not distinct compact modes. Finite-sample soft matching; states outside the domain are reported. No convergence, exact no-flux boundary or global optimum claim.",
-  "unbalanced_mass_penalty_check": {
-    "initial_local_only_weight": 1.0,
-    "initial_global_mass": false,
-    "initial_predicted_mass": [
-      1.0450767278671265,
-      0.9913982152938843
-    ],
-    "final_global_mass": true,
-    "final_mass_weight": 100.0,
-    "reason": "The weak local-only default did not attain M=2. The existing global penalty is explicitly enabled for this toy; no training-core change."
-  }
+  "tests_passed": 77,
+  "notebook_execution": "All cells executed from scratch; shared warm-up plus both refinements.",
+  "unbalanced_validation": "The optional CLI M=2 branch passed a 2-step warm-up/2-step refinement smoke test. No full compact unbalanced accuracy claim.",
+  "scope": "Numerical illustration; no global-optimum or exact-boundary claim. Endpoint shape and escaped-state fraction are reported."
 }
