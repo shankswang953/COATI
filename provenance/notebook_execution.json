@@ -1,8 +1,12 @@
 [
   {
-    "notebook": "01_gaussian.ipynb",
-    "code_cells": 9,
-    "seconds": 7.0,
+    "notebook": "synthetic/balancedGaussianbump.ipynb",
+    "code_cells": 7,
+    "status": "passed"
+  },
+  {
+    "notebook": "synthetic/unbalancedGaussianbump.ipynb",
+    "code_cells": 8,
     "status": "passed"
   },
   {

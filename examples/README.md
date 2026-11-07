@@ -59,15 +59,18 @@ The script refuses to overwrite nonempty directories.
 
 The original-reference notebook reads the archived files directly. It never
 regenerates them; their file hashes are retained in
-`data/gaussian_reference/manifest.json`. The active sync/no-sync tutorial generates these observations in memory,
-assembles AnnData, trains a fresh Fourier map for 6000 steps, and reports held-out
-and independent-grid performance before comparing two 3000-step balanced fields.
-The Gaussian example overrides only settings that differ from COATI defaults.
-No archived observations, JSON presets or pretrained maps are read by that workflow.
+`data/gaussian_reference/manifest.json`. The active synthetic tutorials share
+the committed AnnData and frozen map in `examples/data/synthetic/gaussian_bump/`.
+The build script regenerates those assets from the same repository code and refuses
+to overwrite an existing asset directory.
 
 The fresh AnnData workflow requires the `anndata` extra; Jupyter additionally
-requires the `notebooks` extra. The notebook spells out generation, AnnData
-construction and the supplied parameter dictionary directly in its cells.
+requires the `notebooks` extra.
+
+```bash
+python examples/build_synthetic_gaussian_assets.py \
+  --output outputs/gaussian-bump-assets
+```
 
 ```bash
 python examples/run_gaussian_sync.py --output outputs/gaussian-fresh

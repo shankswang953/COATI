@@ -1,0 +1,127 @@
+{
+  "data": {
+    "observed_cells": 3000,
+    "map_pairs": 10000,
+    "initial_covariance": "0.004 I_2",
+    "terminal_covariances": [
+      "0.003 I_2",
+      "0.003 I_2"
+    ],
+    "observed_counts": [
+      1000,
+      2000
+    ],
+    "target_mass_ratio": 2.0
+  },
+  "map_fit": {
+    "best_step": 1500,
+    "best_validation_loss": 0.0018048104830086231,
+    "n_training": 8500,
+    "n_validation": 1500
+  },
+  "map_metrics": [
+    {
+      "Evaluation": "Held-out observed",
+      "Pairs": 434,
+      "XY_RMSE": 4.744901161757298e-05,
+      "Z_RMSE": 0.02107900381088257,
+      "Z_MAE": 0.0040672775357961655
+    },
+    {
+      "Evaluation": "Held-out support",
+      "Pairs": 1066,
+      "XY_RMSE": 6.54781615594402e-05,
+      "Z_RMSE": 0.005543963052332401,
+      "Z_MAE": 0.003499872051179409
+    },
+    {
+      "Evaluation": "Independent grid",
+      "Pairs": 9216,
+      "XY_RMSE": 6.717474025208503e-05,
+      "Z_RMSE": 0.005036137066781521,
+      "Z_MAE": 0.0029980025719851255
+    }
+  ],
+  "grid_z_correlation": 0.9993778708102545,
+  "center_predicted_height": 0.9999194741249084,
+  "training_history": [
+    {
+      "step": 1,
+      "training_loss": 0.5852230191230774,
+      "validation_loss": 0.5389558672904968,
+      "validation_z_rmse": 0.2119254469871521
+    },
+    {
+      "step": 500,
+      "training_loss": 0.0011949833715334535,
+      "validation_loss": 0.0018566244980320334,
+      "validation_z_rmse": 0.012438556179404259
+    },
+    {
+      "step": 1000,
+      "training_loss": 0.0015444316668435931,
+      "validation_loss": 0.0018985102651640773,
+      "validation_z_rmse": 0.012578103691339493
+    },
+    {
+      "step": 1500,
+      "training_loss": 0.0005092771607451141,
+      "validation_loss": 0.0018048104830086231,
+      "validation_z_rmse": 0.012263791635632515
+    },
+    {
+      "step": 2000,
+      "training_loss": 0.004692583344876766,
+      "validation_loss": 0.0018399240216240287,
+      "validation_z_rmse": 0.01238251943141222
+    },
+    {
+      "step": 2500,
+      "training_loss": 0.012757477350533009,
+      "validation_loss": 0.0019427468068897724,
+      "validation_z_rmse": 0.012723813764750957
+    },
+    {
+      "step": 3000,
+      "training_loss": 0.0005545569001697004,
+      "validation_loss": 0.0018207409884780645,
+      "validation_z_rmse": 0.012317804619669914
+    },
+    {
+      "step": 3500,
+      "training_loss": 0.0009152818820439279,
+      "validation_loss": 0.002805372467264533,
+      "validation_z_rmse": 0.015289896167814732
+    },
+    {
+      "step": 4000,
+      "training_loss": 0.003516361117362976,
+      "validation_loss": 0.00184211868327111,
+      "validation_z_rmse": 0.012389910407364368
+    },
+    {
+      "step": 4500,
+      "training_loss": 0.0005684552597813308,
+      "validation_loss": 0.0021582439076155424,
+      "validation_z_rmse": 0.013410951942205429
+    },
+    {
+      "step": 5000,
+      "training_loss": 0.002404561499133706,
+      "validation_loss": 0.0018368788296356797,
+      "validation_z_rmse": 0.012372273951768875
+    },
+    {
+      "step": 5500,
+      "training_loss": 0.0034573664888739586,
+      "validation_loss": 0.0019009439274668694,
+      "validation_z_rmse": 0.012586180120706558
+    },
+    {
+      "step": 6000,
+      "training_loss": 0.0011309640249237418,
+      "validation_loss": 0.0019129322608932853,
+      "validation_z_rmse": 0.012625806033611298
+    }
+  ]
+}

@@ -40,7 +40,9 @@ Toy-data preparation and Gaussian-specific helpers are maintained in [examples](
 
 - [Introduction](notebooks/00_introduction.ipynb)
 - [Original Gaussian experiment](notebooks/11_gaussian_reference.ipynb)
-- [Gaussian toy: sync vs no sync](notebooks/01_gaussian.ipynb)
+- [Synthetic Gaussian bump](notebooks/synthetic/)
+  - [Balanced: sync vs no sync](notebooks/synthetic/balancedGaussianbump.ipynb)
+  - [Unbalanced: trajectories and growth](notebooks/synthetic/unbalancedGaussianbump.ipynb)
 - [Splitting and growth](notebooks/03_split.ipynb)
 - [Input formats](notebooks/04_inputs.ipynb)
 - [Mouse gastrulation: data, training and UMAP](notebooks/10_gastrulation.ipynb)

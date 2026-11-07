@@ -1,0 +1,32 @@
+{
+  "shared_assets": {
+    "observed.h5ad": "7e169e69eaa8f93c5e58040c2e732e1d5237135e2ee48b5df9c5cdceeebccdb2",
+    "map_pairs.h5ad": "fc8be50e9cd2c3e5d1976153fbdb47b419e7c475430e8d9df6f0dc2fd79fd9c5",
+    "T.pt": "5839385e594f4e2ada62b1aadb70c9c00ae39d571eaa6782c1d24a128e56005a",
+    "map_report.json": "5ba04332b7aaafc3eb41800285af6eced328670c211bee9d96e25820fab7248c"
+  },
+  "observed_counts": [1000, 2000],
+  "map": {
+    "best_step": 1500,
+    "grid_z_correlation": 0.999378,
+    "center_predicted_height": 0.999919
+  },
+  "balanced": {
+    "without_sync_maximum_bump_height_median": 0.380628,
+    "with_sync_maximum_bump_height_median": 0.038393,
+    "without_sync_terminal_mass": 1.0,
+    "with_sync_terminal_mass": 1.0
+  },
+  "unbalanced": {
+    "biological_num": [1.0, 2.0],
+    "mass_coefficient": 100.0,
+    "global_mass": true,
+    "without_sync_terminal_mass": 1.980399,
+    "with_sync_terminal_mass": 1.981807,
+    "without_sync_maximum_bump_height_median": 0.380701,
+    "with_sync_maximum_bump_height_median": 0.043216
+  },
+  "tests_passed": 85,
+  "training_core_changed": false,
+  "website_strict_build": "passed"
+}

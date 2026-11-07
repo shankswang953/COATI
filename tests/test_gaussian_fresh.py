@@ -70,27 +70,14 @@ def test_balanced_mass_target_does_not_follow_observation_counts():
 
 
 
-def test_explicit_notebook_preparation_matches_the_script(monkeypatch):
-    import json
-    from pathlib import Path
+def test_shared_assets_match_the_reproducible_generator():
+    from synthetic_gaussian_assets import load_shared_gaussian_assets, resolve_asset_directory
     import anndata as ad
-    import pandas as pd
-    import coati as ct
-    from gaussian_parameters import make_flow_config
-    notebook = json.loads((Path(__file__).resolve().parents[1] / 'notebooks/01_gaussian.ipynb').read_text())
-    scope = {'np': np, 'pd': pd, 'ad': ad, 'ct': ct}
-    def reject_load(*args, **kwargs):
-        raise AssertionError('The notebook must generate its inputs directly.')
-    with monkeypatch.context() as patch:
-        patch.setattr(np, 'load', reject_load)
-        patch.setattr(torch, 'load', reject_load)
-        for index in [3, 5, 14]:
-            exec(compile(''.join(notebook['cells'][index]['source']), '<explicit-notebook-cell>', 'exec'), scope)
-        expected_cells, expected_pairs = generate_fresh_anndata()
+
+    expected_cells, expected_pairs = generate_fresh_anndata()
+    cells, _, _ = load_shared_gaussian_assets()
+    pairs = ad.read_h5ad(resolve_asset_directory() / 'map_pairs.h5ad')
     for key in ['X_latent', 'X_secondary']:
-        np.testing.assert_array_equal(scope['cells'].obsm[key], expected_cells.obsm[key])
-    np.testing.assert_array_equal(scope['map_pairs'].X, expected_pairs.X)
-    np.testing.assert_array_equal(scope['map_pairs'].obsm['X_secondary'], expected_pairs.obsm['X_secondary'])
-    pd.testing.assert_frame_equal(scope['cells'].obs, expected_cells.obs)
-    pd.testing.assert_frame_equal(scope['map_pairs'].obs, expected_pairs.obs)
-    assert scope['config'].to_dict() == make_flow_config().to_dict()
+        np.testing.assert_array_equal(cells.obsm[key], expected_cells.obsm[key])
+    np.testing.assert_array_equal(pairs.X, expected_pairs.X)
+    np.testing.assert_array_equal(pairs.obsm['X_secondary'], expected_pairs.obsm['X_secondary'])
