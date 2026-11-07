@@ -11,7 +11,9 @@ These files are the prepared 5-dimensional RNA and ATAC PCA representations used
 - `scmultisim.h5ad`: the assembled paired AnnData used by the tutorial, with RNA PCA
   in `X` and `obsm["X_pca"]`, ATAC PCA in `obsm["X_atac"]`, and time, cell type,
   barcode, and stage annotations in `obs`.
+- `scmultisim_film_T.pt`: the final time-conditioned FiLM map trained on all paired
+  cells and loadable with `coati.maps.load_map`.
 
-Running the tutorial writes `scmultisim.h5ad` to this fixed path and replaces the
-existing file. The simulation parameters are recorded in
+Running the tutorial replaces both `scmultisim.h5ad` and `scmultisim_film_T.pt` at
+these fixed paths. The simulation parameters are recorded in
 [`notebooks/scMultisim/generate_data.R`](../../../notebooks/scMultisim/generate_data.R).
