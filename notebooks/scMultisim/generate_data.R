@@ -119,14 +119,14 @@ write_matrix <- function(matrix, filename) {
 }
 
 message("Writing complete matrices and metadata...")
-write_matrix(rna_counts, "complete_scrna.csv")
-write_matrix(atac_counts, "complete_scatac.csv")
+write_matrix(rna_counts, "complete_scRNA.csv")
+write_matrix(atac_counts, "complete_scATAC.csv")
 write_matrix(velocity, "complete_velocity.csv")
 write_matrix(unspliced_counts, "complete_unspliced.csv")
 write.csv(
   cell_metadata,
-  file = file.path(output_dir, "complete_metadata.csv"),
-  row.names = FALSE,
+  file = file.path(output_dir, "complete_meta.csv"),
+  row.names = TRUE,
   quote = FALSE
 )
 
@@ -134,8 +134,8 @@ for (time_point in seq_len(4L)) {
   selected <- which(time_index == time_point)
   prefix <- paste0("time_", time_point)
 
-  write_matrix(rna_counts[, selected, drop = FALSE], paste0(prefix, "_scrna.csv"))
-  write_matrix(atac_counts[, selected, drop = FALSE], paste0(prefix, "_scatac.csv"))
+  write_matrix(rna_counts[, selected, drop = FALSE], paste0(prefix, "_scRNA.csv"))
+  write_matrix(atac_counts[, selected, drop = FALSE], paste0(prefix, "_scATAC.csv"))
   write_matrix(velocity[, selected, drop = FALSE], paste0(prefix, "_velocity.csv"))
   write_matrix(
     unspliced_counts[, selected, drop = FALSE],
@@ -143,8 +143,8 @@ for (time_point in seq_len(4L)) {
   )
   write.csv(
     cell_metadata[selected, , drop = FALSE],
-    file = file.path(output_dir, paste0(prefix, "_metadata.csv")),
-    row.names = FALSE,
+    file = file.path(output_dir, paste0(prefix, "_meta.csv")),
+    row.names = TRUE,
     quote = FALSE
   )
 }
