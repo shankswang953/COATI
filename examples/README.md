@@ -5,7 +5,7 @@ Data preparation and experiment-specific helpers live here, outside the installe
 
 - `toy_data.py`: small synthetic datasets and an analytic Gaussian-bump map.
 - `generate_gaussian_data.py`: the original two-stage Gaussian data recipe.
-- `gaussian_parameters.py`: supplied BalancedSync flow settings for the fresh comparison.
+- `gaussian_parameters.py`: concise COATI configuration for the fresh comparison.
 - `gaussian_map.py`: original Fourier map fitting and held-out quality checks.
 - `gaussian_fresh.py`: fresh observed/support AnnData assembly.
 - `gaussian_sync.json`: retained settings for the earlier analytic-map comparison.
@@ -62,7 +62,7 @@ regenerates them; their file hashes are retained in
 `data/gaussian_reference/manifest.json`. The active sync/no-sync tutorial generates these observations in memory,
 assembles AnnData, trains a fresh Fourier map for 6000 steps, and reports held-out
 and independent-grid performance before comparing two 3000-step balanced fields.
-The supplied flow settings are recorded directly in `gaussian_parameters.py`.
+The Gaussian example overrides only settings that differ from COATI defaults.
 No archived observations, JSON presets or pretrained maps are read by that workflow.
 
 The fresh AnnData workflow requires the `anndata` extra; Jupyter additionally

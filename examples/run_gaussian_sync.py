@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import coati as ct
 from gaussian_fresh import generate_fresh_anndata
 from gaussian_map import fit_bump_map, evaluate_bump_map, plot_map_training, plot_map_performance
-from gaussian_parameters import FLOW_PARAMETERS
+from gaussian_parameters import make_flow_config
 from gaussian_comparison import make_shared_initial_checkpoint, plot_gaussian_sync, plot_bump_height, compare_gaussian_runs
 
 
@@ -19,7 +19,7 @@ def main():
     parser.add_argument("--output",type=Path,required=True)
     parser.add_argument("--map-steps",type=int,default=6000)
     parser.add_argument("--iterations",type=int,default=3000)
-    parser.add_argument("--secondary-weight",type=float,default=.35)
+    parser.add_argument("--secondary-weight",type=float,default=.5)
     parser.add_argument("--map-only",action="store_true",help="Inspect the freshly fitted T before training fields")
     args=parser.parse_args()
     if args.output.exists() and any(args.output.iterdir()):
@@ -40,7 +40,7 @@ def main():
     print(metrics.to_string());print(json.dumps(summary,indent=2))
     if args.map_only:
         return
-    config=ct.Config(extra=FLOW_PARAMETERS,device="cpu").with_parameters(iterations=args.iterations,secondary_weight=args.secondary_weight)
+    config=make_flow_config(iterations=args.iterations, secondary_weight=args.secondary_weight)
     initial=make_shared_initial_checkpoint(config,args.output/"initial.pt")
     results,predictions={},{}
     for name,cfg in {"Without sync":config.with_parameters(multimodal=False,secondary_weight=0.),"With sync":config}.items():

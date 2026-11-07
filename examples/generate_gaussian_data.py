@@ -20,10 +20,13 @@ def sample_truncated_gaussian(rng, mean, cov, n, low=0.0, high=1.0):
 def make_data(seed=2026, n_initial=1000):
     rng = np.random.default_rng(seed)
 
+    initial_covariance = 0.004 * np.eye(2)
+    terminal_covariance = 0.003 * np.eye(2)
+
     time0 = sample_truncated_gaussian(
         rng,
         mean=np.array([0.30, 0.30]),
-        cov=np.array([[0.0042, 0.0002], [0.0002, 0.0038]]),
+        cov=initial_covariance,
         n=n_initial,
     )
 
@@ -31,13 +34,13 @@ def make_data(seed=2026, n_initial=1000):
     terminal_a = sample_truncated_gaussian(
         rng,
         mean=np.array([0.56, 0.82]),
-        cov=np.array([[0.0030, 0.0001], [0.0001, 0.0030]]),
+        cov=terminal_covariance,
         n=n_each_terminal,
     )
     terminal_b = sample_truncated_gaussian(
         rng,
         mean=np.array([0.83, 0.56]),
-        cov=np.array([[0.0032, -0.0001], [-0.0001, 0.0032]]),
+        cov=terminal_covariance,
         n=n_each_terminal,
     )
     time1 = np.concatenate([terminal_a, terminal_b], axis=0)

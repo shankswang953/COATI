@@ -1,6 +1,7 @@
 """Plot matched Gaussian endpoint transport without prescribing either route."""
 import numpy as np
 import matplotlib.pyplot as plt
+from generate_gaussian_data import gaussian_bump_z
 
 
 def gaussian_sync_example(*, balanced=True, secondary_weight=None,
@@ -82,7 +83,6 @@ def plot_gaussian_sync(data, mapping, results, predictions, *,
     Optional arrows
     show the instantaneous primary field at t=0.5.
     """
-    import torch
     from matplotlib.collections import LineCollection
     from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
@@ -97,8 +97,7 @@ def plot_gaussian_sync(data, mapping, results, predictions, *,
     grid = np.linspace(0., 1., 181)
     xx, yy = np.meshgrid(grid, grid)
     mesh = np.stack([xx, yy], -1)
-    with torch.no_grad():
-        surface = mapping(torch.tensor(mesh, dtype=torch.float32)).cpu().numpy()[..., 2]
+    surface = gaussian_bump_z(mesh)
     observed = np.concatenate(data.primary)
     fig = plt.figure(figsize=(9.4, 8.0))
     fig.subplots_adjust(left=.08, right=.99, bottom=.07, top=.94, wspace=.10, hspace=.19)

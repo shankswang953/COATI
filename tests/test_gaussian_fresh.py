@@ -2,25 +2,37 @@ import numpy as np
 import torch
 from gaussian_fresh import generate_fresh_anndata
 from gaussian_map import fit_bump_map, evaluate_bump_map
-from gaussian_reference import _asset
 from gaussian_comparison import compare_gaussian_runs
 
 
-def test_fresh_anndata_reproduces_the_original_arrays():
+def test_fresh_anndata_contains_isotropic_gaussian_snapshots():
     cells, pairs = generate_fresh_anndata()
     assert cells.n_obs == 3000 and pairs.n_obs == 10000
     assert cells.obs_names.is_unique and pairs.obs_names.is_unique
     np.testing.assert_array_equal(cells.obs_names.to_numpy(), cells.obs['barcode'].to_numpy())
     assert set(cells.obs.columns) >= {'time', 'celltype', 'barcode'}
     assert set(pairs.obs.columns) >= {'source', 'barcode'}
-    for filename, representation in [('primary.npz', 'X_latent'), ('secondary.npz', 'X_secondary')]:
-        with np.load(_asset(filename), allow_pickle=False) as saved:
-            np.testing.assert_allclose(cells.obsm[representation], np.concatenate([saved['time0'], saved['time1']]), rtol=1e-6, atol=1e-7)
-    with np.load(_asset('map_support.npz'), allow_pickle=False) as saved:
-        np.testing.assert_allclose(pairs.X[3000:], saved['support2d'], rtol=1e-6, atol=1e-7)
-        np.testing.assert_allclose(pairs.obsm['X_secondary'][3000:], saved['support3d'], rtol=1e-6, atol=1e-7)
     np.testing.assert_array_equal(pairs.X[:3000], cells.obsm['X_latent'])
     assert np.count_nonzero(cells.obsm['X_secondary'][:, 2]) == 0
+    groups = [cells.obsm['X_latent'][:1000], cells.obsm['X_latent'][1000:2000],
+              cells.obsm['X_latent'][2000:]]
+    for group in groups:
+        covariance = np.cov(group, rowvar=False)
+        assert abs(covariance[0, 1]) < 5e-4
+        assert abs(covariance[0, 0] - covariance[1, 1]) < 6e-4
+
+
+def test_gaussian_generator_uses_exact_isotropic_covariances(monkeypatch):
+    import generate_gaussian_data as generator
+    covariances = []
+    def capture_covariance(rng, mean, cov, n, low=0., high=1.):
+        covariances.append(np.asarray(cov))
+        return np.repeat(np.asarray(mean)[None], n, axis=0)
+    monkeypatch.setattr(generator, 'sample_truncated_gaussian', capture_covariance)
+    generator.make_data()
+    np.testing.assert_array_equal(covariances[0], .004 * np.eye(2))
+    np.testing.assert_array_equal(covariances[1], .003 * np.eye(2))
+    np.testing.assert_array_equal(covariances[2], .003 * np.eye(2))
 
 
 def test_map_training_uses_fresh_inputs_and_preserves_input_gradients(monkeypatch):
@@ -64,7 +76,7 @@ def test_explicit_notebook_preparation_matches_the_script(monkeypatch):
     import anndata as ad
     import pandas as pd
     import coati as ct
-    from gaussian_parameters import FLOW_PARAMETERS
+    from gaussian_parameters import make_flow_config
     notebook = json.loads((Path(__file__).resolve().parents[1] / 'notebooks/01_gaussian.ipynb').read_text())
     scope = {'np': np, 'pd': pd, 'ad': ad, 'ct': ct}
     def reject_load(*args, **kwargs):
@@ -81,4 +93,4 @@ def test_explicit_notebook_preparation_matches_the_script(monkeypatch):
     np.testing.assert_array_equal(scope['map_pairs'].obsm['X_secondary'], expected_pairs.obsm['X_secondary'])
     pd.testing.assert_frame_equal(scope['cells'].obs, expected_cells.obs)
     pd.testing.assert_frame_equal(scope['map_pairs'].obs, expected_pairs.obs)
-    assert scope['FLOW_PARAMETERS'] == FLOW_PARAMETERS
+    assert scope['config'].to_dict() == make_flow_config().to_dict()

@@ -185,13 +185,11 @@ def plot_map_performance(grid):
     shape = grid["xx"].shape
     truth = grid["target"][:, 2].reshape(shape)
     prediction = grid["prediction"][:, 2].reshape(shape)
-    error = np.abs(prediction - truth)
-    fig, axes = plt.subplots(1, 3, figsize=(10.8, 3.5), layout="constrained")
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.5), layout="constrained")
     low, high = min(0., float(prediction.min())), max(1., float(prediction.max()))
-    for ax, values, title in zip(axes, [truth, prediction, error],
-                                ["Target bump", "Trained T", "Absolute error"]):
-        settings = dict(vmin=low, vmax=high, cmap="viridis") if title != "Absolute error" else dict(vmin=0., cmap="magma")
-        image = ax.imshow(values, origin="lower", extent=(0, 1, 0, 1), **settings)
+    for ax, values, title in zip(axes, [truth, prediction], ["Target bump", "Trained T"]):
+        image = ax.imshow(values, origin="lower", extent=(0, 1, 0, 1),
+                          vmin=low, vmax=high, cmap="viridis")
         ax.set(title=title, xlabel="Primary 1", ylabel="Primary 2", aspect="equal")
         fig.colorbar(image, ax=ax, shrink=.8)
     return fig
