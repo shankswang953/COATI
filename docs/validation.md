@@ -224,8 +224,8 @@ This is a functional training check, not a convergence or accuracy claim.
 
 The [Gaussian tutorial](tutorials/01_gaussian.ipynb) uses the shared packaged
 example configuration at `src/coati/_gaussian_example.json`. The current secondary
-weight is Cy=0.9. Terminal centers are (0.52, 0.78) and (0.78, 0.52), slightly
-closer than before, with the original compact covariances and Gaussian bump.
+weight is Cy=0.9. Terminal centers are (0.56, 0.74) and (0.74, 0.56),
+with the same midpoint and a smaller separation, with the original compact covariances and Gaussian bump.
 Numeric parameter blocks and the earlier parameter discussion have been removed
 from the notebook. The Python script uses the same configuration.
 
@@ -237,11 +237,11 @@ checked against the complete prediction arrays. The training core is unchanged.
 
 | Model | Endpoint Sinkhorn | Primary action | Secondary action | Terminal mass | Paths above half bump |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Without sync | 0.000083 | 0.133232 | 0.763836 | 1.000 | 31.45% |
-| With sync | 0.000267 | 0.167052 | 0.390369 | 1.000 | 6.05% |
+| Without sync | 0.000099 | 0.126787 | 1.218385 | 1.000 | 56.25% |
+| With sync | 0.000485 | 0.149900 | 0.521974 | 1.000 | 17.38% |
 
-All notebook cells executed from scratch. Existing package checks passed, the
-wheel includes the shared example configuration, and the optional unbalanced CLI
-passed a short flow check. This is a finite-sample numerical illustration, not a
+All notebook cells executed from scratch. The 77 package checks, wheel inclusion
+and optional unbalanced CLI flow were verified at commit 67d8ae5; this update
+changes only the endpoint centers and refreshes the resulting outputs. This is a finite-sample numerical illustration, not a
 convergence or global-optimum result. Full settings and hashes are in
 `provenance/gaussian_sync_validation.json`.

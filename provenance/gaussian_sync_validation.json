@@ -1,7 +1,7 @@
 {
   "date": "2026-11-06",
-  "reference": "User-requested Cy=0.9 and slightly closer terminal centers.",
-  "previous_commit": "157ac3a",
+  "reference": "Further reduce terminal separation while retaining Cy=0.9 and the same training settings.",
+  "previous_commit": "67d8ae5",
   "example_configuration": "src/coati/_gaussian_example.json",
   "settings": {
     "seed": 7,
@@ -27,12 +27,12 @@
       ],
       "terminal_centers": [
         [
-          0.52,
-          0.78
+          0.56,
+          0.74
         ],
         [
-          0.78,
-          0.52
+          0.74,
+          0.56
         ]
       ],
       "initial_covariance": [
@@ -80,7 +80,7 @@
       "dt": 0.05
     }
   },
-  "terminal_center_distance": 0.36769552621700474,
+  "terminal_center_distance": 0.25455844122715704,
   "domain": [
     [
       0,
@@ -95,7 +95,7 @@
   "terminal_mass_target": 1.0,
   "covariance_source": "Compact original experimental covariances; user-adjusted centers.",
   "same_common_checkpoint": true,
-  "common_checkpoint_state_sha256": "c31450f11bb8f233f64b421a1026237d7d96f1819ddfa87c3ec4a781835a95f8",
+  "common_checkpoint_state_sha256": "80ad6adcd10a9b05a4dda020be8b2d80c9bd7c04f3456f978ace404fe722ecfc",
   "initial_states_sha256": "2a3e65f3a52718e1b00da71d6f2c06de69cb3736a5b439375c325e610c0e7811",
   "training_core_modified": false,
   "original_project_modified": false,
@@ -108,50 +108,76 @@
     "coordinate_integrity_check": "All plotted paths exactly equal prediction arrays; no clipping or smoothing"
   },
   "intermediate_observations_supplied": false,
-  "run_directory": "outputs/gaussian-sync-7de00d63",
+  "run_directory": "outputs/gaussian-sync-0235664d",
   "measured_costs": [
     {
       "Model": "Without sync",
-      "Primary endpoint Sinkhorn": 8.290298865176737e-05,
-      "Primary kinetic energy": 0.13323159515857697,
-      "Secondary kinetic energy": 0.7638361848908206,
+      "Primary endpoint Sinkhorn": 9.868736378848553e-05,
+      "Primary kinetic energy": 0.1267867088317871,
+      "Secondary kinetic energy": 1.2183853416821937,
       "Predicted terminal mass": 1.0,
       "Target terminal mass": 1.0,
-      "Median maximum bump height": 0.3446696698665619,
+      "Median maximum bump height": 0.5641535520553589,
       "States outside unit square": 0.0
     },
     {
       "Model": "With sync",
-      "Primary endpoint Sinkhorn": 0.0002667888766154647,
-      "Primary kinetic energy": 0.1670522838830948,
-      "Secondary kinetic energy": 0.3903687876461505,
+      "Primary endpoint Sinkhorn": 0.0004854286089539528,
+      "Primary kinetic energy": 0.1498996615409851,
+      "Secondary kinetic energy": 0.5219737824027073,
       "Predicted terminal mass": 1.0,
       "Target terminal mass": 1.0,
-      "Median maximum bump height": 0.13599875569343567,
+      "Median maximum bump height": 0.18917131423950195,
       "States outside unit square": 0.0
     }
   ],
   "height_diagnostics": {
     "Without sync": {
-      "fraction_paths_exceeding_half_bump": 0.314453125,
+      "fraction_paths_exceeding_half_bump": 0.5625,
       "maximum_height_quantiles_10_50_90": [
-        0.07631013244390487,
-        0.3446696698665619,
-        0.7848838746547699
+        0.15328719168901445,
+        0.5641535520553589,
+        0.9578560173511507
       ]
     },
     "With sync": {
-      "fraction_paths_exceeding_half_bump": 0.060546875,
+      "fraction_paths_exceeding_half_bump": 0.173828125,
       "maximum_height_quantiles_10_50_90": [
-        0.034232661873102185,
-        0.13599876314401627,
-        0.40209912657737734
+        0.05899490676820278,
+        0.18917132169008255,
+        0.6790216803550722
       ]
     }
   },
   "tests_passed": 77,
+  "package_tests_verified_at_commit": "67d8ae5",
   "notebook_execution": "All cells executed from scratch.",
-  "unbalanced_validation": "Optional CLI branch passed a 2-step warm-up/2-step refinement flow check; no full unbalanced accuracy claim.",
+  "unbalanced_validation": "CLI flow verified at 67d8ae5; only endpoint centers changed afterward. No full unbalanced accuracy claim.",
   "notebook_design": "Numeric defaults and parameter discussion removed; both notebook and CLI load the shared packaged example configuration.",
-  "scope": "Numerical illustration; no global-optimum or exact-boundary claim."
+  "scope": "Numerical illustration; no global-optimum or exact-boundary claim.",
+  "geometry_check": {
+    "trial_centers": [
+      [
+        0.58,
+        0.72
+      ],
+      [
+        0.72,
+        0.58
+      ]
+    ],
+    "trial_run_directory": "outputs/gaussian-sync-f7a3487a",
+    "finding": "The tighter candidate produced a visually dominant one-sided arc and worse endpoint matching under the same short training budget. The accepted centers retain two visible routes.",
+    "trial_sync_endpoint_sinkhorn": 0.001672,
+    "accepted_centers": [
+      [
+        0.56,
+        0.74
+      ],
+      [
+        0.74,
+        0.56
+      ]
+    ]
+  }
 }
