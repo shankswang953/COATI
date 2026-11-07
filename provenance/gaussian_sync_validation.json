@@ -2,7 +2,7 @@
   "date": "2026-11-06",
   "reference": "Further reduce terminal separation while retaining Cy=0.9 and the same training settings.",
   "previous_commit": "67d8ae5",
-  "example_configuration": "src/coati/_gaussian_example.json",
+  "example_configuration": "examples/gaussian_sync.json",
   "settings": {
     "seed": 7,
     "n_cells": 512,

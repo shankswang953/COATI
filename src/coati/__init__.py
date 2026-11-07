@@ -12,7 +12,6 @@ def load_result(*args, **kwargs):
     from .result import Result
     return Result.load(*args, **kwargs)
 
-from . import datasets
 
 
 def train_vector_field(*args, **kwargs):

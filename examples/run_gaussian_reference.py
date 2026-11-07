@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import coati as ct
-from coati.gaussian_reference import load_example, replay_reference, plot_reference, _asset
+from gaussian_reference import load_example, replay_reference, plot_reference, _asset
 
 
 def main():

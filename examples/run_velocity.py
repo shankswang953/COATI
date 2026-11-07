@@ -18,6 +18,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import coati as ct
+import toy_data as datasets
 
 
 def main():
@@ -31,7 +32,7 @@ def main():
     parser.add_argument("--cells",type=int,default=128)
     parser.add_argument("--output",required=True)
     args=parser.parse_args()
-    data=ct.datasets.paired(n=args.cells,seed=7) if args.multimodal else ct.datasets.split(n=args.cells,seed=7)
+    data=datasets.paired(n=args.cells,seed=7) if args.multimodal else datasets.split(n=args.cells,seed=7)
     result=ct.train_vector_field(data,multimodal=args.multimodal,balanced=args.balanced,
              iterations=args.iterations,batch_size=min(64,args.cells),seed=7,map_type="kernel",output_dir=args.output)
     x=np.concatenate(data.primary)

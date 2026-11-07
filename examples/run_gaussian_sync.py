@@ -1,7 +1,7 @@
 """Compare Gaussian transport with and without secondary synchronization.
 
 Default geometry and training settings are shared with the tutorial through
-coati's packaged Gaussian example configuration.
+the repository Gaussian example configuration.
 """
 import argparse
 from pathlib import Path
@@ -9,7 +9,7 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import coati as ct
-from coati.toy_comparison import (
+from gaussian_comparison import (
     gaussian_sync_example, make_shared_initial_checkpoint,
     plot_gaussian_sync, plot_bump_height, compare_gaussian_runs,
 )

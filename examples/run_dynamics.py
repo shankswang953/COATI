@@ -5,6 +5,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import coati as ct
+import toy_data as datasets
 
 
 def main():
@@ -13,7 +14,7 @@ def main():
     parser.add_argument("--iterations", type=int, default=300)
     parser.add_argument("--balanced", action="store_true")
     args = parser.parse_args()
-    snapshots = ct.datasets.split(n=128, seed=7)
+    snapshots = datasets.split(n=128, seed=7)
     features = np.concatenate(snapshots.primary)
     times = np.repeat(snapshots.times, [len(x) for x in snapshots.primary])
     labels = np.where(times == 0, "Initial", np.where(features[:, 1] < .5, "Branch A", "Branch B"))

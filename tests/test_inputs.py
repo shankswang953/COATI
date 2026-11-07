@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 import pytest
-from coati import TemporalData, Config, datasets
+from coati import TemporalData, Config
+import toy_data as datasets
 
 def test_roundtrip_and_adapters(tmp_path):
     data=datasets.paired(n=40)

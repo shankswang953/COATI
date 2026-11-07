@@ -28,11 +28,13 @@ python -m pip install -e '.[notebooks,visualization]'
 
 ```text
 src/coati/     Python package and training engine
-examples/      Standalone Python scripts
+examples/      Data preparation and standalone Python examples
 notebooks/     Executable tutorials
 tests/         Package tests
 assets/        Package logo
 ```
+
+Toy-data preparation and Gaussian-specific helpers are maintained in [examples](examples/README.md), outside the installed package.
 
 ## Notebooks
 

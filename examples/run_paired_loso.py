@@ -7,6 +7,7 @@ import argparse
 import json
 import numpy as np
 import coati as ct
+import toy_data as datasets
 
 
 def main():
@@ -16,7 +17,7 @@ def main():
     parser.add_argument("--map-epochs", type=int, default=300)
     parser.add_argument("--niters", type=int, default=200)
     args = parser.parse_args()
-    observed = ct.datasets.paired(n=128, seed=0)
+    observed = datasets.paired(n=128, seed=0)
     training = observed.without_times([.5])
     result = ct.fit(training, ct.Config(niters=args.niters, sync_loss=True, sync_weight=.35, map_type=args.map_type),
                     map_config=ct.MapConfig(epochs=args.map_epochs), output_dir=args.output)

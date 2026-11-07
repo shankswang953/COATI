@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 import torch
 import coati as ct
+import toy_data as datasets
 from coati.anndata_io import InputConventionWarning
 from coati.result import Result
 
@@ -37,7 +38,7 @@ def test_adaptation_preserves_original_order_and_colors():
 
 
 def test_arrays_temporal_metadata_and_unknown_labels():
-    data = ct.datasets.paired(n=32)
+    data = datasets.paired(n=32)
     labels = [np.repeat("type-a", len(x)) for x in data.primary]
     with pytest.warns(InputConventionWarning, match="generated barcodes"):
         a = data.to_anndata(celltype=labels)
@@ -82,7 +83,7 @@ def test_ambiguous_missing_and_invalid_metadata():
 
 @pytest.mark.parametrize("multimodal", [False, True])
 def test_anndata_training_preserves_temporal_training(multimodal, tmp_path):
-    data = ct.datasets.paired(n=32)
+    data = datasets.paired(n=32)
     a = data.to_anndata(celltype="toy", warn=False)
     cfg = ct.Config(multimodal=multimodal, balanced=False, iterations=3, batch_size=26,
                     hidden_dim=8, map_type="kernel", floor_n_sample=26, median_n_sample=32)

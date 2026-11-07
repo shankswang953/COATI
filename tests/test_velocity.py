@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
 import torch
-from coati import Config, TemporalData, datasets, fit, load_result, train_vector_field
+from coati import Config, TemporalData, fit, load_result, train_vector_field
+import toy_data as datasets
 from coati.result import Result
 from coati.velocity import VelocityEmbedding, project_velocity, _grid
 

@@ -4,17 +4,17 @@ The observations and frozen-map weights are copied reference artifacts, not
 new Gaussian samples. Numeric settings remain outside tutorial notebooks.
 """
 import json
-from importlib.resources import files
+from pathlib import Path
 from types import SimpleNamespace
 import numpy as np
 import torch
 import torch.nn as nn
-from .config import Config
-from .data import TemporalData
+from coati import Config
+from coati import TemporalData
 
 
 def _asset(name):
-    return files('coati').joinpath('_example_data/gaussian_reference', name)
+    return Path(__file__).resolve().parent.joinpath('data/gaussian_reference', name)
 
 
 class FourierBumpMLP(nn.Module):
@@ -100,8 +100,8 @@ def replay_reference():
     Returns prediction arrays and their maximum absolute errors against the
     archived original trajectory tensors. This is checkpoint replay, not refitting.
     """
-    from ._core.Neural import MLPVectorField
-    from .result import Result
+    from coati._core.Neural import MLPVectorField
+    from coati.result import Result
     from pathlib import Path
     example = load_example(); cfg = example.config.to_dict()
     model = MLPVectorField(dim=2, hidden_dim=cfg['hidden_dim'], n_layers=cfg['n_layers'],

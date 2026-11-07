@@ -1,6 +1,6 @@
 """Small deterministic synthetic examples; no biological data downloads."""
 import numpy as np
-from .data import TemporalData
+from coati import TemporalData
 
 def gaussian(n=128, seed=0):
     """Gaussian translation with three observed times."""

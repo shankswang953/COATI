@@ -5,18 +5,18 @@ import matplotlib.pyplot as plt
 
 def gaussian_sync_example(*, balanced=True, secondary_weight=None,
                           iterations=None, warmup_iterations=None, seed=None):
-    """Prepare the Gaussian tutorial from its packaged example configuration.
+    """Prepare the Gaussian tutorial from its repository example configuration.
 
-    Numeric defaults live in _gaussian_example.json, shared by the notebook
+    Numeric defaults live in gaussian_sync.json, shared by the notebook
     and command-line example. Both comparisons use the same endpoint data,
     primary-only warm-up checkpoint, and refinement budget.
     """
     import json
-    from importlib.resources import files
+    from pathlib import Path
     from types import SimpleNamespace
-    from .config import Config
-    from .datasets import gaussian_sync, gaussian_bump_map
-    preset = json.loads(files('coati').joinpath('_gaussian_example.json').read_text())
+    from coati import Config
+    from toy_data import gaussian_sync, gaussian_bump_map
+    preset = json.loads(Path(__file__).with_name('gaussian_sync.json').read_text())
     for key, value in [('secondary_weight', secondary_weight),
                        ('refinement_iterations', iterations),
                        ('warmup_iterations', warmup_iterations), ('seed', seed)]:
@@ -205,7 +205,7 @@ def make_shared_initial_checkpoint(config, path, *, dimension=2):
     """
     from pathlib import Path
     import torch
-    from ._core.Neural import MLPVectorField
+    from coati._core.Neural import MLPVectorField
     path = Path(path).resolve()
     if path.exists():
         raise FileExistsError(f"Initial checkpoint already exists: {path}")

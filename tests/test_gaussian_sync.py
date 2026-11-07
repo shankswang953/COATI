@@ -2,21 +2,22 @@ import numpy as np
 import pytest
 import torch
 import coati as ct
-from coati.toy_comparison import make_shared_initial_checkpoint
+import toy_data as datasets
+from gaussian_comparison import make_shared_initial_checkpoint
 
 
 def test_gaussian_sync_pairing_and_differentiable_known_map():
-    data = ct.datasets.gaussian_sync(n=128,seed=7)
-    same = ct.datasets.gaussian_sync(n=128,seed=7)
+    data = datasets.gaussian_sync(n=128,seed=7)
+    same = datasets.gaussian_sync(n=128,seed=7)
     assert data.times.tolist() == [0.,1.]
     assert all(x.shape == (128,2) for x in data.primary)
     assert all(y.shape == (128,3) for y in data.secondary)
     assert np.linalg.norm(data.primary[-1][:64].mean(0)-[.50,.72]) < .03
     assert np.linalg.norm(data.primary[-1][64:].mean(0)-[.72,.50]) < .03
-    odd = ct.datasets.gaussian_sync(n=129, seed=7)
+    odd = datasets.gaussian_sync(n=129, seed=7)
     assert [len(x) for x in odd.primary] == [129,129]
     assert all(((x >= 0.) & (x <= 1.)).all() for x in data.primary)
-    mapping = ct.datasets.gaussian_bump_map()
+    mapping = datasets.gaussian_bump_map()
     np.testing.assert_allclose(mapping(torch.tensor([[.5,.5]]))[:,-1].numpy(),[1.])
     for x,y,repeated in zip(data.primary,data.secondary,same.primary):
         np.testing.assert_array_equal(x,repeated)
@@ -26,12 +27,12 @@ def test_gaussian_sync_pairing_and_differentiable_known_map():
     mapping(query)[...,-1].sum().backward()
     assert torch.isfinite(query.grad).all() and torch.linalg.norm(query.grad)>0
     assert not list(mapping.parameters())
-    with pytest.raises(ValueError):ct.datasets.gaussian_sync(n=1)
-    with pytest.raises(ValueError):ct.datasets.gaussian_sync(terminal_centers=[[.5,.8]])
-    original=ct.datasets.gaussian_sync(terminal_centers=((.5,.8),(.8,.5)))
+    with pytest.raises(ValueError):datasets.gaussian_sync(n=1)
+    with pytest.raises(ValueError):datasets.gaussian_sync(terminal_centers=[[.5,.8]])
+    original=datasets.gaussian_sync(terminal_centers=((.5,.8),(.8,.5)))
     np.testing.assert_array_equal(original.primary[0],data.primary[0])
     np.testing.assert_allclose(original.primary[-1]-data.primary[-1],np.repeat([[0.,.08],[.08,0.]],64,axis=0),atol=1e-7)
-    with pytest.raises(ValueError):ct.datasets.gaussian_bump_map(width=0)
+    with pytest.raises(ValueError):datasets.gaussian_bump_map(width=0)
 
 
 def test_shared_initialization_is_identical_and_preserves_rng(tmp_path):
@@ -53,7 +54,7 @@ def test_manuscript_identity_kernels_are_truncated_not_compact():
     options = dict(width=.08, initial_covariance=np.eye(2),
                    terminal_covariances=np.repeat(np.eye(2)[None],2,axis=0),
                    terminal_centers=centers)
-    data = ct.datasets.gaussian_sync(n=5000, seed=7, terminal_mass=2., **options)
+    data = datasets.gaussian_sync(n=5000, seed=7, terminal_mass=2., **options)
     assert [len(x) for x in data.primary] == [5000,10000]
     for sample, center in [(data.primary[0],(.3,.3)),
                            (data.primary[-1][:5000],centers[0]),
@@ -65,17 +66,17 @@ def test_manuscript_identity_kernels_are_truncated_not_compact():
         np.testing.assert_allclose(sample.mean(0),expected_mean,atol=.015)
         np.testing.assert_allclose(sample.var(0),expected_variance,atol=.006)
         assert ((sample>=0.) & (sample<=1.)).all()
-    mapping=ct.datasets.gaussian_bump_map(width=.08)
+    mapping=datasets.gaussian_bump_map(width=.08)
     np.testing.assert_allclose(mapping(torch.tensor([[.58,.5]]))[:,-1].numpy(),[np.exp(-.5)],rtol=1e-6)
     with pytest.raises(ValueError,match='integer'):
-        ct.datasets.gaussian_sync(n=128,terminal_mass=1.001)
+        datasets.gaussian_sync(n=128,terminal_mass=1.001)
     with pytest.raises(ValueError,match='positive definite'):
-        ct.datasets.gaussian_sync(initial_covariance=[[1,2],[2,1]])
+        datasets.gaussian_sync(initial_covariance=[[1,2],[2,1]])
 
 
 def test_reference_density_matches_analytic_normalization():
     from scipy.stats import norm
-    from coati.toy_comparison import gaussian_density_on_unit_square
+    from gaussian_comparison import gaussian_density_on_unit_square
     query=np.array([[0.,0.],[.3,.3],[.5,.5],[1.,1.],[-.01,.5]])
     mu=np.array([.3,.3])
     norm_constant=np.prod(norm.cdf(1-mu)-norm.cdf(-mu))
@@ -86,7 +87,7 @@ def test_reference_density_matches_analytic_normalization():
 
 def test_unbalanced_comparison_uses_mass_action_not_path_mean():
     from types import SimpleNamespace
-    from coati.toy_comparison import compare_gaussian_runs
+    from gaussian_comparison import compare_gaussian_runs
     times=np.array([0.,.5,1.])
     source=np.array([[0.,0.],[0.,1.]])
     states=source[None]+times[:,None,None]*np.array([1.,0.])

@@ -2,24 +2,11 @@
 import argparse
 import json
 from pathlib import Path
-from . import datasets, train_vector_field, load_result, Config, MapConfig, TemporalData
+from . import train_vector_field, load_result, Config, MapConfig, TemporalData
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description="COATI trajectory inference")
     sub=parser.add_subparsers(dest="command",required=True)
-    toy=sub.add_parser("toy",help="Run a small synthetic example")
-    toy.add_argument("--dataset",choices=["gaussian","split","paired"],default="gaussian")
-    toy.add_argument("--niters",type=int,default=200)
-    toy.add_argument("--seed",type=int,default=0)
-    mass=toy.add_mutually_exclusive_group()
-    mass.add_argument("--unbalanced",dest="balanced",action="store_false")
-    mass.add_argument("--balanced",dest="balanced",action="store_true")
-    toy.set_defaults(balanced=True)
-    toy.add_argument("--multimodal",action=argparse.BooleanOptionalAction,default=None)
-    toy.add_argument("--device",default="cpu")
-    toy.add_argument("--output",required=True)
-    toy.add_argument("--map-type", choices=["film", "mlp", "kernel", "accurate_kernel"], default="film")
-    toy.add_argument("--map-epochs", type=int, default=300)
     train=sub.add_parser("train-vector-field",aliases=["fit"],help="Train a vector field from ordered NPZ snapshots")
     train.add_argument("input")
     train.add_argument("--secondary")
@@ -59,18 +46,11 @@ def main(argv=None):
         ax.figure.savefig(args.output,dpi=180,bbox_inches="tight")
         print(f"Saved velocity plot: {args.output}")
         return
-    if args.command=="toy":
-        data=getattr(datasets,args.dataset)(seed=args.seed)
-        multimodal=args.dataset=="paired" if args.multimodal is None else args.multimodal
-        cfg=Config(iterations=args.niters,seed=args.seed,device=args.device,
-                   multimodal=multimodal,balanced=args.balanced,map_type=args.map_type)
-        map_cfg = MapConfig(epochs=args.map_epochs) if cfg.multimodal and args.map_type in {"film", "mlp"} else None
-    else:
-        data=TemporalData.from_npz(args.input,keys=args.keys,times=args.times,secondary_path=args.secondary)
-        cfg=Config.load(args.config) if args.config else Config()
-        overrides={key:getattr(args,key) for key in ["multimodal","balanced","iterations","batch_size","learning_rate"] if getattr(args,key) is not None}
-        cfg=cfg.with_parameters(**overrides)
-        map_cfg = MapConfig(**json.loads(Path(args.map_config).read_text())) if args.map_config else None
+    data=TemporalData.from_npz(args.input,keys=args.keys,times=args.times,secondary_path=args.secondary)
+    cfg=Config.load(args.config) if args.config else Config()
+    overrides={key:getattr(args,key) for key in ["multimodal","balanced","iterations","batch_size","learning_rate"] if getattr(args,key) is not None}
+    cfg=cfg.with_parameters(**overrides)
+    map_cfg = MapConfig(**json.loads(Path(args.map_config).read_text())) if args.map_config else None
     result=train_vector_field(data,cfg,output_dir=args.output,map_config=map_cfg)
     if result.map_report is not None:
         print(f"Map validation: {result.map_report['status']}. Report: {result.output_dir / 'map/report.txt'}")

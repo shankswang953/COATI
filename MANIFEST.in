@@ -1,6 +1,6 @@
 include README.md
 include assets/coati-logo.png
 recursive-include notebooks *.ipynb
-recursive-include examples *.py *.json
+recursive-include examples *.py *.json *.npz *.pt *.png *.md
 recursive-include scripts *.py
 recursive-include provenance *.json
