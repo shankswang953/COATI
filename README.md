@@ -49,6 +49,8 @@ Toy-data preparation and Gaussian-specific helpers are maintained in [examples](
 - [Cross-modal map training and quality checks](notebooks/08_map_quality.ipynb)
 - [Lineage gene and peak dynamics](notebooks/09_lineage_features.ipynb)
 
+- [scMultisim](notebooks/scMultisim/)
+
 ## TraInfBench
 
 [TraInfBench](https://github.com/shankswang953/TraInfBench) hosts the external-method benchmark code used to compare COATI with CytoBridge, TrajectoryNet, MIOFlow, TIGON and scMultiNODE. It includes method-specific running instructions, evaluation and figure-analysis scripts, and dataset information.
