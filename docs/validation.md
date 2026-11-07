@@ -260,3 +260,20 @@ Pairing, model inputs, source-file hashes and finite nonzero velocities were
 verified. The training core and original project are unchanged. This short run
 is a workflow demonstration; it does not establish biological accuracy.
 Settings and validation details are in `provenance/gastrulation_quickstart.json`.
+
+## Original Gaussian reference reproduction
+
+The [original Gaussian experiment](tutorials/11_gaussian_reference.ipynb) loads
+byte-identical copies of the original primary/secondary observations, support
+cloud, frozen Fourier-map checkpoint and reference vector-field artifacts.
+All source hashes were checked; original TraInf files are unchanged. No endpoint
+sampling, normalization, warm-up or analytic-map substitution is used.
+
+The original checkpoint replay has zero maximum primary-coordinate error and
+approximately 1.2e-7 secondary-coordinate error against the saved tensors in this
+environment. A separate direct 3,000-step fit was executed and displayed. It does
+not recover the historical weights exactly; refitting and checkpoint replay are
+explicitly distinguished. All 79 package tests passed, including data identity
+and original-checkpoint replay checks. Full comparisons and measured errors are
+in `provenance/gaussian_reference_comparison.md` and
+`provenance/gaussian_reference_validation.json`.

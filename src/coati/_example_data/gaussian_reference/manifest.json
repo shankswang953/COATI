@@ -1,0 +1,42 @@
+{
+  "primary.npz": {
+    "source": "data/rna_2d_by_time.npz",
+    "sha256": "b5a818055f11a74ed82a707d0ef3d425badb9a861923f1b0a57ec0d690b4fb5f",
+    "bytes": 24506
+  },
+  "secondary.npz": {
+    "source": "data/secondary_3d_bump_by_time.npz",
+    "sha256": "239cb970ad49c4a7e9de137ff4719ef6f94a4349105e9935ec16d225b1cac223",
+    "bytes": 23660
+  },
+  "map.pt": {
+    "source": "GaussianBump/checkpoint/T_bump_mlp.pt",
+    "sha256": "ce6f703f548a8fc126532ca79f8130dba4b81d8e3ee4f97fa8a91974bad10df6",
+    "bytes": 239926
+  },
+  "reference_velocity.pt": {
+    "source": "GaussianBump/BalancedSync/checkpoint/ckpt_s0_e1.0_m50.0_d0.0_a0.35_iter3000.pth",
+    "sha256": "b328ade25a52570bc95a7742bd9542a7133f2c46a5c3fd38038a99b7b5c935ce",
+    "bytes": 273353
+  },
+  "reference_primary.pt": {
+    "source": "GaussianBump/BalancedSync/figures/primary_trajectory.pt",
+    "sha256": "2dd0d230cdabbd96fa6f3dc8c2dfdc7ce16129b1a02a36e05a5f7100dd2dced2",
+    "bytes": 613622
+  },
+  "reference_secondary.pt": {
+    "source": "GaussianBump/BalancedSync/figures/secondary_trajectory.pt",
+    "sha256": "2fe91b28cee9459d14d5a9b52774da0d3b25f2bbcfa12f54bd0748424cf8f72d",
+    "bytes": 613636
+  },
+  "reference_figure.png": {
+    "source": "GaussianBump/BalancedSync/figures/trajectory_primary_secondary_iter3000.png",
+    "sha256": "a5dba066c0b3a36b2a9b37b14ea17ff1ea86ee545a55e6646592857c55a9744c",
+    "bytes": 805172
+  },
+  "map_support.npz": {
+    "source": "data/bump_support_2d_3d.npz",
+    "sha256": "70f53fc2e7d98b1d70431c45398f28a13c2482cde5de7b3918724dbeb4e554a8",
+    "bytes": 128068
+  }
+}

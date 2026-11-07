@@ -1,0 +1,292 @@
+{
+  "date": "2026-11-06",
+  "source_figure": "GaussToy/GaussianBump/BalancedSync/figures/trajectory_primary_secondary_iter3000.png",
+  "files": {
+    "primary.npz": {
+      "source": "data/rna_2d_by_time.npz",
+      "sha256": "b5a818055f11a74ed82a707d0ef3d425badb9a861923f1b0a57ec0d690b4fb5f",
+      "bytes": 24506
+    },
+    "secondary.npz": {
+      "source": "data/secondary_3d_bump_by_time.npz",
+      "sha256": "239cb970ad49c4a7e9de137ff4719ef6f94a4349105e9935ec16d225b1cac223",
+      "bytes": 23660
+    },
+    "map.pt": {
+      "source": "GaussianBump/checkpoint/T_bump_mlp.pt",
+      "sha256": "ce6f703f548a8fc126532ca79f8130dba4b81d8e3ee4f97fa8a91974bad10df6",
+      "bytes": 239926
+    },
+    "reference_velocity.pt": {
+      "source": "GaussianBump/BalancedSync/checkpoint/ckpt_s0_e1.0_m50.0_d0.0_a0.35_iter3000.pth",
+      "sha256": "b328ade25a52570bc95a7742bd9542a7133f2c46a5c3fd38038a99b7b5c935ce",
+      "bytes": 273353
+    },
+    "reference_primary.pt": {
+      "source": "GaussianBump/BalancedSync/figures/primary_trajectory.pt",
+      "sha256": "2dd0d230cdabbd96fa6f3dc8c2dfdc7ce16129b1a02a36e05a5f7100dd2dced2",
+      "bytes": 613622
+    },
+    "reference_secondary.pt": {
+      "source": "GaussianBump/BalancedSync/figures/secondary_trajectory.pt",
+      "sha256": "2fe91b28cee9459d14d5a9b52774da0d3b25f2bbcfa12f54bd0748424cf8f72d",
+      "bytes": 613636
+    },
+    "reference_figure.png": {
+      "source": "GaussianBump/BalancedSync/figures/trajectory_primary_secondary_iter3000.png",
+      "sha256": "a5dba066c0b3a36b2a9b37b14ea17ff1ea86ee545a55e6646592857c55a9744c",
+      "bytes": 805172
+    },
+    "map_support.npz": {
+      "source": "data/bump_support_2d_3d.npz",
+      "sha256": "70f53fc2e7d98b1d70431c45398f28a13c2482cde5de7b3918724dbeb4e554a8",
+      "bytes": 128068
+    }
+  },
+  "all_copied_files_match_source_sha256": true,
+  "source_files_unchanged": true,
+  "source_observation_counts": [
+    1000,
+    2000
+  ],
+  "balanced_probability_mass": 1.0,
+  "observed_secondary_z": "Exactly zero at both snapshots",
+  "training_settings": {
+    "training": {
+      "time_plot": false,
+      "reverseMatching": false,
+      "accumulate_training": true,
+      "MixSampling": false,
+      "seed": 0,
+      "gpu": 0,
+      "unbalancedModel": false,
+      "alpha_growth": 0.0,
+      "mass_loss": false,
+      "mass_coefficient": 0.0,
+      "global_mass": false,
+      "hidden_dim": 256,
+      "n_layers": 2,
+      "activation": "leaky_relu",
+      "niters": 3000,
+      "lr": 0.001,
+      "num_samples": 256,
+      "median_n_sample": 512,
+      "floor_n_sample": 256,
+      "support_points": false,
+      "dt": 0.1,
+      "mmd_loss": false,
+      "density_coefficient": 0.0,
+      "pdf_lossMSE": false,
+      "pdf_coefficient": 50.0,
+      "sinkhorn_pdf": true,
+      "energy_coefficient": 1.0,
+      "density_topk": 25,
+      "density_hinge": 0.01,
+      "terminal_density_weight": 1.0,
+      "sync_loss": true,
+      "sync_weight": 0.35,
+      "sync_mmd_loss": false,
+      "sync_density_loss": true,
+      "sync_pdf_loss": true,
+      "map_type": "MLP",
+      "kernel_sigma": 0.01,
+      "adaptive_lambda": true,
+      "blur_coeff": 0.05,
+      "floor_buffer_std": 0.0,
+      "pdf_coefficient_pri": 50.0,
+      "pdf_coefficient_sec": 50.0,
+      "lambda_init_pri": 50.0,
+      "lambda_init_sec": 50.0,
+      "lambda_max_pri": 100.0,
+      "lambda_max_sec": 100.0,
+      "lambda_min_pri": 5.0,
+      "lambda_min_sec": 5.0,
+      "eta_lambda_pri": 10.0,
+      "eta_lambda_sec": 10.0,
+      "floor_pri_multiplier": 1.0,
+      "floor_sec_multiplier": 1.0,
+      "dual_warmup": 500,
+      "dual_decay": 1.0,
+      "device": "cpu"
+    },
+    "times": [
+      0.0,
+      1.0
+    ],
+    "data_generation": {
+      "seed": 2026,
+      "initial_center": [
+        0.3,
+        0.3
+      ],
+      "terminal_centers": [
+        [
+          0.56,
+          0.82
+        ],
+        [
+          0.83,
+          0.56
+        ]
+      ],
+      "initial_covariance": [
+        [
+          0.0042,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.0038
+        ]
+      ],
+      "terminal_covariances": [
+        [
+          [
+            0.003,
+            0.0001
+          ],
+          [
+            0.0001,
+            0.003
+          ]
+        ],
+        [
+          [
+            0.0032,
+            -0.0001
+          ],
+          [
+            -0.0001,
+            0.0032
+          ]
+        ]
+      ]
+    },
+    "prediction": {
+      "dt": 0.02,
+      "points": 51,
+      "method": "rk4",
+      "device": "cpu",
+      "n_lines": 180,
+      "seed": 0
+    },
+    "data_policy": "Load copied NPZ bytes; do not generate or resample endpoint observations.",
+    "normalization": "None; use original coordinates",
+    "initialization": "From scratch after modality-specific diagnostics; no warm-up or manual initial checkpoint.",
+    "reference": "GaussToy/GaussianBump/BalancedSync/figures/trajectory_primary_secondary_iter3000.png",
+    "runtime_note": "The saved training log has timing output disabled; numeric defaults are taken from the original Args and checked against the log and checkpoint."
+  },
+  "adjusted_tutorial_settings": {
+    "seed": 7,
+    "n_cells": 512,
+    "secondary_weight": 0.9,
+    "warmup_iterations": 3000,
+    "warmup_learning_rate": 0.003,
+    "refinement_iterations": 2000,
+    "prediction_points": 101,
+    "mass_weight": 100.0,
+    "bump": {
+      "height": 1.0,
+      "width": 0.08,
+      "center": [
+        0.5,
+        0.5
+      ]
+    },
+    "distribution": {
+      "initial_center": [
+        0.3,
+        0.3
+      ],
+      "terminal_centers": [
+        [
+          0.56,
+          0.74
+        ],
+        [
+          0.74,
+          0.56
+        ]
+      ],
+      "initial_covariance": [
+        [
+          0.0042,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.0038
+        ]
+      ],
+      "terminal_covariances": [
+        [
+          [
+            0.003,
+            0.0001
+          ],
+          [
+            0.0001,
+            0.003
+          ]
+        ],
+        [
+          [
+            0.0032,
+            -0.0001
+          ],
+          [
+            -0.0001,
+            0.0032
+          ]
+        ]
+      ]
+    },
+    "training": {
+      "batch_size": 128,
+      "learning_rate": 0.0005,
+      "hidden_dim": 64,
+      "n_layers": 3,
+      "activation": "tanh",
+      "matching_weight": 300.0,
+      "energy_weight": 1.0,
+      "manifold_weight": 0.0,
+      "dt": 0.05
+    }
+  },
+  "checkpoint_replay_max_abs_error": {
+    "primary": 0.0,
+    "secondary": 1.1920928955078125e-07
+  },
+  "reference_data_loaded_without_sampling": true,
+  "fresh_refit_run": "outputs/gaussian-reference-7c416252",
+  "pilot_refit_run": "outputs/gaussian-original-19f9a81b",
+  "current_refits_model_max_abs_difference": 0.0,
+  "fresh_vs_historical_weights_max_abs_difference": 0.3066945970058441,
+  "fresh_vs_historical_trajectory_error": {
+    "primary": {
+      "max_abs": 0.35370585322380066,
+      "rmse": 0.04401407390832901
+    },
+    "secondary": {
+      "max_abs": 0.6980593204498291,
+      "rmse": 0.04108712449669838
+    }
+  },
+  "historical_refit_is_bitwise_reproduced": false,
+  "historical_runtime_environment": "Not archived in the supplied checkpoint; exact cause of refit drift has not been isolated.",
+  "early_log_check": "At dt=0.1, the first 15 rounded primary losses match the historical log within 0.0001; dt=0.05 and 0.02 differ substantially.",
+  "versions": {
+    "torch": "2.14.0",
+    "torchdiffeq": "0.2.5",
+    "numpy": "2.2.6",
+    "geomloss": "0.3.1"
+  },
+  "tests_passed": 79,
+  "notebook": "notebooks/11_gaussian_reference.ipynb",
+  "notebook_cells_executed": 11,
+  "script": "examples/run_gaussian_reference.py",
+  "script_replay_executed": true,
+  "training_core_modified": false,
+  "original_TraInf_modified": false,
+  "scope": "Exact copied data and frozen T; original checkpoint replay matches archived paths to float32 precision. Direct refitting is not claimed to recover historical weights."
+}
