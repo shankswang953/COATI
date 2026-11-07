@@ -114,7 +114,8 @@ def plot_gaussian_sync(data, mapping, results, predictions, *,
                 centers = np.asarray(distribution_parameters['terminal_centers'])
             groups = np.linalg.norm(primary[-1, :, None] - centers[None], axis=-1).argmin(1)
         config = result.metadata['config']
-        colour = '#1688b1' if config['sync_loss'] else '#64748b'
+        colour = (plt.get_cmap('Blues')(.35 + .55 * config['sync_weight'])
+                  if config['sync_loss'] else '#64748b')
         title = (f"Sync · Cy = {config['sync_weight']:g}"
                  if config['sync_loss'] else 'No sync')
         if config['unbalancedModel']:
@@ -181,8 +182,12 @@ def plot_gaussian_sync(data, mapping, results, predictions, *,
 def plot_bump_height(predictions):
     fig,ax=plt.subplots(figsize=(8,3.8),layout='constrained')
     for name, pred in predictions.items():
-        sync = 'With sync' in name
-        color = '#0072b2' if sync else '#64748b'
+        sync = 'With sync' in name or 'Cy=' in name
+        if sync:
+            weight = float(name.split('Cy=')[1].split()[0]) if 'Cy=' in name else .5
+            color = plt.get_cmap('Blues')(.35 + .55 * weight)
+        else:
+            color = '#64748b'
         linestyle = '--' if '0.1' in name else '-'
         h=pred['secondary'][...,2]
         weights = _normalized_path_weights(pred)

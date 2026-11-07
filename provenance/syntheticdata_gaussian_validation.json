@@ -17,6 +17,36 @@
     "without_sync_terminal_mass": 1.0,
     "with_sync_terminal_mass": 1.0
   },
+  "cy_sweep": {
+    "balanced": true,
+    "shared_training_budget": 3000,
+    "runs": {
+      "no_sync": {
+        "cy": 0.0,
+        "primary_endpoint_sinkhorn": 0.000206,
+        "secondary_kinetic_energy": 0.999115,
+        "maximum_bump_height_median": 0.380628
+      },
+      "cy_0_1": {
+        "cy": 0.1,
+        "primary_endpoint_sinkhorn": 0.000120,
+        "secondary_kinetic_energy": 0.374621,
+        "maximum_bump_height_median": 0.093191
+      },
+      "cy_0_5": {
+        "cy": 0.5,
+        "primary_endpoint_sinkhorn": 0.001425,
+        "secondary_kinetic_energy": 0.266299,
+        "maximum_bump_height_median": 0.038393
+      },
+      "cy_0_9": {
+        "cy": 0.9,
+        "primary_endpoint_sinkhorn": 0.012709,
+        "secondary_kinetic_energy": 0.655671,
+        "maximum_bump_height_median": 0.253984
+      }
+    }
+  },
   "unbalanced": {
     "biological_num": [1.0, 2.0],
     "mass_coefficient": 100.0,
