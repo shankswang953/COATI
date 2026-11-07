@@ -39,11 +39,11 @@
         "secondary_kinetic_energy": 0.266299,
         "maximum_bump_height_median": 0.038393
       },
-      "cy_0_9": {
-        "cy": 0.9,
-        "primary_endpoint_sinkhorn": 0.012709,
-        "secondary_kinetic_energy": 0.655671,
-        "maximum_bump_height_median": 0.253984
+      "cy_0_7": {
+        "cy": 0.7,
+        "primary_endpoint_sinkhorn": 0.000807,
+        "secondary_kinetic_energy": 0.232102,
+        "maximum_bump_height_median": 0.029090
       }
     }
   },
