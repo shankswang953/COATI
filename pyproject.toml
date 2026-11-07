@@ -14,7 +14,6 @@ dependencies = ["numpy>=1.24", "torch>=2.1", "torchdiffeq>=0.2.3", "geomloss>=0.
 anndata = ["anndata>=0.10"]
 visualization = ["anndata>=0.10", "umap-learn>=0.5,<0.6"]
 notebooks = ["jupyterlab>=4", "ipykernel>=6", "nbformat>=5", "nbclient>=0.10"]
-docs = ["sphinx>=7", "furo>=2024.1.29", "myst-nb>=1.1,<2"]
 dev = ["pytest>=8", "build>=1", "nbclient>=0.10", "nbformat>=5"]
 legacy = ["scanpy>=1.10", "ipython>=8"]
 
@@ -24,7 +23,7 @@ coati-downstream = "coati.downstream.cli:main"
 
 [project.urls]
 Repository = "https://github.com/shankswang953/COATI"
-Documentation = "https://shankswang953.github.io/COATI/"
+Documentation = "https://shankswang953.github.io/COATI_website/"
 
 [tool.setuptools.packages.find]
 where = ["src"]

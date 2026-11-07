@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/coati-logo.png" alt="COATI — Cross-Omics Aligned Trajectory Inference" width="100%"></p>
 
-[Website](https://shankswang953.github.io/COATI/) · [Tutorials](https://shankswang953.github.io/COATI/tutorials.html)
+[Website](https://shankswang953.github.io/COATI_website/) · [Tutorials](https://shankswang953.github.io/COATI_website/tutorials.html)
 
 # COATI
 
@@ -30,9 +30,8 @@ python -m pip install -e '.[notebooks,visualization]'
 src/coati/     Python package and training engine
 examples/      Standalone Python scripts
 notebooks/     Executable tutorials
-docs/          Website documentation source
 tests/         Package tests
-assets/        Logo and figures
+assets/        Package logo
 ```
 
 ## Notebooks

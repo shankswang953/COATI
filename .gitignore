@@ -7,11 +7,5 @@ dist/
 .pytest_cache/
 .ipynb_checkpoints/
 outputs/
-docs/_build/
-.sites-runtime/
 .DS_Store
 .venv-clean/
-site/
-
-.venv-manim/
-animations/media/
