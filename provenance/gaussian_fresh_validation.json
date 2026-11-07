@@ -1,0 +1,167 @@
+{
+  "notebook": "notebooks/01_gaussian.ipynb",
+  "script": "examples/run_gaussian_sync.py",
+  "inputs": "Fresh generation in memory; no archived data or pretrained map input",
+  "generation_seed": 2026,
+  "observed_counts": [
+    1000,
+    2000
+  ],
+  "map_pair_counts": {
+    "observed": 3000,
+    "support": 7000
+  },
+  "anndata_fields": {
+    "primary": "obsm/X_latent",
+    "secondary": "obsm/X_secondary",
+    "obs": [
+      "time",
+      "celltype",
+      "barcode"
+    ]
+  },
+  "observation_sha256": {
+    "X_latent": "023ff799607db14131c110b931cf83d0e072cb71b6d9d9f8383ed2cdf879d222",
+    "X_secondary": "7c1d40653ffed200650173bc39813de475ce1ad6cb88ca9789204ffb3e18a2db"
+  },
+  "original_arrays_verified_exactly": true,
+  "original_map_three_step_parameter_difference": 0.0,
+  "map_training": {
+    "steps": 6000,
+    "architecture": "FourierBumpMLP",
+    "hidden": 160,
+    "n_layers": 4,
+    "num_frequencies": 10,
+    "max_frequency": 18.0,
+    "xy_residual_scale": 0.05,
+    "batch_size": 768,
+    "learning_rate": 0.001,
+    "weight_decay": 1e-05,
+    "validation_fraction": 0.15,
+    "z_weight": 12.0,
+    "observed_weight": 1.0,
+    "support_weight": 1.0,
+    "training_pairs": 8500,
+    "validation_pairs": 1500,
+    "best_step": 4000,
+    "best_validation_loss": 0.0014214952243492007
+  },
+  "map_performance_rounded": {
+    "Held-out observed": {
+      "pairs": 434.0,
+      "xy_rmse": 2e-05,
+      "z_rmse": 0.018564,
+      "z_mae": 0.005176
+    },
+    "Held-out support": {
+      "pairs": 1066.0,
+      "xy_rmse": 3.1e-05,
+      "z_rmse": 0.005135,
+      "z_mae": 0.003115
+    },
+    "Independent grid": {
+      "pairs": 9216.0,
+      "xy_rmse": 3.5e-05,
+      "z_rmse": 0.004531,
+      "z_mae": 0.002646
+    }
+  },
+  "grid_z_correlation": 0.99944,
+  "center_predicted_height": 1.009059,
+  "flow_parameters": {
+    "time_plot": true,
+    "reverseMatching": false,
+    "accumulate_training": true,
+    "MixSampling": false,
+    "seed": 0,
+    "gpu": 0,
+    "unbalancedModel": false,
+    "alpha_growth": 0.0,
+    "mass_loss": false,
+    "mass_coefficient": 0.0,
+    "global_mass": false,
+    "hidden_dim": 256,
+    "n_layers": 2,
+    "activation": "leaky_relu",
+    "niters": 3000,
+    "lr": 0.001,
+    "num_samples": 256,
+    "median_n_sample": 512,
+    "floor_n_sample": 256,
+    "support_points": false,
+    "dt": 0.1,
+    "mmd_loss": false,
+    "density_coefficient": 0.0,
+    "pdf_lossMSE": false,
+    "pdf_coefficient": 50.0,
+    "sinkhorn_pdf": true,
+    "energy_coefficient": 1.0,
+    "density_topk": 25,
+    "density_hinge": 0.01,
+    "terminal_density_weight": 1.0,
+    "sync_loss": true,
+    "sync_weight": 0.35,
+    "sync_mmd_loss": false,
+    "sync_density_loss": true,
+    "sync_pdf_loss": true,
+    "map_type": "MLP",
+    "kernel_sigma": 0.01,
+    "adaptive_lambda": true,
+    "blur_coeff": 0.05,
+    "floor_buffer_std": 0.0,
+    "pdf_coefficient_pri": 50.0,
+    "pdf_coefficient_sec": 50.0,
+    "lambda_init_pri": 50.0,
+    "lambda_init_sec": 50.0,
+    "lambda_max_pri": 100.0,
+    "lambda_max_sec": 100.0,
+    "lambda_min_pri": 5.0,
+    "lambda_min_sec": 5.0,
+    "eta_lambda_pri": 10.0,
+    "eta_lambda_sec": 10.0,
+    "floor_pri_multiplier": 1.0,
+    "floor_sec_multiplier": 1.0,
+    "dual_warmup": 500,
+    "dual_decay": 1.0
+  },
+  "comparison": "Fresh shared random initialization; 3000 steps per field; no warm-up",
+  "flow_performance_rounded": {
+    "Primary endpoint Sinkhorn": {
+      "without_sync": 0.000762,
+      "with_sync": 0.000921
+    },
+    "Primary kinetic energy": {
+      "without_sync": 0.157419,
+      "with_sync": 0.185172
+    },
+    "Secondary kinetic energy": {
+      "without_sync": 1.015785,
+      "with_sync": 0.2603
+    },
+    "Predicted terminal mass": {
+      "without_sync": 1.0,
+      "with_sync": 1.0
+    },
+    "Target terminal mass": {
+      "without_sync": 1.0,
+      "with_sync": 1.0
+    },
+    "Median maximum bump height": {
+      "without_sync": 0.381557,
+      "with_sync": 0.053917
+    },
+    "States outside unit square": {
+      "without_sync": 0.0,
+      "with_sync": 0.0
+    }
+  },
+  "all_paths_shown": true,
+  "completed_code_cells": 13,
+  "tests_passed": 83,
+  "training_core_changed": false,
+  "numpy_version": "2.2.6",
+  "torch_version": "2.14.0",
+  "notebook_data_assembly_and_parameters": "Explicit code cells; no data or parameter-file inputs",
+  "explicit_notebook_vs_shared_recipe_parameter_difference": 0.0,
+  "result_directory": "outputs/gaussian-fresh-d0433a9f"
+}

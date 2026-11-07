@@ -5,7 +5,10 @@ Data preparation and experiment-specific helpers live here, outside the installe
 
 - `toy_data.py`: small synthetic datasets and an analytic Gaussian-bump map.
 - `generate_gaussian_data.py`: the original two-stage Gaussian data recipe.
-- `gaussian_sync.json`: settings for the adjusted sync/no-sync comparison.
+- `gaussian_parameters.py`: supplied BalancedSync flow settings for the fresh comparison.
+- `gaussian_map.py`: original Fourier map fitting and held-out quality checks.
+- `gaussian_fresh.py`: fresh observed/support AnnData assembly.
+- `gaussian_sync.json`: retained settings for the earlier analytic-map comparison.
 - `gaussian_comparison.py`: comparison setup and plots used by that tutorial.
 - `gaussian_reference.py`: loading and replaying the unchanged original artifacts.
 - `data/gaussian_reference/`: original NPZ files, checkpoints and reference outputs.
@@ -56,5 +59,21 @@ The script refuses to overwrite nonempty directories.
 
 The original-reference notebook reads the archived files directly. It never
 regenerates them; their file hashes are retained in
-`data/gaussian_reference/manifest.json`. The adjusted comparison uses its own
-explicit settings in `gaussian_sync.json` and is a separate example.
+`data/gaussian_reference/manifest.json`. The active sync/no-sync tutorial generates these observations in memory,
+assembles AnnData, trains a fresh Fourier map for 6000 steps, and reports held-out
+and independent-grid performance before comparing two 3000-step balanced fields.
+The supplied flow settings are recorded directly in `gaussian_parameters.py`.
+No archived observations, JSON presets or pretrained maps are read by that workflow.
+
+The fresh AnnData workflow requires the `anndata` extra; Jupyter additionally
+requires the `notebooks` extra. The notebook spells out generation, AnnData
+construction and the supplied parameter dictionary directly in its cells.
+
+```bash
+python examples/run_gaussian_sync.py --output outputs/gaussian-fresh
+python examples/run_gaussian_sync.py --map-only --output outputs/gaussian-map
+```
+
+`--map-steps` and `--iterations` allow short functional checks. The earlier
+analytic-map preset in `gaussian_sync.json` is retained separately; the active
+fresh-data workflow does not use it.

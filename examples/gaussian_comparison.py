@@ -162,7 +162,7 @@ def plot_gaussian_sync(data, mapping, results, predictions, *,
                 if mask.any():
                     mean = mapped[:, mask].mean(1)
                     ax3.plot(mean[:, 0], mean[:, 1], mean[:, 2], color=colour, linewidth=2, zorder=4)
-        ax3.set(xlim=(lower, upper), ylim=(lower, upper), zlim=(0., float(surface.max())*1.05))
+        ax3.set(xlim=(lower, upper), ylim=(lower, upper), zlim=(min(0., float(mapped[..., 2].min()), float(surface.min())), float(surface.max())*1.05))
         if row == 0:
             ax3.set_title('Secondary', fontsize=14, pad=12)
         ax3.set_xticks([0., 1.]); ax3.set_yticks([0., 1.]); ax3.set_zticks([0., float(surface.max())])
@@ -257,7 +257,8 @@ def compare_gaussian_runs(results, predictions):
                'Primary kinetic energy': float(primary_energy),
                'Secondary kinetic energy': float(energy),
                'Predicted terminal mass': float(terminal_mass),
-               'Target terminal mass': len(result.data.primary[-1])/len(result.data.primary[0]),
+               'Target terminal mass': (len(result.data.primary[-1])/len(result.data.primary[0])
+                                        if 'log_weights' in pred else 1.),
                'Median maximum bump height': float(np.median(mapped[...,2].max(0))),
                'States outside unit square': float(((pred['primary'] < 0.) | (pred['primary'] > 1.)).any(-1).mean())}
         rows.append(row)

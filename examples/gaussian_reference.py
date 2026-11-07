@@ -8,72 +8,15 @@ from pathlib import Path
 from types import SimpleNamespace
 import numpy as np
 import torch
-import torch.nn as nn
 from coati import Config
 from coati import TemporalData
+from gaussian_map import FourierBumpMLP
 
 
 def _asset(name):
     return Path(__file__).resolve().parent.joinpath('data/gaussian_reference', name)
 
 
-class FourierBumpMLP(nn.Module):
-    """
-    T(q, t) -> (x, y, z). Time is accepted for SyncOT compatibility but ignored.
-
-    Fourier features make the localized Gaussian peak easier to learn, while
-    the small residual head keeps the first two coordinates close to identity.
-    """
-
-    def __init__(
-        self,
-        d_in=2,
-        d_out=3,
-        hidden=160,
-        n_layers=4,
-        num_frequencies=10,
-        max_frequency=18.0,
-        xy_residual_scale=0.05,
-    ):
-        super().__init__()
-        self.d_in = d_in
-        self.d_out = d_out
-        self.hidden = hidden
-        self.n_layers = n_layers
-        self.num_frequencies = num_frequencies
-        self.max_frequency = max_frequency
-        self.xy_residual_scale = xy_residual_scale
-
-        freqs = torch.logspace(
-            0.0,
-            np.log10(max_frequency),
-            steps=num_frequencies,
-            dtype=torch.float32,
-        )
-        self.register_buffer("freqs", freqs)
-
-        feature_dim = d_in * (1 + 2 * num_frequencies)
-        layers = [nn.Linear(feature_dim, hidden), nn.GELU()]
-        for _ in range(n_layers - 2):
-            layers += [nn.Linear(hidden, hidden), nn.GELU()]
-        layers += [nn.Linear(hidden, d_out)]
-        self.net = nn.Sequential(*layers)
-
-    def features(self, q_flat):
-        parts = [q_flat]
-        scaled = q_flat.unsqueeze(-1) * self.freqs.reshape(1, 1, -1) * np.pi
-        parts.append(torch.sin(scaled).flatten(start_dim=1))
-        parts.append(torch.cos(scaled).flatten(start_dim=1))
-        return torch.cat(parts, dim=1)
-
-    def forward(self, q, t=None):
-        orig_shape = q.shape[:-1]
-        q_flat = q.reshape(-1, self.d_in)
-        raw = self.net(self.features(q_flat))
-        xy = q_flat + self.xy_residual_scale * raw[:, :2]
-        z = raw[:, 2:3]
-        out = torch.cat([xy, z], dim=1)
-        return out.reshape(*orig_shape, self.d_out)
 
 def load_example():
     """Load the exact original snapshots, frozen learned T and training settings."""
