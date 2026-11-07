@@ -6,6 +6,8 @@ These files are the prepared 5-dimensional RNA and ATAC PCA representations used
 
 - `all_time_scRNA_pca.npz`: RNA PCA coordinates under keys `time1` to `time4`.
 - `all_time_scATAC_pca.npz`: paired ATAC PCA coordinates under the same keys.
+- `all_time_celltype.npz`: matching scMultiSim population labels stored as plain
+  Unicode arrays; loading never requires pickle.
 
 The public tutorial verifies SHA-256 hashes before assembling these arrays as AnnData.
 The simulation parameters are recorded in
