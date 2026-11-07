@@ -30,7 +30,7 @@ Documentation = "https://coati-trajectory-docs.shankswang.chatgpt.site/"
 where = ["src"]
 
 [tool.setuptools.package-data]
-coati = ["_defaults.json"]
+coati = ["_defaults.json", "_gaussian_example.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

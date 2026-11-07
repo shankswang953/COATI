@@ -3,6 +3,44 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def gaussian_sync_example(*, balanced=True, secondary_weight=None,
+                          iterations=None, warmup_iterations=None, seed=None):
+    """Prepare the Gaussian tutorial from its packaged example configuration.
+
+    Numeric defaults live in _gaussian_example.json, shared by the notebook
+    and command-line example. Both comparisons use the same endpoint data,
+    primary-only warm-up checkpoint, and refinement budget.
+    """
+    import json
+    from importlib.resources import files
+    from types import SimpleNamespace
+    from .config import Config
+    from .datasets import gaussian_sync, gaussian_bump_map
+    preset = json.loads(files('coati').joinpath('_gaussian_example.json').read_text())
+    for key, value in [('secondary_weight', secondary_weight),
+                       ('refinement_iterations', iterations),
+                       ('warmup_iterations', warmup_iterations), ('seed', seed)]:
+        if value is not None:
+            preset[key] = value
+    mass = 1 if balanced else 2
+    data = gaussian_sync(n=preset['n_cells'], seed=preset['seed'],
+                         terminal_mass=mass, **preset['bump'], **preset['distribution'])
+    mapping = gaussian_bump_map(**preset['bump'])
+    base = Config(multimodal=False, balanced=balanced,
+                  iterations=preset['refinement_iterations'], seed=preset['seed'],
+                  mass_weight=0. if balanced else preset['mass_weight'],
+                  global_mass=not balanced, **preset['training'])
+    return SimpleNamespace(
+        data=data, mapping=mapping, distribution=preset['distribution'],
+        terminal_mass=mass, settings=preset,
+        configs={'Without sync': base, 'With sync': base.with_parameters(
+            multimodal=True, secondary_weight=preset['secondary_weight'])},
+        warmup_config=base.with_parameters(iterations=preset['warmup_iterations'],
+                                          learning_rate=preset['warmup_learning_rate']),
+        times=np.linspace(data.times[0], data.times[-1], preset['prediction_points']),
+    )
+
+
 def gaussian_density_on_unit_square(points, center, covariance):
     """Evaluate N_X from a Gaussian kernel, normalized on [0,1]^2.
 

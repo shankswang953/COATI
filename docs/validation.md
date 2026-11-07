@@ -222,33 +222,26 @@ This is a functional training check, not a convergence or accuracy claim.
 
 ## Compact Gaussian synchronization comparison
 
-The [Gaussian tutorial](tutorials/01_gaussian.ipynb) uses compact covariances from
-the original experiment generator, explicitly listed in the notebook, with the
-requested centers (0.3, 0.3), (0.5, 0.8) and (0.8, 0.5). The known map has a
-unit-height bump of width 0.08 centered at (0.5, 0.5). This differs from the
-identity-covariance manuscript text: identity kernels normalized on the square
-are broad and strongly overlapping, whereas the reference figure has compact clouds.
+The [Gaussian tutorial](tutorials/01_gaussian.ipynb) uses the shared packaged
+example configuration at `src/coati/_gaussian_example.json`. The current secondary
+weight is Cy=0.9. Terminal centers are (0.52, 0.78) and (0.78, 0.52), slightly
+closer than before, with the original compact covariances and Gaussian bump.
+Numeric parameter blocks and the earlier parameter discussion have been removed
+from the notebook. The Python script uses the same configuration.
 
-A primary-only field is fitted for a common 3,000-iteration warm-up. Both final
-models then start from that same checkpoint with fresh optimizers and receive
-2,000 refinement iterations at learning rate 0.0005. Cy=0.99 is used for sync.
-This initialization avoids unnecessary loops seen when starting the large-Cy
-objective directly from a random field. Only the endpoint observations are used;
-no route or branch assignment is supplied. The training core is unchanged.
-
-The plot now draws all 512 predicted paths in each primary and secondary panel.
-Grey points show observed endpoint populations. Three black contours show the
-bump height, rather than endpoint density contours. Every plotted 2D/3D path was
-checked against the full prediction arrays; no particle filtering, clipping,
-smoothing or group-mean curves are used.
+Both final models start from a common primary-only warm-up checkpoint, with fresh
+optimizers and the same refinement budget. Only endpoint snapshots are supplied.
+The comparison shows all particles in both spaces, with the bump's three black
+contours and observed endpoint populations in grey. Plotted coordinates were
+checked against the complete prediction arrays. The training core is unchanged.
 
 | Model | Endpoint Sinkhorn | Primary action | Secondary action | Terminal mass | Paths above half bump |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Without sync | 0.000306 | 0.138928 | 0.608279 | 1.000 | 20.90% |
-| With sync | 0.000482 | 0.173741 | 0.297491 | 1.000 | 1.37% |
+| Without sync | 0.000083 | 0.133232 | 0.763836 | 1.000 | 31.45% |
+| With sync | 0.000267 | 0.167052 | 0.390369 | 1.000 | 6.05% |
 
-All notebook cells executed from scratch. The existing 77 package tests passed,
-and the script's optional unbalanced branch passed a short flow check; no full
-compact unbalanced accuracy claim is made here. This is a finite-sample example,
-not a convergence or global-optimum result. Full settings and hashes are in
+All notebook cells executed from scratch. Existing package checks passed, the
+wheel includes the shared example configuration, and the optional unbalanced CLI
+passed a short flow check. This is a finite-sample numerical illustration, not a
+convergence or global-optimum result. Full settings and hashes are in
 `provenance/gaussian_sync_validation.json`.

@@ -1,0 +1,77 @@
+{
+  "seed": 7,
+  "n_cells": 512,
+  "secondary_weight": 0.9,
+  "warmup_iterations": 3000,
+  "warmup_learning_rate": 0.003,
+  "refinement_iterations": 2000,
+  "prediction_points": 101,
+  "mass_weight": 100.0,
+  "bump": {
+    "height": 1.0,
+    "width": 0.08,
+    "center": [
+      0.5,
+      0.5
+    ]
+  },
+  "distribution": {
+    "initial_center": [
+      0.3,
+      0.3
+    ],
+    "terminal_centers": [
+      [
+        0.52,
+        0.78
+      ],
+      [
+        0.78,
+        0.52
+      ]
+    ],
+    "initial_covariance": [
+      [
+        0.0042,
+        0.0002
+      ],
+      [
+        0.0002,
+        0.0038
+      ]
+    ],
+    "terminal_covariances": [
+      [
+        [
+          0.003,
+          0.0001
+        ],
+        [
+          0.0001,
+          0.003
+        ]
+      ],
+      [
+        [
+          0.0032,
+          -0.0001
+        ],
+        [
+          -0.0001,
+          0.0032
+        ]
+      ]
+    ]
+  },
+  "training": {
+    "batch_size": 128,
+    "learning_rate": 0.0005,
+    "hidden_dim": 64,
+    "n_layers": 3,
+    "activation": "tanh",
+    "matching_weight": 300.0,
+    "energy_weight": 1.0,
+    "manifold_weight": 0.0,
+    "dt": 0.05
+  }
+}

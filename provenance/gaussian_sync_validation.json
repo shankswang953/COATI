@@ -1,7 +1,86 @@
 {
   "date": "2026-11-06",
-  "reference": "User-provided compact-cloud reference figure",
-  "supersedes": "570f864 used identity covariance from the text screenshot; this version explicitly uses compact experimental covariances to match the figure.",
+  "reference": "User-requested Cy=0.9 and slightly closer terminal centers.",
+  "previous_commit": "157ac3a",
+  "example_configuration": "src/coati/_gaussian_example.json",
+  "settings": {
+    "seed": 7,
+    "n_cells": 512,
+    "secondary_weight": 0.9,
+    "warmup_iterations": 3000,
+    "warmup_learning_rate": 0.003,
+    "refinement_iterations": 2000,
+    "prediction_points": 101,
+    "mass_weight": 100.0,
+    "bump": {
+      "height": 1.0,
+      "width": 0.08,
+      "center": [
+        0.5,
+        0.5
+      ]
+    },
+    "distribution": {
+      "initial_center": [
+        0.3,
+        0.3
+      ],
+      "terminal_centers": [
+        [
+          0.52,
+          0.78
+        ],
+        [
+          0.78,
+          0.52
+        ]
+      ],
+      "initial_covariance": [
+        [
+          0.0042,
+          0.0002
+        ],
+        [
+          0.0002,
+          0.0038
+        ]
+      ],
+      "terminal_covariances": [
+        [
+          [
+            0.003,
+            0.0001
+          ],
+          [
+            0.0001,
+            0.003
+          ]
+        ],
+        [
+          [
+            0.0032,
+            -0.0001
+          ],
+          [
+            -0.0001,
+            0.0032
+          ]
+        ]
+      ]
+    },
+    "training": {
+      "batch_size": 128,
+      "learning_rate": 0.0005,
+      "hidden_dim": 64,
+      "n_layers": 3,
+      "activation": "tanh",
+      "matching_weight": 300.0,
+      "energy_weight": 1.0,
+      "manifold_weight": 0.0,
+      "dt": 0.05
+    }
+  },
+  "terminal_center_distance": 0.36769552621700474,
   "domain": [
     [
       0,
@@ -12,140 +91,67 @@
       1
     ]
   ],
-  "initial_center": [
-    0.3,
-    0.3
-  ],
-  "terminal_centers": [
-    [
-      0.5,
-      0.8
-    ],
-    [
-      0.8,
-      0.5
-    ]
-  ],
-  "initial_covariance": [
-    [
-      0.0042,
-      0.0002
-    ],
-    [
-      0.0002,
-      0.0038
-    ]
-  ],
-  "terminal_covariances": [
-    [
-      [
-        0.003,
-        0.0001
-      ],
-      [
-        0.0001,
-        0.003
-      ]
-    ],
-    [
-      [
-        0.0032,
-        -0.0001
-      ],
-      [
-        -0.0001,
-        0.0032
-      ]
-    ]
-  ],
-  "covariance_source": "Original read-only GaussToy/data/generate_gaussian_toy.py; requested centers retained, not its different terminal locations.",
-  "identity_covariance_warning": "Identity kernels on the unit square give broad overlapping densities; they are not the compact-cloud inputs used in the reference figure.",
-  "known_map": {
-    "height": 1.0,
-    "width": 0.08,
-    "center": [
-      0.5,
-      0.5
-    ]
-  },
-  "secondary_weight": 0.99,
-  "seed": 7,
-  "observed_counts": [
-    512,
-    512
-  ],
   "balanced": true,
   "terminal_mass_target": 1.0,
-  "common_warmup_iterations": 3000,
-  "common_warmup_learning_rate": 0.003,
-  "refinement_iterations_per_model": 2000,
-  "refinement_learning_rate": 0.0005,
+  "covariance_source": "Compact original experimental covariances; user-adjusted centers.",
   "same_common_checkpoint": true,
-  "common_checkpoint_state_sha256": "9a22cd56ef54bcfb2277894771a26815963395024b6619deff4a410d56e479e5",
+  "common_checkpoint_state_sha256": "c31450f11bb8f233f64b421a1026237d7d96f1819ddfa87c3ec4a781835a95f8",
   "initial_states_sha256": "2a3e65f3a52718e1b00da71d6f2c06de69cb3736a5b439375c325e610c0e7811",
-  "batch_size": 128,
-  "hidden_dim": 64,
-  "n_layers": 3,
-  "activation": "tanh",
-  "dt": 0.05,
-  "matching_weight": 300.0,
-  "energy_weight": 1.0,
-  "manifold_weight": 0.0,
-  "prediction_grid_points": 101,
   "training_core_modified": false,
   "original_project_modified": false,
   "display": {
     "paths_per_model": 512,
     "path_selection": null,
     "group_mean_curves": false,
-    "contours": "Secondary bump height at levels 0.05, 0.3, 0.7; not endpoint density contours",
+    "contours": "Secondary bump height; no endpoint density contours",
     "grey_points": "Observed initial and terminal populations",
-    "coordinate_integrity_check": "All 2D and 3D plotted paths exactly equal prediction arrays; no clipping or smoothing"
+    "coordinate_integrity_check": "All plotted paths exactly equal prediction arrays; no clipping or smoothing"
   },
   "intermediate_observations_supplied": false,
-  "run_directory": "outputs/gaussian-compact-m1-e403ffe2",
+  "run_directory": "outputs/gaussian-sync-7de00d63",
   "measured_costs": [
     {
       "Model": "Without sync",
-      "Primary endpoint Sinkhorn": 0.00030555023113265634,
-      "Primary kinetic energy": 0.13892816007137299,
-      "Secondary kinetic energy": 0.6082793563772173,
+      "Primary endpoint Sinkhorn": 8.290298865176737e-05,
+      "Primary kinetic energy": 0.13323159515857697,
+      "Secondary kinetic energy": 0.7638361848908206,
       "Predicted terminal mass": 1.0,
       "Target terminal mass": 1.0,
-      "Median maximum bump height": 0.2651274800300598,
+      "Median maximum bump height": 0.3446696698665619,
       "States outside unit square": 0.0
     },
     {
       "Model": "With sync",
-      "Primary endpoint Sinkhorn": 0.0004822054470423609,
-      "Primary kinetic energy": 0.17374122142791748,
-      "Secondary kinetic energy": 0.2974910380933672,
+      "Primary endpoint Sinkhorn": 0.0002667888766154647,
+      "Primary kinetic energy": 0.1670522838830948,
+      "Secondary kinetic energy": 0.3903687876461505,
       "Predicted terminal mass": 1.0,
       "Target terminal mass": 1.0,
-      "Median maximum bump height": 0.11369681358337402,
+      "Median maximum bump height": 0.13599875569343567,
       "States outside unit square": 0.0
     }
   ],
   "height_diagnostics": {
     "Without sync": {
-      "fraction_paths_exceeding_half_bump": 0.208984375,
+      "fraction_paths_exceeding_half_bump": 0.314453125,
       "maximum_height_quantiles_10_50_90": [
-        0.054221007972955704,
-        0.2651274651288986,
-        0.7084285855293275
+        0.07631013244390487,
+        0.3446696698665619,
+        0.7848838746547699
       ]
     },
     "With sync": {
-      "fraction_paths_exceeding_half_bump": 0.013671875,
+      "fraction_paths_exceeding_half_bump": 0.060546875,
       "maximum_height_quantiles_10_50_90": [
-        0.019627538323402405,
-        0.11369680985808372,
-        0.3179129242897035
+        0.034232661873102185,
+        0.13599876314401627,
+        0.40209912657737734
       ]
     }
   },
   "tests_passed": 77,
-  "notebook_execution": "All cells executed from scratch; shared warm-up plus both refinements.",
-  "unbalanced_validation": "The optional CLI M=2 branch passed a 2-step warm-up/2-step refinement smoke test. No full compact unbalanced accuracy claim.",
-  "scope": "Numerical illustration; no global-optimum or exact-boundary claim. Endpoint shape and escaped-state fraction are reported."
+  "notebook_execution": "All cells executed from scratch.",
+  "unbalanced_validation": "Optional CLI branch passed a 2-step warm-up/2-step refinement flow check; no full unbalanced accuracy claim.",
+  "notebook_design": "Numeric defaults and parameter discussion removed; both notebook and CLI load the shared packaged example configuration.",
+  "scope": "Numerical illustration; no global-optimum or exact-boundary claim."
 }
