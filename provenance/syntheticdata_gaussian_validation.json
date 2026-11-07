@@ -21,10 +21,18 @@
     "biological_num": [1.0, 2.0],
     "mass_coefficient": 100.0,
     "global_mass": true,
-    "without_sync_terminal_mass": 1.980399,
-    "with_sync_terminal_mass": 1.981807,
-    "without_sync_maximum_bump_height_median": 0.380701,
-    "with_sync_maximum_bump_height_median": 0.043216
+    "beta_1": {
+      "without_sync_terminal_mass": 1.980399,
+      "with_sync_terminal_mass": 1.981807,
+      "without_sync_maximum_bump_height_median": 0.380701,
+      "with_sync_maximum_bump_height_median": 0.043216
+    },
+    "beta_0_1": {
+      "without_sync_terminal_mass": 1.940608,
+      "with_sync_terminal_mass": 1.962171,
+      "without_sync_maximum_bump_height_median": 0.380506,
+      "with_sync_maximum_bump_height_median": 0.045225
+    }
   },
   "tests_passed": 85,
   "training_core_changed": false,

@@ -60,7 +60,7 @@ The script refuses to overwrite nonempty directories.
 The original-reference notebook reads the archived files directly. It never
 regenerates them; their file hashes are retained in
 `data/gaussian_reference/manifest.json`. The active synthetic tutorials share
-the committed AnnData and frozen map in `examples/data/synthetic/gaussian_bump/`.
+the committed AnnData and frozen map in `examples/data/syntheticdata/gaussian_bump/`.
 The build script regenerates those assets from the same repository code and refuses
 to overwrite an existing asset directory.
 

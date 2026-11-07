@@ -1,4 +1,4 @@
-# Synthetic
+# Synthetic data
 
 - [Balanced Gaussian bump](balancedGaussianbump.ipynb)
 - [Unbalanced Gaussian bump](unbalancedGaussianbump.ipynb)

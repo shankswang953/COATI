@@ -99,9 +99,8 @@ def plot_gaussian_sync(data, mapping, results, predictions, *,
     mesh = np.stack([xx, yy], -1)
     surface = gaussian_bump_z(mesh)
     observed = np.concatenate(data.primary)
-    fig = plt.figure(figsize=(9.4, 8.0))
+    fig = plt.figure(figsize=(9.4, max(8.0, 3.75 * len(results))))
     fig.subplots_adjust(left=.08, right=.99, bottom=.07, top=.94, wspace=.10, hspace=.19)
-    palette = ['#8878ae', '#1688b1']
     for row, (name, result) in enumerate(results.items()):
         pred = predictions[name]
         primary, mapped = np.asarray(pred['primary']), np.asarray(pred['secondary'])
@@ -114,9 +113,12 @@ def plot_gaussian_sync(data, mapping, results, predictions, *,
             else:
                 centers = np.asarray(distribution_parameters['terminal_centers'])
             groups = np.linalg.norm(primary[-1, :, None] - centers[None], axis=-1).argmin(1)
-        colour = palette[row % len(palette)]
-        title = (f"Sync · Cy = {result.metadata['config']['sync_weight']:g}"
-                 if result.metadata['config']['sync_loss'] else 'No sync')
+        config = result.metadata['config']
+        colour = '#1688b1' if config['sync_loss'] else '#64748b'
+        title = (f"Sync · Cy = {config['sync_weight']:g}"
+                 if config['sync_loss'] else 'No sync')
+        if config['unbalancedModel']:
+            title += rf" · $\beta={config['alpha_growth']:g}$"
         ax = fig.add_subplot(len(results), 2, 2*row+1)
         ax.scatter(observed[:, 0], observed[:, 1], s=3, color='#9ca3af',
                    alpha=.30, linewidths=0, rasterized=True, zorder=1)
@@ -178,10 +180,14 @@ def plot_gaussian_sync(data, mapping, results, predictions, *,
 
 def plot_bump_height(predictions):
     fig,ax=plt.subplots(figsize=(8,3.8),layout='constrained')
-    for (name,pred),color in zip(predictions.items(),['#64748b','#0072b2']):
+    for name, pred in predictions.items():
+        sync = 'With sync' in name
+        color = '#0072b2' if sync else '#64748b'
+        linestyle = '--' if '0.1' in name else '-'
         h=pred['secondary'][...,2]
         weights = _normalized_path_weights(pred)
-        ax.plot(pred['times'],(h * weights).sum(1),color=color,lw=2.5,label=name)
+        ax.plot(pred['times'],(h * weights).sum(1),color=color,linestyle=linestyle,
+                lw=2.5,label=name)
         quantiles = []
         for values, w in zip(h, weights):
             order = np.argsort(values)

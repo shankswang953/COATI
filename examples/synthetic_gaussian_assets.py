@@ -16,14 +16,14 @@ from generate_gaussian_data import gaussian_bump_z
 ASSET_NAMES = ("observed.h5ad", "map_pairs.h5ad", "T.pt", "map_report.json")
 RAW_BASE_URL = (
     "https://raw.githubusercontent.com/shankswang953/COATI/main/"
-    "examples/data/synthetic/gaussian_bump"
+    "examples/data/syntheticdata/gaussian_bump"
 )
 
 
 def resolve_asset_directory(*, download_directory="outputs/synthetic-gaussian-data"):
     """Use repository assets when available, otherwise download public copies."""
     for root in (Path.cwd(), *Path.cwd().parents):
-        candidate = root / "examples/data/synthetic/gaussian_bump"
+        candidate = root / "examples/data/syntheticdata/gaussian_bump"
         if candidate.is_dir():
             return candidate
     directory = Path(download_directory)
@@ -62,9 +62,11 @@ def plot_growth_along_trajectories(data, results, predictions):
     grid = np.linspace(0., 1., 181)
     xx, yy = np.meshgrid(grid, grid)
     surface = gaussian_bump_z(np.stack([xx, yy], axis=-1))
-    fig, axes = plt.subplots(1, len(results), figsize=(10.0, 4.4),
+    ncols = min(2, len(results))
+    nrows = int(np.ceil(len(results) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(10.0, 4.3 * nrows),
                              sharex=True, sharey=True, layout="constrained")
-    axes = np.atleast_1d(axes)
+    axes = np.atleast_1d(axes).ravel()
     artist = None
     for ax, (name, result) in zip(axes, results.items()):
         path = predictions[name]["primary"].transpose(1, 0, 2)
@@ -85,6 +87,8 @@ def plot_growth_along_trajectories(data, results, predictions):
                xlabel="$x_1$", ylabel="$x_2$", xlim=(0, 1), ylim=(0, 1), aspect="equal")
         ax.spines[["top", "right"]].set_visible(False)
         ax.grid(False)
+    for ax in axes[len(results):]:
+        ax.remove()
     colorbar = fig.colorbar(artist, ax=axes, shrink=.82, pad=.02)
     colorbar.set_label("Instantaneous growth  $d\\log w / dt$")
     fig.suptitle("Growth along learned trajectories", fontsize=14)

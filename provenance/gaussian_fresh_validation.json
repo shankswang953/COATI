@@ -1,5 +1,5 @@
 {
-  "notebook": "notebooks/synthetic/balancedGaussianbump.ipynb",
+  "notebook": "notebooks/syntheticdata/balancedGaussianbump.ipynb",
   "script": "examples/run_gaussian_sync.py",
   "inputs": "Fresh generation in memory; no archived data or pretrained map input",
   "generation_seed": 2026,
