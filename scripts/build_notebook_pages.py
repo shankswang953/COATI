@@ -32,7 +32,8 @@ def main():
                   "06_heldout_biological": "Held-out biological reconstruction",
                   "07_dynamics": "Gastrulation dynamics and mass",
                   "08_map_quality": "Train and inspect a cross-modal map",
-                  "09_lineage_features": "Lineage gene and peak dynamics"}
+                  "09_lineage_features": "Lineage gene and peak dynamics",
+                  "10_gastrulation": "Mouse gastrulation"}
         if notebook.cells and notebook.cells[0].cell_type == "markdown":
             first = notebook.cells[0].source.splitlines()
             first[0] = "# " + titles.get(source.stem, first[0].lstrip("# "))

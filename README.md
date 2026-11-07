@@ -41,6 +41,7 @@ assets/        Logo and figures
 - [Gaussian toy: sync vs no sync](notebooks/01_gaussian.ipynb)
 - [Splitting and growth](notebooks/03_split.ipynb)
 - [Input formats](notebooks/04_inputs.ipynb)
+- [Mouse gastrulation: data, training and UMAP](notebooks/10_gastrulation.ipynb)
 - [Held-out biological reconstruction](notebooks/06_heldout_biological.ipynb)
 - [Gastrulation dynamics and mass decomposition](notebooks/07_dynamics.ipynb)
 - [Cross-modal map training and quality checks](notebooks/08_map_quality.ipynb)

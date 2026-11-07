@@ -245,3 +245,18 @@ and optional unbalanced CLI flow were verified at commit 67d8ae5; this update
 changes only the endpoint centers and refreshes the resulting outputs. This is a finite-sample numerical illustration, not a
 convergence or global-optimum result. Full settings and hashes are in
 `provenance/gaussian_sync_validation.json`.
+
+## Mouse gastrulation quickstart
+
+The [Mouse gastrulation tutorial](tutorials/10_gastrulation.ipynb) contains the
+minimal data preparation, training and UMAP workflow. All nine cells were executed
+on 35,503 paired cells at four observed times, using RNA50 and ATAC14 in their
+supplied normalized representation. The cross-modal map passed its internal
+validation, followed by 1,000 vector-field training iterations.
+
+One UMAP shows observed E8.5 cell types and the projected COATI flow. The Python
+script was checked by reloading the saved result and reproducing the view.
+Pairing, model inputs, source-file hashes and finite nonzero velocities were
+verified. The training core and original project are unchanged. This short run
+is a workflow demonstration; it does not establish biological accuracy.
+Settings and validation details are in `provenance/gastrulation_quickstart.json`.

@@ -1,0 +1,17 @@
+{
+  "training": {
+    "multimodal": true,
+    "balanced": false,
+    "iterations": 1000,
+    "batch_size": 128,
+    "hidden_dim": 128,
+    "learning_rate": 0.001,
+    "secondary_weight": 0.35,
+    "matching_weight": 50.0,
+    "energy_weight": 1.0,
+    "manifold_weight": 0.1,
+    "sync_density_loss": true,
+    "seed": 0
+  },
+  "plot_stage": "E8.5"
+}

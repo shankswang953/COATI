@@ -4,7 +4,7 @@ recursive-include assets *.png *.pdf *.mp4 *.gif
 recursive-include docs *.py *.md *.css *.png *.pdf *.mp4 *.gif *.html *.ipynb
 prune docs/_build
 recursive-include notebooks *.ipynb
-recursive-include examples *.py
+recursive-include examples *.py *.json
 recursive-include scripts *.py
 recursive-include provenance *.json
 recursive-include animations *.py *.md *.txt *.npz
