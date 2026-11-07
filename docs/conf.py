@@ -5,6 +5,7 @@ release = "0.1.0"
 extensions = ["myst_nb", "sphinx.ext.autodoc", "sphinx.ext.napoleon"]
 html_theme = "furo"
 html_title = "COATI documentation"
+html_baseurl = "https://shankswang953.github.io/COATI/"
 html_logo = "_static/coati-logo.png"
 html_static_path = ["_static"]
 html_css_files = ["coati.css"]

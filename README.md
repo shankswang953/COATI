@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/coati-logo.png" alt="COATI — Cross-Omics Aligned Trajectory Inference" width="100%"></p>
 
-[Website](https://coati-trajectory-docs.shankswang.chatgpt.site/) · [Tutorials](https://coati-trajectory-docs.shankswang.chatgpt.site/tutorials)
+[Website](https://shankswang953.github.io/COATI/) · [Tutorials](https://shankswang953.github.io/COATI/tutorials.html)
 
 # COATI
 
