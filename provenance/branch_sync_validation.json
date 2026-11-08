@@ -33,12 +33,15 @@
     "activation": "leaky_relu",
     "learning_rate": 0.001,
     "energy_coefficient": 0.1,
-    "matching_coefficient": 10.0,
+    "matching_coefficient": 100.0,
+    "primary_matching_initial": 100.0,
+    "primary_matching_minimum": 1.0,
+    "primary_matching_maximum": 100.0,
     "secondary_matching_initial": 10.0,
     "secondary_matching_minimum": 1.0,
     "secondary_matching_maximum": 10.0,
-    "primary_weighted_pdf_to_energy_gradient_ratio_at_iteration_10000": 2.8403,
-    "secondary_weighted_pdf_to_energy_gradient_ratio_at_iteration_10000": 9.7040,
+    "primary_weighted_pdf_to_energy_gradient_ratio_at_iteration_10000": 24.4336,
+    "secondary_weighted_pdf_to_energy_gradient_ratio_at_iteration_10000": 6.9074,
     "branch_sync_cy": 0.9,
     "control_density_coefficient": 1.0,
     "branch_sync_density_coefficient": 10.0,
@@ -46,18 +49,18 @@
   },
   "results": {
     "primary_only": {
-      "primary_terminal_separation": 0.093899,
-      "mapped_terminal_separation": 0.267969,
-      "secondary_endpoint_sinkhorn": 0.000615,
-      "primary_endpoint_sinkhorn": 0.000419,
-      "kinetic_energy_mean": 0.090173
+      "primary_terminal_separation": 0.089341,
+      "mapped_terminal_separation": 0.242373,
+      "secondary_endpoint_sinkhorn": 0.000413,
+      "primary_endpoint_sinkhorn": 0.000037,
+      "kinetic_energy_mean": 0.080701
     },
     "branch_sync": {
-      "primary_terminal_separation": 0.083030,
-      "mapped_terminal_separation": 0.222116,
-      "secondary_endpoint_sinkhorn": 0.001599,
-      "primary_endpoint_sinkhorn": 0.000342,
-      "kinetic_energy_mean": 0.079818
+      "primary_terminal_separation": 0.097393,
+      "mapped_terminal_separation": 0.268039,
+      "secondary_endpoint_sinkhorn": 0.000218,
+      "primary_endpoint_sinkhorn": 0.000025,
+      "kinetic_energy_mean": 0.081272
     }
   },
   "historical_unbalanced_not_retrained_here": {
