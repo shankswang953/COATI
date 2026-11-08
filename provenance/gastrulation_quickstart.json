@@ -24,7 +24,7 @@
     "atac.h5ad": "9a53bad7987710a161596cf37e31ecd828845ef130a20dd3baae4aa24a863631"
   },
   "source_files_unchanged": true,
-  "notebook": "notebooks/10_gastrulation.ipynb",
+  "notebook": "notebooks/gastrulation/mouseGastrulation.ipynb",
   "notebook_cells_executed": 9,
   "script": "examples/run_gastrulation.py",
   "shared_config": "examples/gastrulation.json",
