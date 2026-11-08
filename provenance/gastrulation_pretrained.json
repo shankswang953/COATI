@@ -1,0 +1,38 @@
+{
+  "models": {
+    "balanced": {
+      "checkpoint": "balanced_cy0p3_s1_iter20000.pth",
+      "iteration": 20000,
+      "seed": 1,
+      "cy": 0.3,
+      "hidden_dim": 400,
+      "n_layers": 4
+    },
+    "unbalanced": {
+      "checkpoint": "unbalanced_cy0p3_s0_iter20000.pth",
+      "iteration": 20000,
+      "seed": 0,
+      "cy": 0.3,
+      "hidden_dim": 800,
+      "n_layers": 3,
+      "final_mass_ratio_for_600_cell_tutorial_cohort": 10.799
+    }
+  },
+  "inference": {
+    "times": [0.0, 1.0, 2.0, 2.5],
+    "integration_grid_size": 26,
+    "integration_method": "rk4",
+    "tutorial_initial_cells": 600,
+    "stored_unbalanced_trajectory_max_absolute_error_normalized": 1.1920929e-07
+  },
+  "umap": {
+    "source": "original saved RNA UMAP reducer",
+    "reference_cells": 35503,
+    "n_neighbors": 30,
+    "min_dist": 0.5,
+    "random_state": 42,
+    "reference_input_exactly_matches_rna_pca_by_time": true,
+    "trajectory_lines_drawn": false
+  },
+  "training_core_changed": false
+}

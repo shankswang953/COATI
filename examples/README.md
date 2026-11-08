@@ -12,6 +12,8 @@ Data preparation and experiment-specific helpers live here, outside the installe
 - `gaussian_comparison.py`: comparison setup and plots used by that tutorial.
 - `gaussian_reference.py`: loading and replaying the unchanged original artifacts.
 - `data/gaussian_reference/`: original NPZ files, checkpoints and reference outputs.
+- `gastrulation_pretrained.py`: verified loading of the archived full-data gastrulation networks.
+- `data/gastrulation/pretrained/`: public 20k checkpoints and their exact RNA50 snapshots.
 
 Run a small example from the repository root:
 

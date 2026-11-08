@@ -15,6 +15,11 @@
     "status": "passed"
   },
   {
+    "notebook": "gastrulation/pretrainedModels.ipynb",
+    "code_cells": 5,
+    "status": "passed"
+  },
+  {
     "notebook": "02_paired.ipynb",
     "code_cells": 10,
     "seconds": 8.47,

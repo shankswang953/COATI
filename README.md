@@ -48,6 +48,7 @@ Toy-data preparation and Gaussian-specific helpers are maintained in [examples](
 - [Input formats](notebooks/04_inputs.ipynb)
 - [Gastrulation](notebooks/gastrulation/)
   - [Mouse gastrulation: data, training and UMAP](notebooks/gastrulation/mouseGastrulation.ipynb)
+  - [Pretrained full-data models: balanced and unbalanced predictions in the original UMAP](notebooks/gastrulation/pretrainedModels.ipynb)
 - [Held-out biological reconstruction](notebooks/06_heldout_biological.ipynb)
 - [Gastrulation dynamics and mass decomposition](notebooks/07_dynamics.ipynb)
 - [Cross-modal map training and quality checks](notebooks/08_map_quality.ipynb)
