@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from coati import Config, MapConfig, fit, load_result
-import toy_data as datasets
+from synthetic import toy_data as datasets
 
 @pytest.mark.parametrize("kind",["gaussian","split","paired"])
 def test_fit_reload(kind,tmp_path):

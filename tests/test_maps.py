@@ -5,7 +5,7 @@ import pytest
 import torch
 
 from coati import Config, MapConfig, TemporalData, fit, load_result
-import toy_data as datasets
+from synthetic import toy_data as datasets
 from coati.maps import MapQualityWarning, PairedMap, load_map, train_map
 
 

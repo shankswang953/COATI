@@ -1,6 +1,6 @@
 """Train a toy vector field and plot it on a real UMAP of synthetic snapshots.
 
-python examples/run_velocity.py --multimodal --unbalanced --output outputs/velocity
+python -m examples.synthetic.run_velocity --multimodal --unbalanced --output outputs/velocity
 No biological data are used. Install with pip install -e '.[visualization]'.
 """
 import os
@@ -18,7 +18,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import coati as ct
-import toy_data as datasets
+from . import toy_data as datasets
 
 
 def main():

@@ -51,7 +51,7 @@ def plot_umap(result, cells, stage):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", required=True, help="Folder containing rna.h5ad and atac.h5ad")
-    parser.add_argument("--config", type=Path, default=Path(__file__).with_name("gastrulation.json"))
+    parser.add_argument("--config", type=Path, default=Path(__file__).with_name("config.json"))
     parser.add_argument("--output", type=Path)
     parser.add_argument("--iterations", type=int)
     parser.add_argument("--stage")

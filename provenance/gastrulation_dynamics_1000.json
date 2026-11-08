@@ -188,7 +188,7 @@
   "finite_vectors_and_growth": true,
   "scope": "One-seed short unbalanced multimodal run; no convergence, proliferation or lineage-accuracy claim",
   "notebook": "notebooks/07_dynamics.ipynb",
-  "standalone_script": "examples/run_gastrulation_dynamics.py",
+  "standalone_script": "examples/gastrulation/dynamics.py",
   "training_algorithm_modified": false,
   "original_TraInf_modified": false
 }

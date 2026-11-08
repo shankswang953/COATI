@@ -5,8 +5,8 @@ from pathlib import Path
 
 import torch
 
-from gaussian_fresh import generate_fresh_anndata
-from gaussian_map import evaluate_bump_map, fit_bump_map
+from .gaussian_fresh import generate_fresh_anndata
+from .gaussian_map import evaluate_bump_map, fit_bump_map
 
 
 def main():

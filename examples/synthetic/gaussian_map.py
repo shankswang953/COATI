@@ -11,7 +11,7 @@ import pandas as pd
 import torch
 from torch import nn
 import matplotlib.pyplot as plt
-from generate_gaussian_data import gaussian_bump_z
+from .generate_gaussian_data import gaussian_bump_z
 
 
 class FourierBumpMLP(nn.Module):

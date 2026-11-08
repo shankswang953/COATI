@@ -396,7 +396,7 @@
   "scope": "Unseen paired cells within observed stages; precomputed source PCA/LSI and scales fixed. Stage consistency is conditional on supplied time for FiLM.",
   "date": "2026-10-12",
   "notebook": "notebooks/08_map_quality.ipynb",
-  "script": "examples/run_map_quality.py",
+  "script": "examples/gastrulation/map_quality.py",
   "training_algorithm_modified": false,
   "original_TraInf_modified": false
 }

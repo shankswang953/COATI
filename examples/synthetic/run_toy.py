@@ -2,7 +2,7 @@
 import argparse
 import json
 from pathlib import Path
-import toy_data as datasets
+from . import toy_data as datasets
 from coati import Config, MapConfig, train_vector_field
 
 

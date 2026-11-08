@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from coati import Config
 from coati import TemporalData
-from gaussian_map import FourierBumpMLP
+from .gaussian_map import FourierBumpMLP
 
 
 def _asset(name):

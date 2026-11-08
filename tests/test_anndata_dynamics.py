@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import torch
 import coati as ct
-import toy_data as datasets
+from synthetic import toy_data as datasets
 from coati.anndata_io import InputConventionWarning
 from coati.result import Result
 

@@ -7,7 +7,7 @@ import argparse
 import json
 import numpy as np
 import coati as ct
-import toy_data as datasets
+from . import toy_data as datasets
 
 
 def main():

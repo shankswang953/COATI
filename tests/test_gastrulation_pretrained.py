@@ -1,6 +1,6 @@
 import numpy as np
 
-from gastrulation_pretrained import (
+from gastrulation.pretrained import (
     load_gastrulation_result,
     load_gastrulation_umap,
     obtain_gastrulation_assets,

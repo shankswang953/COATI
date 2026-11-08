@@ -5,7 +5,7 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import coati as ct
-import toy_data as datasets
+from . import toy_data as datasets
 
 
 def main():

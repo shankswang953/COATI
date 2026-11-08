@@ -13,7 +13,7 @@ from coati import Config, MapConfig, fit, load_result
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples"))
-import toy_data as datasets
+from synthetic import toy_data as datasets
 out=Path(sys.argv[1]);out.mkdir(parents=True,exist_ok=True)
 cases=[('balanced','gaussian',{}),('kernel_sync','paired',dict(sync_loss=True,sync_weight=.35,map_type='kernel')),('film_sync','paired',dict(sync_loss=True,sync_weight=.35,map_type='film')),('unbalanced','split',dict(unbalancedModel=True,alpha_growth=1.,mass_loss=True,mass_coefficient=1.)),('adaptive','gaussian',dict(adaptive_lambda=True,extra={'dual_warmup':0,'dual_update_freq':1}))]
 report=[]

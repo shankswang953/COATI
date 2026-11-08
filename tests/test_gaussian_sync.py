@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 import torch
 import coati as ct
-import toy_data as datasets
-from gaussian_comparison import make_shared_initial_checkpoint
+from synthetic import toy_data as datasets
+from synthetic.gaussian_comparison import make_shared_initial_checkpoint
 
 
 def test_gaussian_sync_pairing_and_differentiable_known_map():
@@ -76,7 +76,7 @@ def test_manuscript_identity_kernels_are_truncated_not_compact():
 
 def test_reference_density_matches_analytic_normalization():
     from scipy.stats import norm
-    from gaussian_comparison import gaussian_density_on_unit_square
+    from synthetic.gaussian_comparison import gaussian_density_on_unit_square
     query=np.array([[0.,0.],[.3,.3],[.5,.5],[1.,1.],[-.01,.5]])
     mu=np.array([.3,.3])
     norm_constant=np.prod(norm.cdf(1-mu)-norm.cdf(-mu))
@@ -87,7 +87,7 @@ def test_reference_density_matches_analytic_normalization():
 
 def test_unbalanced_comparison_uses_mass_action_not_path_mean():
     from types import SimpleNamespace
-    from gaussian_comparison import compare_gaussian_runs
+    from synthetic.gaussian_comparison import compare_gaussian_runs
     times=np.array([0.,.5,1.])
     source=np.array([[0.,0.],[0.,1.]])
     states=source[None]+times[:,None,None]*np.array([1.,0.])

@@ -15,6 +15,6 @@ well defined if the stored observations are later subsampled.
 Regenerate the assets from repository code with:
 
 ```bash
-python examples/build_synthetic_gaussian_assets.py \
+python -m examples.synthetic.build_gaussian_assets \
   --output /path/to/new/gaussian_bump
 ```

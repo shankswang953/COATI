@@ -15,9 +15,9 @@ from coati._core.Neural import MLPVectorField
 
 ASSET_URL = (
     "https://raw.githubusercontent.com/shankswang953/COATI/main/"
-    "examples/data/gastrulation/pretrained"
+    "examples/gastrulation/data/pretrained"
 )
-LOCAL_ASSETS = Path(__file__).resolve().parent / "data/gastrulation/pretrained"
+LOCAL_ASSETS = Path(__file__).resolve().parent / "data/pretrained"
 
 
 def _sha256(path: Path) -> str:

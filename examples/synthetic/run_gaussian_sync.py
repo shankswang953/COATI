@@ -8,10 +8,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import coati as ct
-from gaussian_fresh import generate_fresh_anndata
-from gaussian_map import fit_bump_map, evaluate_bump_map, plot_map_training, plot_map_performance
-from gaussian_parameters import make_flow_config
-from gaussian_comparison import make_shared_initial_checkpoint, plot_gaussian_sync, plot_bump_height, compare_gaussian_runs
+from .gaussian_fresh import generate_fresh_anndata
+from .gaussian_map import fit_bump_map, evaluate_bump_map, plot_map_training, plot_map_performance
+from .gaussian_parameters import make_flow_config
+from .gaussian_comparison import make_shared_initial_checkpoint, plot_gaussian_sync, plot_bump_height, compare_gaussian_runs
 
 
 def main():

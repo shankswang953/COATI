@@ -97,7 +97,7 @@
   "date": "2026-10-12",
   "package_checks_passed": 60,
   "notebook": "notebooks/09_lineage_features.ipynb",
-  "standalone_script": "examples/run_lineage_features.py",
+  "standalone_script": "examples/gastrulation/lineage_features.py",
   "training_algorithm_modified": false,
   "raw_source_access": "Read-only source-verified selected-feature cache; original source files and TraInf untouched",
   "biological_checks": [

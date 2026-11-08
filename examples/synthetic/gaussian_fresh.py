@@ -3,7 +3,7 @@ import anndata as ad
 import numpy as np
 import pandas as pd
 import coati as ct
-from generate_gaussian_data import make_data, map_to_secondary, make_support
+from .generate_gaussian_data import make_data, map_to_secondary, make_support
 
 
 def assemble_anndata(time0, time1, support2d, support3d):

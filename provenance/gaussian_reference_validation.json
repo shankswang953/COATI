@@ -284,7 +284,7 @@
   "tests_passed": 79,
   "notebook": "notebooks/11_gaussian_reference.ipynb",
   "notebook_cells_executed": 11,
-  "script": "examples/run_gaussian_reference.py",
+  "script": "examples/synthetic/run_gaussian_reference.py",
   "script_replay_executed": true,
   "training_core_modified": false,
   "original_TraInf_modified": false,

@@ -34,7 +34,7 @@ tests/         Package tests
 assets/        Package logo
 ```
 
-Toy-data preparation and Gaussian-specific helpers are maintained in [examples](examples/README.md), outside the installed package.
+Dataset-specific notebook reproductions are maintained in [examples](examples/README.md), outside the installed package.
 
 ## Notebooks
 

@@ -9,21 +9,21 @@ from matplotlib.colors import TwoSlopeNorm
 import numpy as np
 import torch
 
-from gaussian_map import FourierBumpMLP
-from generate_gaussian_data import gaussian_bump_z
+from .gaussian_map import FourierBumpMLP
+from .generate_gaussian_data import gaussian_bump_z
 
 
 ASSET_NAMES = ("observed.h5ad", "map_pairs.h5ad", "T.pt", "map_report.json")
 RAW_BASE_URL = (
     "https://raw.githubusercontent.com/shankswang953/COATI/main/"
-    "examples/data/syntheticdata/gaussian_bump"
+    "examples/synthetic/data/gaussian_bump"
 )
 
 
 def resolve_asset_directory(*, download_directory="outputs/synthetic-gaussian-data"):
     """Use repository assets when available, otherwise download public copies."""
     for root in (Path.cwd(), *Path.cwd().parents):
-        candidate = root / "examples/data/syntheticdata/gaussian_bump"
+        candidate = root / "examples/synthetic/data/gaussian_bump"
         if candidate.is_dir():
             return candidate
     directory = Path(download_directory)

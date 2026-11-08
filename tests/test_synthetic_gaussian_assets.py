@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from synthetic_gaussian_assets import load_shared_gaussian_assets
+from synthetic.gaussian_assets import load_shared_gaussian_assets
 
 
 def test_committed_synthetic_assets_share_data_and_frozen_map():

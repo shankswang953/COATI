@@ -1,7 +1,7 @@
 """Plot matched Gaussian endpoint transport without prescribing either route."""
 import numpy as np
 import matplotlib.pyplot as plt
-from generate_gaussian_data import gaussian_bump_z
+from .generate_gaussian_data import gaussian_bump_z
 
 
 def gaussian_sync_example(*, balanced=True, secondary_weight=None,
@@ -16,7 +16,7 @@ def gaussian_sync_example(*, balanced=True, secondary_weight=None,
     from pathlib import Path
     from types import SimpleNamespace
     from coati import Config
-    from toy_data import gaussian_sync, gaussian_bump_map
+    from .toy_data import gaussian_sync, gaussian_bump_map
     preset = json.loads(Path(__file__).with_name('gaussian_sync.json').read_text())
     for key, value in [('secondary_weight', secondary_weight),
                        ('refinement_iterations', iterations),

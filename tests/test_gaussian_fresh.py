@@ -1,8 +1,8 @@
 import numpy as np
 import torch
-from gaussian_fresh import generate_fresh_anndata
-from gaussian_map import fit_bump_map, evaluate_bump_map
-from gaussian_comparison import compare_gaussian_runs
+from synthetic.gaussian_fresh import generate_fresh_anndata
+from synthetic.gaussian_map import fit_bump_map, evaluate_bump_map
+from synthetic.gaussian_comparison import compare_gaussian_runs
 
 
 def test_fresh_anndata_contains_isotropic_gaussian_snapshots():
@@ -23,7 +23,7 @@ def test_fresh_anndata_contains_isotropic_gaussian_snapshots():
 
 
 def test_gaussian_generator_uses_exact_isotropic_covariances(monkeypatch):
-    import generate_gaussian_data as generator
+    from synthetic import generate_gaussian_data as generator
     covariances = []
     def capture_covariance(rng, mean, cov, n, low=0., high=1.):
         covariances.append(np.asarray(cov))
@@ -71,7 +71,7 @@ def test_balanced_mass_target_does_not_follow_observation_counts():
 
 
 def test_shared_assets_match_the_reproducible_generator():
-    from synthetic_gaussian_assets import load_shared_gaussian_assets, resolve_asset_directory
+    from synthetic.gaussian_assets import load_shared_gaussian_assets, resolve_asset_directory
     import anndata as ad
 
     expected_cells, expected_pairs = generate_fresh_anndata()

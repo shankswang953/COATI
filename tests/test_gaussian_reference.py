@@ -1,7 +1,7 @@
 import hashlib
 import json
 import numpy as np
-from gaussian_reference import load_example, replay_reference, _asset
+from synthetic.gaussian_reference import load_example, replay_reference, _asset
 
 
 def test_original_artifacts_are_byte_identical_and_observations_are_not_resampled():
