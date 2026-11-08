@@ -48,10 +48,10 @@ def plot_umap(result, cells, stage):
     return fig
 
 
-def main():
+def main(*, default_config="config.json", run_name="gastrulation"):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", required=True, help="Folder containing rna.h5ad and atac.h5ad")
-    parser.add_argument("--config", type=Path, default=Path(__file__).with_name("config.json"))
+    parser.add_argument("--config", type=Path, default=Path(__file__).with_name(default_config))
     parser.add_argument("--output", type=Path)
     parser.add_argument("--iterations", type=int)
     parser.add_argument("--stage")
@@ -66,7 +66,7 @@ def main():
     cells = load_data(args.data_dir)
     if stage not in cells.obs["stage"].unique():
         parser.error(f"Unknown stage: {stage}")
-    output = args.output or Path("outputs") / ("gastrulation-" + uuid.uuid4().hex[:8])
+    output = args.output or Path("outputs") / (run_name + "-" + uuid.uuid4().hex[:8])
     if args.reuse:
         result = ct.load_result(output)
         for i, time in enumerate(result.data.times):

@@ -1,0 +1,20 @@
+{
+  "training": {
+    "multimodal": true,
+    "balanced": true,
+    "iterations": 20000,
+    "batch_size": 256,
+    "hidden_dim": 400,
+    "n_layers": 4,
+    "activation": "leaky_relu",
+    "learning_rate": 0.0001,
+    "secondary_weight": 0.3,
+    "matching_weight": 100.0,
+    "energy_weight": 0.1,
+    "manifold_weight": 0.1,
+    "sync_density_loss": true,
+    "sync_pdf_loss": false,
+    "seed": 1
+  },
+  "plot_stage": "E8.5"
+}

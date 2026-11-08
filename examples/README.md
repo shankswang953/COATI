@@ -14,7 +14,8 @@ Run the examples from the repository root with Python's module syntax:
 
 ```bash
 python -m examples.synthetic.run_toy --dataset gaussian --niters 200 --output outputs/gaussian
-python -m examples.gastrulation.train --data-dir /path/to/gastrulation
+python -m examples.gastrulation.train_balanced --data-dir /path/to/gastrulation --output outputs/gastrulation-balanced
+python -m examples.gastrulation.train_unbalanced --data-dir /path/to/gastrulation --output outputs/gastrulation-unbalanced
 ```
 
 The installed package remains under `src/coati/`. General functionality belongs there;
