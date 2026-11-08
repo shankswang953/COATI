@@ -53,19 +53,23 @@ The bundled `data/T_FiLM.pt` is the default if `--map-checkpoint` is omitted.
 For a smoke test, use `--epochs 5` when fitting T and `--iterations 20` when
 fitting either vector field.
 
-Both full vector-field configurations run for 20,000 iterations and use
-`device="auto"`: CUDA is preferred, followed by Apple MPS, with CPU only as a
-fallback. Check the first line of `training.log` before leaving a long run; it
-must report the intended accelerator rather than CPU.
+Both full vector-field configurations run for 20,000 iterations and require
+`device="mps"`. They fail immediately when Apple MPS is unavailable rather
+than silently falling back to CPU. Check the first line of `training.log`
+before leaving a long run; it must report `device = mps`.
 
-For a detached manual run, start one `tmux` session per model:
+For a detached manual run on one MPS device, run the two models sequentially
+inside one `tmux` session:
 
 ```bash
-tmux new-session -d -s coati-balanced \
-  'cd /Users/jingfeng/local/project/COATI && source .venv/bin/activate && python -m examples.gastrulation.train_balanced --map-checkpoint outputs/gastrulation-film/T_FiLM.pt --output outputs/gastrulation-balanced-gpu'
-
-tmux new-session -d -s coati-unbalanced \
-  'cd /Users/jingfeng/local/project/COATI && source .venv/bin/activate && python -m examples.gastrulation.train_unbalanced --map-checkpoint outputs/gastrulation-film/T_FiLM.pt --output outputs/gastrulation-unbalanced-gpu'
+tmux new-session -d -s coati-gastrulation \
+  'cd /Users/jingfeng/local/project/COATI && \
+  .venv/bin/python -m examples.gastrulation.train_balanced \
+    --map-checkpoint outputs/gastrulation-film/T_FiLM.pt \
+    --output outputs/gastrulation-balanced-mps && \
+  .venv/bin/python -m examples.gastrulation.train_unbalanced \
+    --map-checkpoint outputs/gastrulation-film/T_FiLM.pt \
+    --output outputs/gastrulation-unbalanced-mps'
 ```
 
 `balanced.json` uses the architecture and loss settings from
