@@ -1,0 +1,37 @@
+{
+  "training": {
+    "multimodal": false,
+    "balanced": false,
+    "iterations": 20000,
+    "device": "mps",
+    "batch_size": 1024,
+    "hidden_dim": 800,
+    "n_layers": 3,
+    "activation": "leaky_relu",
+    "learning_rate": 0.0001,
+    "matching_weight": 100.0,
+    "energy_weight": 0.01,
+    "manifold_weight": 0.01,
+    "growth_weight": 1.0,
+    "mass_weight": 1.0,
+    "mass_loss": true,
+    "global_mass": true,
+    "sync_density_loss": false,
+    "sync_pdf_loss": false,
+    "map_type": "none",
+    "seed": 0,
+    "extra": {
+      "biological_num": [1.0, 4.0, 6.0, 11.0],
+      "median_n_sample": 2000,
+      "floor_n_sample": 1024,
+      "adaptive_lambda": true,
+      "blur_coeff": 0.1,
+      "pdf_coefficient_pri": 100.0,
+      "lambda_max_pri": 100.0,
+      "lambda_min_pri": 10.0,
+      "floor_pri_multiplier": 2.5,
+      "dual_warmup": 2000
+    }
+  },
+  "plot_stage": "E8.5"
+}

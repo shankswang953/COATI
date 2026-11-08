@@ -78,11 +78,12 @@ def main(*, default_config="config.json", run_name="gastrulation"):
             np.testing.assert_array_equal(result.data.primary[i], cells.obsm["X_pca"][rows])
             np.testing.assert_array_equal(result.data.secondary[i], cells.obsm["X_atac"][rows])
     else:
-        T_model = load_film_checkpoint(args.map_checkpoint)
+        config = ct.Config(**settings["training"])
+        T_model = load_film_checkpoint(args.map_checkpoint) if config.multimodal else None
         result = ct.train_vector_field(
-            cells, ct.Config(**settings["training"]), output_dir=output,
+            cells, config, output_dir=output,
             T_model=T_model, primal_norm_path=args.primal_norm,
-            sec_norm_path=args.secondary_norm,
+            sec_norm_path=args.secondary_norm if config.multimodal else None,
         )
     fig = plot_umap(result, cells, stage)
     fig.savefig(result.output_dir / "umap_flow.png", dpi=180, bbox_inches="tight")

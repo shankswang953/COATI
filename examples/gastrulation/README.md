@@ -58,6 +58,13 @@ Both full vector-field configurations run for 20,000 iterations and require
 than silently falling back to CPU. Check the first line of `training.log`
 before leaving a long run; it must report `device = mps`.
 
+The RNA-only controls use the same RNA PCA50 snapshots and RNA normalization
+but omit the ATAC snapshots and FiLM map entirely. Their entry points are
+`train_balanced_rna_only` and `train_unbalanced_rna_only`. In the unbalanced
+configuration, the transport coefficient is implicitly one and
+`growth_weight=1.0` sets the continuity-equation growth coefficient to one;
+`mass_weight=1.0` is the separate mass-matching penalty.
+
 For a detached manual run on one MPS device, run the two models sequentially
 inside one `tmux` session:
 
