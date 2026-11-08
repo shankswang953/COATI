@@ -33,11 +33,12 @@
     "activation": "leaky_relu",
     "learning_rate": 0.001,
     "energy_coefficient": 0.1,
-    "matching_coefficient": 100.0,
+    "matching_coefficient": 10.0,
     "secondary_matching_initial": 10.0,
     "secondary_matching_minimum": 1.0,
     "secondary_matching_maximum": 10.0,
-    "secondary_weighted_pdf_to_energy_gradient_ratio_at_iteration_10000": 9.0551,
+    "primary_weighted_pdf_to_energy_gradient_ratio_at_iteration_10000": 2.8403,
+    "secondary_weighted_pdf_to_energy_gradient_ratio_at_iteration_10000": 9.7040,
     "branch_sync_cy": 0.9,
     "control_density_coefficient": 1.0,
     "branch_sync_density_coefficient": 10.0,
@@ -45,18 +46,18 @@
   },
   "results": {
     "primary_only": {
-      "primary_terminal_separation": 0.090687,
-      "mapped_terminal_separation": 0.236606,
-      "secondary_endpoint_sinkhorn": 0.001094,
-      "primary_endpoint_sinkhorn": 0.000168,
-      "kinetic_energy_mean": 0.081611
+      "primary_terminal_separation": 0.093899,
+      "mapped_terminal_separation": 0.267969,
+      "secondary_endpoint_sinkhorn": 0.000615,
+      "primary_endpoint_sinkhorn": 0.000419,
+      "kinetic_energy_mean": 0.090173
     },
     "branch_sync": {
-      "primary_terminal_separation": 0.091105,
-      "mapped_terminal_separation": 0.257130,
-      "secondary_endpoint_sinkhorn": 0.000326,
-      "primary_endpoint_sinkhorn": 0.000026,
-      "kinetic_energy_mean": 0.080141
+      "primary_terminal_separation": 0.083030,
+      "mapped_terminal_separation": 0.222116,
+      "secondary_endpoint_sinkhorn": 0.001599,
+      "primary_endpoint_sinkhorn": 0.000342,
+      "kinetic_energy_mean": 0.079818
     }
   },
   "historical_unbalanced_not_retrained_here": {

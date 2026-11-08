@@ -298,7 +298,7 @@ def plot_data_and_map(cells, model):
 
 
 def plot_branch_comparison(cells, mapping, results, predictions, max_paths=160):
-    """Compare primary-only and synchronized balanced trajectories in both spaces."""
+    """Compare individual balanced trajectories in primary and mapped spaces."""
     from matplotlib.collections import LineCollection
 
     observed_x = cells.obsm["X_latent"]
@@ -313,23 +313,15 @@ def plot_branch_comparison(cells, mapping, results, predictions, max_paths=160):
         prediction = predictions[name]
         primary = prediction["primary"]
         mapped = map_points(mapping, primary, prediction["times"])
-        color = "#0072B2" if result.metadata["config"]["sync_loss"] else "#8172B2"
+        path_colors = "#168BD2"
         for col, (values, observed, title) in enumerate(
                 ((primary, observed_x, "Primary"), (mapped, observed_y, r"$T$(Primary)"))):
             ax = axes[row, col]
             ax.scatter(observed[:, 0], observed[:, 1], s=3, color="#b7bdc5",
                        alpha=.28, linewidths=0, rasterized=True)
             paths = values[:, pick].transpose(1, 0, 2)
-            ax.add_collection(LineCollection(paths, colors=color, linewidths=.55,
-                                              alpha=.28, rasterized=True))
-            upper, lower = [], []
-            for frame in values:
-                median = np.median(frame[:, 1])
-                upper.append(frame[frame[:, 1] >= median].mean(0))
-                lower.append(frame[frame[:, 1] < median].mean(0))
-            upper, lower = np.asarray(upper), np.asarray(lower)
-            ax.plot(upper[:, 0], upper[:, 1], color=color, linewidth=2.2)
-            ax.plot(lower[:, 0], lower[:, 1], color=color, linewidth=2.2)
+            ax.add_collection(LineCollection(paths, colors=path_colors, linewidths=.65,
+                                              alpha=.34, rasterized=True))
             ax.set(xlim=(-.03, 1.03), ylim=(.30, .72), xlabel="Dimension 1",
                    ylabel=name if col == 0 else "Dimension 2")
             if row == 0:
