@@ -1,0 +1,70 @@
+{
+  "source_experiment": "TraInf/ToySplit Figure 2b balanced branching",
+  "data": {
+    "seed": 42,
+    "time_labels": ["time_0", "time_1", "time_2", "time_3", "time_4"],
+    "training_times": [0.0, 1.0, 2.0, 3.0, 4.0],
+    "physical_x_bins": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0],
+    "cells_per_time": 400,
+    "primary_source_sha256": "b52ab6ad91ef09857552bdd1080c33702c238a886a0b74610b6ef8f315289ed8",
+    "secondary_source_sha256": "2188a8d1ece49e97684a933d946d670677a1a0de49d7809a4c4e602301dc547d",
+    "generated_arrays_exactly_match_sources": true
+  },
+  "map": {
+    "kind": "film",
+    "hidden_dim": 64,
+    "n_layers": 3,
+    "time_hidden_dim": 32,
+    "epochs": 300,
+    "batch_size": 256,
+    "coordinate_space": "raw",
+    "normalization": null,
+    "training_loss": "time-balanced paired MSE",
+    "checkpoint_selection": "minimum sum of per-stage validation Sinkhorn divergences, evaluated every 5 epochs",
+    "selected_epoch": 295,
+    "held_out_rmse_by_time": [0.002397, 0.016145, 0.017249, 0.023427, 0.027798],
+    "full_pair_r2_by_time": [0.996879, 0.911787, 0.962201, 0.947993, 0.934251]
+  },
+  "balanced_training": {
+    "iterations": 10000,
+    "batch_size": 128,
+    "hidden_dim": 256,
+    "n_layers": 2,
+    "activation": "leaky_relu",
+    "learning_rate": 0.001,
+    "energy_coefficient": 0.1,
+    "matching_coefficient": 100.0,
+    "secondary_matching_initial": 10.0,
+    "secondary_matching_minimum": 1.0,
+    "secondary_matching_maximum": 10.0,
+    "secondary_weighted_pdf_to_energy_gradient_ratio_at_iteration_10000": 9.0551,
+    "branch_sync_cy": 0.9,
+    "control_density_coefficient": 1.0,
+    "branch_sync_density_coefficient": 10.0,
+    "shared_initial_weights": true
+  },
+  "results": {
+    "primary_only": {
+      "primary_terminal_separation": 0.090687,
+      "mapped_terminal_separation": 0.236606,
+      "secondary_endpoint_sinkhorn": 0.001094,
+      "primary_endpoint_sinkhorn": 0.000168,
+      "kinetic_energy_mean": 0.081611
+    },
+    "branch_sync": {
+      "primary_terminal_separation": 0.091105,
+      "mapped_terminal_separation": 0.257130,
+      "secondary_endpoint_sinkhorn": 0.000326,
+      "primary_endpoint_sinkhorn": 0.000026,
+      "kinetic_energy_mean": 0.080141
+    }
+  },
+  "historical_unbalanced_not_retrained_here": {
+    "iterations": 5000,
+    "model_time_range": [0.0, 1.0],
+    "cy": 0.9,
+    "energy_coefficient": 0.025,
+    "beta_values": [0.1, 1.0, 10.0]
+  },
+  "training_core_changed": false
+}

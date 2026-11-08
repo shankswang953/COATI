@@ -15,6 +15,11 @@
     "status": "passed"
   },
   {
+    "notebook": "syntheticdata/BranchSync.ipynb",
+    "code_cells": 8,
+    "status": "passed"
+  },
+  {
     "notebook": "gastrulation/pretrainedModels.ipynb",
     "code_cells": 5,
     "status": "passed"

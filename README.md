@@ -44,6 +44,7 @@ Dataset-specific notebook reproductions are maintained in [examples](examples/RE
   - [Balanced Gaussian bump: sync vs no sync](notebooks/syntheticdata/balancedGaussianbump.ipynb)
   - [Unbalanced Gaussian bump: trajectories and growth](notebooks/syntheticdata/unbalancedGaussianbump.ipynb)
   - [Cy comparison: 0.1, 0.5 and 0.7](notebooks/syntheticdata/cyComparison.ipynb)
+  - [BranchSync: weak primary and amplified secondary branching](notebooks/syntheticdata/BranchSync.ipynb)
 - [Splitting and growth](notebooks/03_split.ipynb)
 - [Input formats](notebooks/04_inputs.ipynb)
 - [Gastrulation](notebooks/gastrulation/)
