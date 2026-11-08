@@ -3,6 +3,7 @@
     "multimodal": true,
     "balanced": false,
     "iterations": 20000,
+    "device": "auto",
     "batch_size": 1024,
     "hidden_dim": 800,
     "n_layers": 3,
