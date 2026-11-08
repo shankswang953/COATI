@@ -8,7 +8,7 @@
     "n_layers": 3,
     "activation": "leaky_relu",
     "learning_rate": 0.0001,
-    "secondary_weight": 0.3,
+    "secondary_weight": 0.5,
     "matching_weight": 100.0,
     "energy_weight": 0.01,
     "manifold_weight": 0.01,
@@ -18,6 +18,7 @@
     "global_mass": true,
     "sync_density_loss": true,
     "sync_pdf_loss": true,
+    "map_type": "FiLMMLP",
     "seed": 0,
     "extra": {
       "biological_num": [1.0, 4.0, 6.0, 11.0],
@@ -32,7 +33,8 @@
       "lambda_min_pri": 10.0,
       "lambda_min_sec": 10.0,
       "floor_pri_multiplier": 2.5,
-      "floor_sec_multiplier": 2.5
+      "floor_sec_multiplier": 2.5,
+      "dual_warmup": 2000
     }
   },
   "plot_stage": "E8.5"

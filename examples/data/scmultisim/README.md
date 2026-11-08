@@ -26,6 +26,9 @@ The balanced COATI tutorial uses the main-figure representations and frozen map:
   `secondary_norm_params_atac8_no_pc2_w2.pt`: saved W2 normalization scales.
 - `scmultisim_rna10_atac8_film_T.pt`: the frozen 10-to-8 FiLM checkpoint used during
   synchronized vector-field training.
+- `scmultisim_rna10_atac8_mlp_t_T.pt`: the frozen 10-to-8 MLP checkpoint that
+  appends time to the RNA coordinates.
+- `scmultisim_rna10_atac8_ridge_T.pt`: the frozen global 10-to-8 ridge map.
 - `scmultisim_rna10_umap_model.joblib`: the shared UMAP fitted on all 10,000 observed
   RNA PCA10 cells for the main comparison.
 - `observed_rna10_umap.npz`: the matching observed-cell coordinates and population
