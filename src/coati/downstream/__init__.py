@@ -11,3 +11,13 @@ from .gene_peaks import (
 )
 
 from .mass import MassDecomposition, decompose_mass, plot_mass_decomposition
+
+from .distribution_metrics import (
+    DistributionMetrics,
+    composition_similarity,
+    evaluate_distribution,
+    evaluate_paired_distributions,
+    normalize_particle_weights,
+    sinkhorn_w2,
+    support_recall,
+)

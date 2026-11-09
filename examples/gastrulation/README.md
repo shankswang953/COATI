@@ -32,6 +32,25 @@ output checksums.
 The dataset-specific implementation is in `film.py`; it does not use COATI's
 newer standardized `PairedMap`, because that would not match TraInf.
 
+## Strict leave-one-stage-out training
+
+The normalization parameters are fixed from all four observed stages. The held-out
+stage is then removed from both FiLM-map fitting and trajectory fitting; the supplied
+LOTO FiLM checkpoints already follow that split.
+
+```bash
+python -m examples.gastrulation.train_balanced_loso \
+  --held-out-stage E8.0 \
+  --output outputs/gastrulation-balanced-loo-e8.0
+
+python -m examples.gastrulation.train_unbalanced_loso \
+  --held-out-stage E8.0 \
+  --output outputs/gastrulation-unbalanced-loo-e8.0
+```
+
+Use `--held-out-stage E8.5` for the other middle stage. The unbalanced mass prior
+is reduced from `1:4:6:11` to the retained stages automatically.
+
 From the repository root:
 
 ```bash
@@ -88,3 +107,39 @@ explicitly rather than presenting the old weights as FiLM reproductions.
 
 Other scripts in this folder reproduce UMAP dynamics, map-quality and lineage
 feature analyses.
+
+## Reproduce the NMP-related UMAPs
+
+`nmp_umap.py` fits the RNA and ATAC reference UMAPs directly from
+`data/gastrulation_embeddings.h5ad`. It does not load or save a serialized UMAP
+reducer. The script keeps the original AnnData row order and selects the seven
+NMP-related cell types before fitting.
+
+Exact coordinate reproduction requires the visualization extra, which pins
+`umap-learn==0.5.9.post2`:
+
+```bash
+python -m pip install -e '.[visualization]'
+python -m examples.gastrulation.nmp_umap
+```
+
+RNA uses 100 neighbors, `min_dist=0.8`, Euclidean distance and seed 42. ATAC
+uses 150 neighbors, `min_dist=0.98`, Euclidean distance, seed 0 and
+`angular_rp_forest=True`. Both use spectral initialization, `transform_seed=42`
+and one worker. The output contains coordinates, figures and provenance, but no
+reducer object.
+
+## Held-out distribution evaluation
+
+After the four E8.0/E8.5 LOSO runs finish, compare each predicted held-out
+distribution with the observed cells in normalized RNA PCA50 and ATAC LSI14:
+
+```bash
+python -m examples.gastrulation.evaluate_loso
+```
+
+The command writes `outputs/gastrulation-loso-metrics/six_metrics.csv`. It
+reports support recall, Sinkhorn-based W2, and cell-type composition similarity
+independently in RNA and ATAC. Balanced runs use uniform particle weights;
+unbalanced runs use their normalized predicted masses. The metrics compare
+distribution shape and composition, not total population size.
