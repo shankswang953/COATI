@@ -28,34 +28,42 @@ python -m pip install -e '.[notebooks,visualization]'
 
 ```text
 src/coati/     Python package and training engine
+src/coati/downstream/  Reusable trajectory evaluation and downstream analyses
 examples/      Data preparation and standalone Python examples
 notebooks/     Executable tutorials
 tests/         Package tests
-assets/        Package logo
 ```
 
 Dataset-specific notebook reproductions are maintained in [examples](examples/README.md), outside the installed package.
 
-## Notebooks
+## Basic workflow
 
-- [Introduction](notebooks/00_introduction.ipynb)
-- [Original Gaussian experiment](notebooks/11_gaussian_reference.ipynb)
-- [Synthetic data](notebooks/syntheticdata/)
-  - [Balanced Gaussian bump: sync vs no sync](notebooks/syntheticdata/balancedGaussianbump.ipynb)
-  - [Unbalanced Gaussian bump: trajectories and growth](notebooks/syntheticdata/unbalancedGaussianbump.ipynb)
-  - [Cy comparison: 0.1, 0.5 and 0.7](notebooks/syntheticdata/cyComparison.ipynb)
-  - [BranchSync: weak primary and amplified secondary branching](notebooks/syntheticdata/BranchSync.ipynb)
-- [Splitting and growth](notebooks/03_split.ipynb)
-- [Input formats](notebooks/04_inputs.ipynb)
-- [Gastrulation](notebooks/gastrulation/)
-  - [Mouse gastrulation: data, training and UMAP](notebooks/gastrulation/mouseGastrulation.ipynb)
-  - [Pretrained full-data models: balanced and unbalanced predictions in the original UMAP](notebooks/gastrulation/pretrainedModels.ipynb)
-- [Held-out biological reconstruction](notebooks/06_heldout_biological.ipynb)
-- [Gastrulation dynamics and mass decomposition](notebooks/07_dynamics.ipynb)
-- [Cross-modal map training and quality checks](notebooks/08_map_quality.ipynb)
-- [Lineage gene and peak dynamics](notebooks/09_lineage_features.ipynb)
+COATI requires time-indexed primary embeddings, such as RNA PCA, and optionally
+paired secondary embeddings, such as ATAC LSI. For biological data, we recommend
+an AnnData object with `time`, `celltype` and `barcode` annotations. A typical run
+prepares the data, trains or loads the cross-modal map, fits the vector field, and
+then performs trajectory inference and downstream analysis.
 
-- [scMultisim](notebooks/scMultisim/)
+Run a short end-to-end example from the repository root:
+
+```bash
+python -m examples.synthetic.run_toy \
+  --dataset gaussian \
+  --niters 200 \
+  --output outputs/gaussian-smoke
+```
+
+For a guided biological workflow, start the introductory notebook:
+
+```bash
+python -m jupyter lab notebooks/00_introduction.ipynb
+```
+
+## References
+
+1. Wang, J., Zhao, Y., Nie, Q. and Cang, Z. [Synchronized Optimal Transport Reconstructs Coupled Transcriptomic and Chromatin Dynamics](https://arxiv.org/abs/2611.08853). arXiv:2611.08853, 2026.
+2. Cang, Z., Wang, J., Wei, X. and Zhao, Y. [Synchronization of Unbalanced Dynamical Optimal Transport across Multiple Spaces](https://arxiv.org/abs/2602.18725). arXiv:2602.18725, 2026.
+3. Cang, Z. and Zhao, Y. [Synchronized Optimal Transport for Joint Modeling of Dynamics Across Multiple Spaces](https://doi.org/10.1137/24M1667555). *SIAM Journal on Applied Mathematics* 85(1), 341–365, 2025.
 
 ## TraInfBench
 
