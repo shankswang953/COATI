@@ -102,28 +102,24 @@ def load_gastrulation_result(checkpoint, primary_data, *, device="cpu", manifest
     return Result(model, data, metadata, checkpoint.parent)
 
 
-def load_gastrulation_umap(path, primary_data=None):
-    """Load the original RNA UMAP reducer, including older pynndescent pickles."""
-    import joblib
+def fit_gastrulation_umap(primary_data):
+    """Fit the deterministic global RNA UMAP used for gastrulation figures."""
     import numpy as np
-    import pynndescent
+    from umap import UMAP
 
-    original_setstate = pynndescent.NNDescent.__setstate__
-
-    def compatible_setstate(index, state):
-        state.setdefault("quantization", None)
-        state.setdefault("_min_distance", 0.0)
-        state.setdefault("parallel_batch_queries", False)
-        return original_setstate(index, state)
-
-    pynndescent.NNDescent.__setstate__ = compatible_setstate
-    try:
-        reducer = joblib.load(path)
-    finally:
-        pynndescent.NNDescent.__setstate__ = original_setstate
-    if primary_data is not None:
-        with np.load(primary_data, allow_pickle=False) as archive:
-            observed = np.concatenate([archive[key] for key in ("time0", "time1", "time2", "time3")])
-        if reducer._raw_data.shape != observed.shape or not np.array_equal(reducer._raw_data, observed):
-            raise ValueError("The UMAP reducer was not fitted on the supplied RNA snapshots in their stored order.")
-    return reducer
+    with np.load(primary_data, allow_pickle=False) as archive:
+        observed = np.concatenate([
+            archive[key] for key in ("time0", "time1", "time2", "time3")
+        ])
+    return UMAP(
+        n_neighbors=30,
+        min_dist=0.5,
+        n_components=2,
+        metric="euclidean",
+        random_state=42,
+        transform_seed=42,
+        init="spectral",
+        spread=1.0,
+        n_jobs=1,
+        angular_rp_forest=False,
+    ).fit(observed)

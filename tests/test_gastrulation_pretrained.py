@@ -8,8 +8,8 @@ from coati import Config
 
 from gastrulation.film import load_film_checkpoint, load_scale, load_snapshots
 from gastrulation.pretrained import (
+    fit_gastrulation_umap,
     load_gastrulation_result,
-    load_gastrulation_umap,
     obtain_gastrulation_assets,
 )
 
@@ -35,13 +35,24 @@ def test_archived_gastrulation_networks_load_and_infer():
     assert unbalanced.metadata["checkpoint_iteration"] == 20000
 
 
-def test_original_gastrulation_umap_matches_archived_rna_rows():
+def test_gastrulation_umap_is_fitted_from_archived_rna_rows(monkeypatch):
+    from umap import UMAP
+
+    def capture_fit(reducer, values):
+        reducer._raw_data = np.asarray(values)
+        reducer.embedding_ = np.zeros((len(values), 2), dtype=np.float32)
+        return reducer
+
+    monkeypatch.setattr(UMAP, "fit", capture_fit)
     assets, _ = obtain_gastrulation_assets()
-    reducer = load_gastrulation_umap(
-        assets["rna_umap_model.joblib"], assets["rna_pca_by_time.npz"],
-    )
+    reducer = fit_gastrulation_umap(assets["rna_pca_by_time.npz"])
     assert reducer._raw_data.shape == (35503, 50)
     assert reducer.embedding_.shape == (35503, 2)
+    assert reducer.n_neighbors == 30
+    assert reducer.min_dist == .5
+    assert reducer.metric == "euclidean"
+    assert reducer.random_state == 42
+    assert reducer.transform_seed == 42
 
 
 def test_full_data_training_configs_match_trainf_film_recipes():

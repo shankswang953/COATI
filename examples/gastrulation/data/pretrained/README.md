@@ -1,7 +1,7 @@
 # Pretrained full-data gastrulation models
 
-This directory contains two archived 20,000-step full-data checkpoints, the exact
-RNA50 snapshots used to train them, and the original RNA UMAP reducer. They are used by
+This directory contains two archived 20,000-step full-data checkpoints and the exact
+RNA50 snapshots used to train them. They are used by
 [`notebooks/gastrulation/pretrainedModels.ipynb`](../../../../notebooks/gastrulation/pretrainedModels.ipynb).
 
 The models are not the strict leave-one-stage-out checkpoints used for the held-out
@@ -15,5 +15,6 @@ benchmark. Both use `Cy=0.3`, but they are not a one-parameter ablation:
 `manifest.json` records the model specifications, training iteration, normalization scale,
 biological mass prior and SHA-256 hashes. The compatibility loader reconstructs the exact
 architecture and returns a COATI `Result` without modifying or refitting the network. The
-saved UMAP model was fitted on all 35,503 rows of `rna_pca_by_time.npz` in their stored order;
-the loader verifies this identity before projection.
+The notebook fits the global RNA UMAP directly from all 35,503 rows using 30 neighbors,
+`min_dist=0.5`, Euclidean distance, spectral initialization and random seed 42. Keeping
+the parameters instead of a serialized reducer avoids a large version-sensitive asset.

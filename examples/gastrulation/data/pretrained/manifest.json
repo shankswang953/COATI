@@ -8,13 +8,6 @@
     "rna_pca_by_time.npz": {
       "sha256": "640756afcae75bb27ea3a732a8a1e7afe9ebcd9b81c4fcc5384034a63b1e9567"
     },
-    "rna_umap_model.joblib": {
-      "sha256": "e526b2ece7ecff0f9c6e9e7f01509b5992a379ef796965a6a528dd209646ed59",
-      "n_cells": 35503,
-      "n_neighbors": 30,
-      "min_dist": 0.5,
-      "random_state": 42
-    },
     "balanced_cy0p3_s1_iter20000.pth": {
       "sha256": "c360e8a99c6c67de8adb03c355ba0a72b46d6fa8234532c9427d3e0faf40404c",
       "iteration": 20000,
