@@ -1,0 +1,37 @@
+{
+  "description": "Current 20,000-step full-data COATI models used by the NMP trajectory notebook",
+  "times": [0.0, 1.0, 2.0, 2.5],
+  "labels": ["0.0", "1.0", "2.0", "2.5"],
+  "primary_scale": 22.863716719648387,
+  "secondary_scale": 0.0015835087817000948,
+  "data_sha256": "45400911646ab518055cf0db0f1a8e050640efcf5da8a675f5706369e69da3a2",
+  "map_sha256": "1062085df849ecc25298f8fc7b46b1b0f70440aa4b2602bac54dc4facab85e97",
+  "assets": {
+    "balanced_cy0p5_s0_iter20000.pth": {
+      "sha256": "094436a67d3e32421b91b7a700e863b2df84a3bb971bb422d9f5da89de752e4c",
+      "iteration": 20000,
+      "seed": 0,
+      "cy": 0.5,
+      "hidden_dim": 800,
+      "n_layers": 3,
+      "unbalanced": false,
+      "alpha_growth": 0.0,
+      "energy_coefficient": 0.1,
+      "density_coefficient": 0.1
+    },
+    "unbalanced_cy0p5_s0_iter20000.pth": {
+      "sha256": "71df4a437705560b592622a3ad2fccbe82f12d6b5936b5be80b22fa36928039b",
+      "iteration": 20000,
+      "seed": 0,
+      "cy": 0.5,
+      "hidden_dim": 800,
+      "n_layers": 3,
+      "unbalanced": true,
+      "alpha_growth": 1.0,
+      "energy_coefficient": 0.01,
+      "density_coefficient": 0.01,
+      "mass_coefficient": 1.0,
+      "biological_num": [1.0, 4.0, 6.0, 11.0]
+    }
+  }
+}

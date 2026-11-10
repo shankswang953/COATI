@@ -21,3 +21,5 @@ from .distribution_metrics import (
     sinkhorn_w2,
     support_recall,
 )
+
+from .plotting import plot_trajectory_embedding
