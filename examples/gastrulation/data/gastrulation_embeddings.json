@@ -21,7 +21,7 @@
     "atac_lsi_by_time_14D.npz": "fb96cdcbd20560361bd9b17272d3bafff38f57cbc396627c2a3b37a2544fb43b",
     "celltype_sub_by_stage.npz": "06e084c495dbce559dc2490a020ce255c469b41e2c8f73bdc9388c49e0d5a206"
   },
-  "trainf_assets": {
+  "model_assets": {
     "T_FiLM.pt": "1062085df849ecc25298f8fc7b46b1b0f70440aa4b2602bac54dc4facab85e97",
     "primal_norm_params.pt": "d02b346a04c6694a801407e51dea97a67e3bb3929ea2b4d95e390c54eb727511",
     "secondary_norm_params.pt": "5f42270594214e7ba3eb7780acd9ce3932b9d723972a3d7c6c6658306cdbdf02"

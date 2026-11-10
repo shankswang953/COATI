@@ -1,4 +1,4 @@
-"""Fit the exact TraInf gastrulation FiLM map before trajectory training."""
+"""Fit the COATI gastrulation FiLM map before trajectory training."""
 import argparse
 from pathlib import Path
 

@@ -1,4 +1,4 @@
-"""Exact gastrulation FiLM map architecture and fitting recipe from TraInf."""
+"""Gastrulation FiLM map architecture and fitting recipe used by COATI."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -14,7 +14,7 @@ TIMES = (0.0, 1.0, 2.0, 2.5)
 
 
 class FiLMMLP(nn.Module):
-    """Time-conditioned RNA-to-ATAC map used by the TraInf gastrulation run."""
+    """Time-conditioned RNA-to-ATAC map used by the COATI gastrulation run."""
 
     def __init__(self, d_in, d_out, hidden=128, n_layers=3, t_hidden=32, dropout=0.0):
         super().__init__()
@@ -72,7 +72,7 @@ def load_scale(path):
 
 
 def load_snapshots(adata_path, primal_norm_path, secondary_norm_path, *, device="cpu"):
-    """Load paired PCA/LSI snapshots and apply the two saved TraInf scales."""
+    """Load paired PCA/LSI snapshots and apply the two saved COATI scales."""
     import anndata as ad
 
     cells = ad.read_h5ad(adata_path)

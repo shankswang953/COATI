@@ -6,11 +6,11 @@ the notebooks. It is intentionally outside the public `coati` API.
 ## Included data
 
 `data/gastrulation_embeddings.h5ad` is the lightweight paired dataset used by
-TraInf: 35,503 cells with RNA PCA50 in `obsm['X_pca']`, ATAC LSI14 in
+COATI: 35,503 cells with RNA PCA50 in `obsm['X_pca']`, ATAC LSI14 in
 `obsm['X_atac']`, the original RNA UMAP, cell type, stage, time and barcode.
 It does not contain the multi-gigabyte RNA or ATAC count matrices.
 
-The folder also contains the exact TraInf normalization dictionaries and the
+The folder also contains the normalization dictionaries and the
 archived FiLM checkpoint:
 
 - `primal_norm_params.pt`: RNA scale `22.863716719648387`.
@@ -18,19 +18,20 @@ archived FiLM checkpoint:
 - `T_FiLM.pt`: the original 50-to-14 FiLM map selected at epoch 150.
 
 `build_embeddings.py` records how the compact AnnData was assembled from the
-original TraInf NPZ files. `gastrulation_embeddings.json` records source and
+prepared PCA/LSI files. `gastrulation_embeddings.json` records source and
 output checksums.
 
-## Exact TraInf order of operations
+## COATI training workflow
 
 1. Split the AnnData into E7.5, E8.0, E8.5 and E8.75 snapshots.
 2. Divide RNA PCA and ATAC LSI independently by their saved global scales.
-3. Train the original FiLMMLP for 300 epochs using paired MSE.
+3. Train the dataset-specific FiLMMLP for 300 epochs using paired MSE.
 4. Select T by the summed held-out Sinkhorn score across all four time points.
 5. Freeze T and start balanced or unbalanced vector-field training.
 
-The dataset-specific implementation is in `film.py`; it does not use COATI's
-newer standardized `PairedMap`, because that would not match TraInf.
+The dataset-specific implementation is in `film.py`. It is kept separate from
+the general `PairedMap` interface so this example reproduces the published
+gastrulation configuration exactly.
 
 ## Strict leave-one-stage-out training
 
@@ -98,9 +99,8 @@ tmux new-session -d -s coati-gastrulation \
     --output outputs/gastrulation-unbalanced-mps'
 ```
 
-`balanced.json` uses the architecture and loss settings from
-`TraInf/Gastrulation/FilmSync`, with the requested 20,000-iteration run length.
-`unbalanced.json` mirrors `TraInf/Gastrulation/UnbalancedSync_biological_num`.
+`balanced.json` and `unbalanced.json` record the architecture and loss settings
+used for the corresponding 20,000-iteration COATI runs.
 These current FiLM recipes are distinct from the older archived checkpoints
 shown in `pretrainedModels.ipynb`; the notebook states that provenance
 explicitly rather than presenting the old weights as FiLM reproductions.

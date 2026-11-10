@@ -1,0 +1,17 @@
+{
+  "reference": "archived gastrulation research implementation",
+  "reference_files": {
+    "film_training": "8f85196a9431c3a0f9f0d86422da95bdcff74f64ba01841eea47f9914b061595",
+    "balanced_config": "265fa9d327f6e18af02fe3915902e74fa1316e7091e1be259d475d6096ec334b",
+    "balanced_entrypoint": "2df90d51f06e7fa5a26de181c5be725fa23c1686f0eb666f264a71212c778d71",
+    "unbalanced_config": "cfce7bf9aa7e2e704c07558dfa335765f0d756ec20bad92e3bd744ea721ad1e8"
+  },
+  "verified": {
+    "normalized_rna_tensors_bitwise_equal": true,
+    "normalized_atac_tensors_bitwise_equal": true,
+    "film_checkpoint_outputs_bitwise_equal": true,
+    "balanced_one_iteration_smoke_test": "passed",
+    "unbalanced_one_iteration_smoke_test": "passed"
+  },
+  "provenance_note": "The pretrainedModels notebook retains older archived vector-field checkpoints. The current balanced FiLM recipe is a separate COATI configuration and is not claimed as the provenance of the older 400-wide balanced checkpoint."
+}

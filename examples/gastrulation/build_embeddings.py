@@ -1,4 +1,4 @@
-"""Build the lightweight paired gastrulation AnnData from TraInf PCA/LSI assets."""
+"""Build the lightweight paired gastrulation AnnData from prepared PCA/LSI assets."""
 import argparse
 import hashlib
 import json
@@ -24,7 +24,7 @@ def sha256(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True,
-                        help="TraInf/Gastrulation/data directory")
+                        help="Directory containing the prepared gastrulation data")
     parser.add_argument("--output", type=Path,
                         default=Path(__file__).resolve().parent / "data/gastrulation_embeddings.h5ad")
     args = parser.parse_args()
