@@ -27,11 +27,11 @@ python -m pip install -e '.[notebooks,visualization]'
 ## Structure
 
 ```text
-src/coati/     Python package and training engine
-src/coati/downstream/  Reusable trajectory evaluation and downstream analyses
-examples/      Data preparation and standalone Python examples
-notebooks/     Executable tutorials
-tests/         Package tests
+src/coati/                 Python package and training engine
+src/coati/downstream/      Reusable trajectory evaluation and downstream analyses
+examples/                  Data preparation and standalone Python examples
+notebooks/                 Executable tutorials
+tests/                     Package tests
 ```
 
 Dataset-specific notebook reproductions are maintained in [examples](examples/README.md), outside the installed package.
