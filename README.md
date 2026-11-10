@@ -44,13 +44,12 @@ an AnnData object with `time`, `celltype` and `barcode` annotations. A typical r
 prepares the data, trains or loads the cross-modal map, fits the vector field, and
 then performs trajectory inference and downstream analysis.
 
-Run a short end-to-end example from the repository root:
+Run a short mouse-gastrulation example from the repository root:
 
 ```bash
-python -m examples.synthetic.run_toy \
-  --dataset gaussian \
-  --niters 200 \
-  --output outputs/gaussian-smoke
+python -m examples.gastrulation.train_balanced \
+  --iterations 200 \
+  --output outputs/gastrulation-balanced-smoke
 ```
 
 For a guided biological workflow, start the introductory notebook:
