@@ -1,5 +1,4 @@
 from pickletools import optimize
-from syslog import LOG_ERR
 import torch
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter

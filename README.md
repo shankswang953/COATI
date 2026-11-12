@@ -21,7 +21,17 @@ The package is imported as `coati`. For local development and the notebooks:
 ```bash
 git clone https://github.com/shankswang953/COATI.git
 cd COATI
-python -m pip install -e '.[notebooks,visualization]'
+python -m pip install -e ".[notebooks,visualization]"
+```
+
+### GPU support (optional)
+
+With an NVIDIA GPU, choose a PyTorch build compatible with
+your GPU and driver using the [official installation guide](https://pytorch.org/get-started/locally/).
+For example, for RTX 50-series GPUs with a compatible NVIDIA driver:
+
+```bash
+python -m pip install "torch==2.14.1+cu130" --index-url https://download.pytorch.org/whl/cu130
 ```
 
 ## Structure
