@@ -8,6 +8,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m pip install -e '.[dev,anndata]'
+      - run: python -m pip install -e '.[dev,anndata,visualization]'
       - run: python -m pytest -q
       - run: python -m build
