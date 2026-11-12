@@ -73,10 +73,11 @@ The bundled `data/T_FiLM.pt` is the default if `--map-checkpoint` is omitted.
 For a smoke test, use `--epochs 5` when fitting T and `--iterations 20` when
 fitting either vector field.
 
-Both full vector-field configurations run for 20,000 iterations and require
-`device="mps"`. They fail immediately when Apple MPS is unavailable rather
-than silently falling back to CPU. Check the first line of `training.log`
-before leaving a long run; it must report `device = mps`.
+Both full vector-field configurations run for 20,000 iterations. The public
+configuration uses `device="auto"`: COATI selects CUDA when available, then
+Apple MPS, and otherwise CPU. Pass `--device cuda`, `--device mps` or
+`--device cpu` to override this selection explicitly. Check the first line of
+`training.log` before leaving a long run to confirm the selected device.
 
 The RNA-only controls use the same RNA PCA50 snapshots and RNA normalization
 but omit the ATAC snapshots and FiLM map entirely. Their entry points are
@@ -85,18 +86,17 @@ configuration, the transport coefficient is implicitly one and
 `growth_weight=1.0` sets the continuity-equation growth coefficient to one;
 `mass_weight=1.0` is the separate mass-matching penalty.
 
-For a detached manual run on one MPS device, run the two models sequentially
-inside one `tmux` session:
+For a detached manual run, run the two models sequentially inside one `tmux`
+session from the repository root:
 
 ```bash
 tmux new-session -d -s coati-gastrulation \
-  'cd /Users/jingfeng/local/project/COATI && \
-  .venv/bin/python -m examples.gastrulation.train_balanced \
+  'python -m examples.gastrulation.train_balanced \
     --map-checkpoint outputs/gastrulation-film/T_FiLM.pt \
-    --output outputs/gastrulation-balanced-mps && \
-  .venv/bin/python -m examples.gastrulation.train_unbalanced \
+    --output outputs/gastrulation-balanced && \
+  python -m examples.gastrulation.train_unbalanced \
     --map-checkpoint outputs/gastrulation-film/T_FiLM.pt \
-    --output outputs/gastrulation-unbalanced-mps'
+    --output outputs/gastrulation-unbalanced'
 ```
 
 `balanced.json` and `unbalanced.json` record the architecture and loss settings

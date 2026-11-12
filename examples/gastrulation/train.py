@@ -58,6 +58,7 @@ def main(*, default_config="config.json", run_name="gastrulation"):
     parser.add_argument("--secondary-norm", type=Path, default=DATA / "secondary_norm_params.pt")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--iterations", type=int)
+    parser.add_argument("--device", choices=("auto", "cpu", "mps", "cuda"))
     parser.add_argument("--stage")
     parser.add_argument("--reuse", action="store_true", help="Reload --output instead of training again")
     args = parser.parse_args()
@@ -66,6 +67,8 @@ def main(*, default_config="config.json", run_name="gastrulation"):
     settings = json.loads(args.config.read_text())
     if args.iterations is not None:
         settings["training"]["iterations"] = args.iterations
+    if args.device is not None:
+        settings["training"]["device"] = args.device
     stage = args.stage or settings["plot_stage"]
     cells = load_data(args.data)
     if stage not in cells.obs["stage"].unique():

@@ -38,7 +38,7 @@ def main(*, default_config="balanced_loso.json", run_name="gastrulation-balanced
     parser.add_argument("--secondary-norm", type=Path, default=DATA / "secondary_norm_params.pt")
     parser.add_argument("--output", type=Path, default=Path("outputs") / run_name)
     parser.add_argument("--iterations", type=int)
-    parser.add_argument("--device", choices=("cpu", "mps", "cuda"))
+    parser.add_argument("--device", choices=("auto", "cpu", "mps", "cuda"))
     args = parser.parse_args()
 
     settings = json.loads(args.config.read_text())["training"]
