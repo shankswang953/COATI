@@ -106,10 +106,10 @@ class Config:
         defaults.update(extra or {})
         self.values = defaults
         for key in ("niters", "num_samples", "median_n_sample", "floor_n_sample", "hidden_dim"):
-            if not isinstance(defaults[key], int) or defaults[key] < 1:
+            if isinstance(defaults[key], bool) or not isinstance(defaults[key], int) or defaults[key] < 1:
                 raise ValueError(f"{key} must be a positive integer.")
-        if defaults["dt"] <= 0 or defaults["lr"] <= 0:
-            raise ValueError("dt and lr must be positive.")
+        if any(not math.isfinite(defaults[key]) or defaults[key] <= 0 for key in ("dt", "lr")):
+            raise ValueError("dt and lr must be finite and positive.")
         if not 0 <= defaults["sync_weight"] <= 1:
             raise ValueError("sync_weight must be between zero and one.")
         if defaults["support_points"]:

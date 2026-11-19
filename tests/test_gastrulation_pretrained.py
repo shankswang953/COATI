@@ -61,7 +61,7 @@ def test_full_data_training_configs_match_trainf_film_recipes():
     unbalanced = Config(**json.loads((example_dir / "unbalanced.json").read_text())["training"]).to_dict()
 
     assert (balanced["niters"], balanced["num_samples"], balanced["hidden_dim"],
-            balanced["n_layers"], balanced["seed"]) == (50000, 1024, 800, 3, 0)
+            balanced["n_layers"], balanced["seed"]) == (20000, 1024, 800, 3, 0)
     assert (balanced["sync_weight"], balanced["pdf_coefficient"],
             balanced["energy_coefficient"], balanced["density_coefficient"]) == (.5, 100., .1, .1)
     assert not balanced["unbalancedModel"]

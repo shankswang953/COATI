@@ -18,8 +18,10 @@ class Result:
     def load(cls, directory, *, device="cpu", T_model=None, map_model=None):
         """Reload trajectories and built-in maps; external maps must be supplied again."""
         import torch
+        from ._devices import resolve_device
+        device = resolve_device(device)
         from ._core.Neural import MLPVectorField
-        directory = Path(directory)
+        directory = Path(directory).expanduser()
         meta = json.loads((directory/"result.json").read_text())
         cfg = meta["config"]
         model = MLPVectorField(dim=meta["dimension"], hidden_dim=cfg["hidden_dim"], n_layers=cfg["n_layers"],

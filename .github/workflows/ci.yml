@@ -2,12 +2,47 @@ name: package-checks
 on: [push, pull_request]
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ['3.10', '3.11']
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: python -m pip install -e '.[dev,anndata]'
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install --upgrade pip
+      - name: Install the platform PyTorch build
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+          else
+            python -m pip install torch
+          fi
+      - run: python -m pip install -e '.[dev,visualization]'
+      - run: python -m pip check
       - run: python -m pytest -q
       - run: python -m build
+      - name: Verify the installed wheel outside the checkout
+        shell: bash
+        run: |
+          python -m pip install --no-deps --force-reinstall dist/*.whl
+          cd "$RUNNER_TEMP"
+          python -m coati --version
+          python - <<'PY'
+          import numpy as np
+          import coati as ct
+
+          assert str(ct.resolve_device("cpu")) == "cpu"
+          rng = np.random.default_rng(0)
+          data = ct.TemporalData([rng.normal(0, .05, (32, 2)),
+                                  rng.normal(.2, .05, (32, 2))], [0., 1.])
+          cfg = ct.Config(iterations=1, batch_size=26, floor_n_sample=26,
+                          median_n_sample=32, hidden_dim=8)
+          result = ct.fit(data, cfg, device="cpu", output_dir="wheel-smoke-run")
+          np.testing.assert_array_equal(result.predict()["primary"],
+                                        ct.load_result(result.output_dir).predict()["primary"])
+          PY

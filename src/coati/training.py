@@ -4,12 +4,31 @@ from types import SimpleNamespace
 import contextlib
 import copy
 import json
+import sys
+import traceback
 import uuid
 from .config import Config, MapConfig
 from .data import TemporalData
 
 
-def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
+class _Tee:
+    """Write live training output to both its existing stream and the run log."""
+    def __init__(self, stream, log):
+        self.stream, self.log = stream, log
+
+    def write(self, text):
+        self.log.write(text)
+        return self.stream.write(text)
+
+    def flush(self):
+        self.log.flush()
+        self.stream.flush()
+
+    def __getattr__(self, name):
+        return getattr(self.stream, name)
+
+
+def fit(data, config=None, *, output_dir=None, device=None, T_model=None, map_model=None,
         map_config=None,
         primal_norm_path=None, sec_norm_path=None, warm_start_path=None,
         verbose=False):
@@ -23,10 +42,17 @@ def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
     A supplied ``T_model`` accepts ``forward(q)`` or ``forward(q, t)`` in training
     coordinates and is frozen on a copy. Only supplied snapshots are used; omitted
     stages are never loaded for either map fitting or trajectory fitting.
+    device overrides Config.device on a copy: cpu, mps, cuda, cuda:N or auto.
+    The configured CPU default and auto-selection priority are preserved.
+    Device and parameter checks happen before an output directory is created.
     """
     if not isinstance(data, TemporalData):
         raise TypeError("Wrap inputs with TemporalData or one of its from_* constructors.")
-    cfg = config or Config()
+    if config is not None and not isinstance(config, Config):
+        raise TypeError("config must be a Config.")
+    cfg = config if config is not None else Config()
+    if device is not None:
+        cfg = cfg.with_parameters(device=str(device))
     values = cfg.to_dict()
     if map_config is not None and not isinstance(map_config, MapConfig):
         raise TypeError("map_config must be a MapConfig.")
@@ -40,6 +66,12 @@ def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
         raise ValueError("Without a supplied map, map_type must be 'film', 'mlp', 'kernel' or 'accurate_kernel'.")
     if min(map(len, data.primary)) < values["num_samples"]:
         raise ValueError("num_samples exceeds the smallest snapshot; choose a smaller batch explicitly.")
+    topk = values["density_topk"]
+    if isinstance(topk, bool) or not isinstance(topk, int) or not 1 <= topk <= values["num_samples"]:
+        raise ValueError(
+            "density_topk must be a positive integer no larger than batch_size/num_samples "
+            f"({values['num_samples']}). Increase batch_size or explicitly choose a smaller density_topk."
+        )
     if values["sync_loss"] and data.secondary is None:
         raise ValueError("sync_loss=True requires paired secondary snapshots.")
     if not values["sync_loss"] and (T_model is not None or map_model is not None):
@@ -48,28 +80,38 @@ def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
     intervals = np.diff(data.times) / values["dt"]
     if np.any(intervals < 1) or not np.allclose(intervals, np.round(intervals), atol=1e-6):
         raise ValueError("Each interval must be an integer multiple of dt: the preserved energy uses dt explicitly.")
-    out = Path(output_dir or Path("outputs") / ("run-" + uuid.uuid4().hex[:10])).resolve()
-    if out.exists() and any(out.iterdir()):
-        raise FileExistsError(f"Output directory is not empty: {out}. Choose a fresh directory.")
-    out.mkdir(parents=True, exist_ok=True)
-    (out / "checkpoints").mkdir()
-    keys = data.save_npz(out / "inputs")
-    cfg.save(out / "config.json")
-    values.update(data_path=str(out/"inputs/primary.npz"), sync_data_path=str(out/"inputs/secondary.npz"),
-                  time_labels=keys, time_points=data.times.tolist(), otdim=data.primary[0].shape[1],
-                  train_dir=str(out/"checkpoints"), results_dir=str(out/"logs"))
-    # Import scientific backends only when training is requested.
-    from ._core.Training import run_training, _resolve_device
-    from .result import Result
-    args = SimpleNamespace(**values)
-    device = _resolve_device(args)
+    from ._devices import resolve_device
+    device = resolve_device(values["device"], gpu_index=values["gpu"])
     import torch
+    if isinstance(values["device"], torch.device):
+        cfg = cfg.with_parameters(device=str(values["device"]))
+        values = cfg.to_dict()
+
     def scale(path):
         value = 1.0 if path is None else float(torch.load(path, map_location="cpu", weights_only=True)["scale"])
         if not np.isfinite(value) or value <= 0:
             raise ValueError("Normalization scale must be finite and positive.")
         return value
     primary_scale, secondary_scale = scale(primal_norm_path), scale(sec_norm_path)
+
+    out = Path(output_dir or Path("outputs") / ("run-" + uuid.uuid4().hex[:10])).expanduser().resolve()
+    if out.exists() and not out.is_dir():
+        raise NotADirectoryError(f"Output path is not a directory: {out}. Choose a fresh directory.")
+    if out.exists() and any(out.iterdir()):
+        raise FileExistsError(f"Output directory is not empty: {out}. Choose a fresh directory.")
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "checkpoints").mkdir()
+    print(f"[COATI] Device: {device}", flush=True)
+    print(f"[COATI] Output directory: {out}", flush=True)
+    keys = data.save_npz(out / "inputs")
+    cfg.save(out / "config.json")
+    values.update(data_path=str(out/"inputs/primary.npz"), sync_data_path=str(out/"inputs/secondary.npz"),
+                  time_labels=keys, time_points=data.times.tolist(), otdim=data.primary[0].shape[1],
+                  train_dir=str(out/"checkpoints"), results_dir=str(out/"logs"))
+    # Import scientific backends only when training is requested.
+    from ._core.Training import run_training
+    from .result import Result
+    args = SimpleNamespace(**values)
     from .maps import train_map, freeze_external_map
     if builtin_map:
         if verbose:
@@ -94,16 +136,23 @@ def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
             if mapped.shape != (*sample.shape[:-1], data.secondary[0].shape[1]) or not torch.isfinite(mapped).all():
                 raise ValueError("T_model must return finite secondary states with the same leading dimensions as q.")
     with (out/"training.log").open("w") as log:
-        with contextlib.ExitStack() as stack:
-            if not verbose:
-                stack.enter_context(contextlib.redirect_stdout(log))
-                stack.enter_context(contextlib.redirect_stderr(log))
-            trained = run_training(args, T_model=T_model, map_model=map_model,
-                                   primal_norm_path=primal_norm_path, sec_norm_path=sec_norm_path,
-                                   warm_start_path=warm_start_path)
+        try:
+            with contextlib.ExitStack() as stack:
+                stack.enter_context(contextlib.redirect_stdout(_Tee(sys.stdout, log) if verbose else log))
+                stack.enter_context(contextlib.redirect_stderr(_Tee(sys.stderr, log) if verbose else log))
+                trained = run_training(args, T_model=T_model, map_model=map_model,
+                                       primal_norm_path=primal_norm_path, sec_norm_path=sec_norm_path,
+                                       warm_start_path=warm_start_path)
+        except Exception:
+            traceback.print_exc(file=log)
+            print(f"[COATI] Training failed. Partial outputs: {out}. Log: {out/'training.log'}",
+                  file=sys.stderr, flush=True)
+            raise
     if not (out/"checkpoints/path_param.pth").exists():
         raise RuntimeError(f"Training did not finish; see {out/'training.log'}")
-    metadata = {"version": 1, "config": cfg.to_dict(), "times": data.times.tolist(), "labels": data.labels,
+    metadata = {"version": 1, "config": cfg.to_dict(),
+                "resolved_device": str(next(trained["func"].parameters()).device),
+                "times": data.times.tolist(), "labels": data.labels,
                 "dimension": data.primary[0].shape[1], "primary_scale": primary_scale,
                 "secondary_scale": secondary_scale, "custom_map": not builtin_map and (T_model is not None or map_model is not None),
                 "map_checkpoint": "map/model.pt" if builtin_map else None,
@@ -115,6 +164,9 @@ def fit(data, config=None, *, output_dir=None, T_model=None, map_model=None,
     if args.sigma_per_cell_primary is not None:
         np.savez(out/"kernel_bandwidths.npz", **{f"t{i}": x.cpu().numpy() for i,x in enumerate(args.sigma_per_cell_primary)})
     result = Result(trained["func"], data, metadata, out, T_model=T_model, map_model=map_model)
+    print(f"[COATI] Training complete. Results: {out}", flush=True)
+    print(f"[COATI] Model: {out/'checkpoints/path_param.pth'}", flush=True)
+    print(f"[COATI] Log: {out/'training.log'}", flush=True)
     return result
 
 

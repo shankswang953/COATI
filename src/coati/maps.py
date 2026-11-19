@@ -118,6 +118,8 @@ def train_map(data, *, kind, config, directory, device, seed, primary_scale=1., 
     No data discovery or full-atlas fallback is performed. All statistics and map
     fitting use training rows at supplied times. Validation rows select the checkpoint.
     """
+    from ._devices import resolve_device
+    device = resolve_device(device)
     cfg = config if config is not None else MapConfig()
     if not isinstance(cfg, MapConfig):
         raise TypeError("map_config must be a MapConfig.")
@@ -241,6 +243,9 @@ def train_map(data, *, kind, config, directory, device, seed, primary_scale=1., 
 
 
 def load_map(path, *, device="cpu"):
+    from ._devices import resolve_device
+    device = resolve_device(device)
+    path = Path(path).expanduser()
     checkpoint = torch.load(path, map_location=device, weights_only=True)
     if checkpoint["format_version"] != 1:
         raise ValueError("Unsupported map checkpoint version.")

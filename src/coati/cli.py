@@ -2,10 +2,11 @@
 import argparse
 import json
 from pathlib import Path
-from . import train_vector_field, load_result, Config, MapConfig, TemporalData
+from . import train_vector_field, load_result, Config, MapConfig, TemporalData, __version__
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description="COATI trajectory inference")
+    parser.add_argument("--version", action="version", version=f"COATI {__version__}")
     sub=parser.add_subparsers(dest="command",required=True)
     train=sub.add_parser("train-vector-field",aliases=["fit"],help="Train a vector field from ordered NPZ snapshots")
     train.add_argument("input")
@@ -23,6 +24,7 @@ def main(argv=None):
     train.add_argument("--iterations",type=int)
     train.add_argument("--batch-size",type=int)
     train.add_argument("--learning-rate",type=float)
+    train.add_argument("--device", help="Override the config: cpu, mps, cuda, cuda:N or auto")
     plot=sub.add_parser("plot-velocity",help="Plot a saved vector field on an existing AnnData embedding")
     plot.add_argument("run")
     plot.add_argument("adata")
@@ -34,11 +36,12 @@ def main(argv=None):
     plot.add_argument("--color")
     plot.add_argument("--style",choices=["stream","grid","arrows"],default="stream")
     plot.add_argument("--output",required=True)
+    plot.add_argument("--device", default="cpu", help="Device for the saved model: cpu, mps, cuda, cuda:N or auto")
     args=parser.parse_args(argv)
     if args.command=="plot-velocity":
         import anndata
         mapping=json.loads(Path(args.time_mapping).read_text()) if args.time_mapping else None
-        result=load_result(args.run)
+        result=load_result(args.run, device=args.device)
         adata=anndata.read_h5ad(args.adata)
         ax=result.plot_velocity(adata,use_rep=None if args.use_rep=="X" else args.use_rep,
                                basis=args.basis,time_key=args.time_key,time=args.time,time_mapping=mapping,
@@ -48,7 +51,7 @@ def main(argv=None):
         return
     data=TemporalData.from_npz(args.input,keys=args.keys,times=args.times,secondary_path=args.secondary)
     cfg=Config.load(args.config) if args.config else Config()
-    overrides={key:getattr(args,key) for key in ["multimodal","balanced","iterations","batch_size","learning_rate"] if getattr(args,key) is not None}
+    overrides={key:getattr(args,key) for key in ["multimodal","balanced","iterations","batch_size","learning_rate","device"] if getattr(args,key) is not None}
     cfg=cfg.with_parameters(**overrides)
     map_cfg = MapConfig(**json.loads(Path(args.map_config).read_text())) if args.map_config else None
     result=train_vector_field(data,cfg,output_dir=args.output,map_config=map_cfg)

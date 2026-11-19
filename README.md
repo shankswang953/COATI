@@ -16,6 +16,10 @@ Use Python 3.10 or newer:
 python -m pip install "coati-trajectory[notebooks,visualization] @ git+https://github.com/shankswang953/COATI.git"
 ```
 
+For a fresh environment, Mac/Linux CPU or NVIDIA CUDA installation, and a short
+installation check, see [Installation](INSTALL.md). Install the PyTorch build for
+your machine first. Notebook dependencies are optional for Python scripts.
+
 The package is imported as `coati`. For local development and the notebooks:
 
 ```bash
@@ -51,6 +55,13 @@ python -m examples.gastrulation.train_balanced \
   --iterations 200 \
   --output outputs/gastrulation-balanced-smoke
 ```
+
+The Python API and `coati fit --device ...` accept `cpu`, `mps`, `cuda`, `cuda:N`
+and `auto`. For example, `ct.fit(data, config, device="auto")` selects an available
+accelerator; `ct.fit(data, config, device="cpu")` explicitly uses the CPU.
+The existing CPU default is unchanged. Training prints the selected device and
+absolute output path, then the final checkpoint and log paths. Full training logs
+are saved whether or not live progress is enabled with `verbose=True`.
 
 For a guided biological workflow, start the introductory notebook:
 

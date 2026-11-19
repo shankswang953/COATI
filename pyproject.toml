@@ -8,6 +8,14 @@ version = "0.1.0"
 description = "Cross-Omics Aligned Trajectory Inference"
 readme = "README.md"
 requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
 dependencies = ["numpy>=1.24", "torch>=2.1", "torchdiffeq>=0.2.3", "geomloss>=0.2.6", "POT>=0.9", "scikit-learn>=1.3", "scipy>=1.10", "matplotlib>=3.7", "pandas>=2", "tensorboard>=2.14", "tqdm>=4.65"]
 
 [project.optional-dependencies]

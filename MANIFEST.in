@@ -1,6 +1,8 @@
 include README.md
-include assets/coati-logo.png
-recursive-include notebooks *.ipynb
-recursive-include examples *.py *.json *.npz *.pt *.png *.md
-recursive-include scripts *.py
-recursive-include provenance *.json
+include INSTALL.md
+prune assets
+prune examples
+prune notebooks
+prune scripts
+prune provenance
+prune tests

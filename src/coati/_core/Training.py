@@ -56,13 +56,8 @@ from .Epoch import train_path_epoch
 
 def _resolve_device(args):
     """Pick CUDA / MPS / CPU following the same rules as the run script."""
-    if getattr(args, "device", "auto") != "auto":
-        return torch.device(args.device)
-    if torch.cuda.is_available() and args.gpu >= 0:
-        return torch.device(f'cuda:{args.gpu}')
-    if torch.backends.mps.is_available():
-        return torch.device('mps')
-    return torch.device('cpu')
+    from .._devices import resolve_device
+    return resolve_device(getattr(args, "device", "auto"), gpu_index=getattr(args, "gpu", 0))
 
 
 def _build_time_steps_list(time_points, dt, device):
