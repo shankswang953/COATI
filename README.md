@@ -1,6 +1,6 @@
 <p align="center"><img src="assets/coati-logo.png" alt="COATI — Cross-Omics Aligned Trajectory Inference" width="100%"></p>
 
-[Website](https://shankswang953.github.io/COATI_website/) · [Tutorials](https://shankswang953.github.io/COATI_website/tutorials.html)
+[Website](https://shankswang953.github.io/COATI_website/) · [Tutorials](https://shankswang953.github.io/COATI_website/tutorials.html) · [Paper reproduction models](https://github.com/shankswang953/COATI/releases/download/paper-models-v1/reproduce_results.zip)
 
 # COATI
 
@@ -39,6 +39,10 @@ tests/                     Package tests
 ```
 
 Dataset-specific notebook reproductions are maintained in [examples](examples/README.md), outside the installed package.
+
+## Paper reproduction models
+
+[Download the paper reproduction models (.zip)](https://github.com/shankswang953/COATI/releases/download/paper-models-v1/reproduce_results.zip) for gastrulation, pancreatic endocrinogenesis, palate development and human cerebral organoids. The archive contains 18 selected COATI checkpoints with their frozen cross-modal maps, normalization parameters and model metadata, organized by balanced/unbalanced and full/LOSO design.
 
 ## Basic workflow
 
